@@ -1,12 +1,18 @@
 ---
 description: Analiza un modelo de examen, recalcula el peso de los temas y lo refleja en el índice
-argument-hint: "<materia> <archivo>"
+argument-hint: "<materia> <archivo o fuente del notebook>"
 ---
 
 Cargar modelo de examen: $ARGUMENTS
 
-1. **Archivo**: si no está en `materias/<materia>/examenes/`, copialo ahí con nombre
-   kebab-case (`parcial-1-2025.pdf`). Leelo.
+1. **Modelo**:
+   - Si es un **archivo local** y no está en `materias/<materia>/examenes/`, copialo
+     ahí con nombre kebab-case (`parcial-1-2025.pdf`). Leelo.
+   - Si es una **fuente del notebook** (por ejemplo `2024-08-01.jpeg`, ver
+     `fuentes.md#modelos-de-examen`), buscá su id con `list_sources` y pedile a
+     NotebookLM con `source_ids=[<id>]` la transcripción de cada ejercicio (de a pocos
+     ejercicios si es largo). Si hay versión "(resuelto)", usala para ver qué se espera.
+   - Preguntá si es parcial, recuperatorio o final si el nombre no lo dice.
 2. **Análisis**: por cada ejercicio o pregunta: tema(s) de `temas.md`, tipo de ejercicio
    (teórico, ejercicio completo, múltiple choice, V/F, código, diagrama…) y puntaje si figura.
    Un ejercicio que no encaja en ningún tema → señalalo; puede faltar en el programa.

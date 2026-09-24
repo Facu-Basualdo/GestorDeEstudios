@@ -40,6 +40,11 @@ Prefijo real: `mcp__notebooklm-mcp-2026__`.
 - **Las citas vienen como `[1]`, `[2, 3]`**: son referencias internas de NotebookLM
   a pasajes, **no se ven desde acá**. Para la nota, citá por **fuente + página/minuto**
   (pedíselos explícitamente en la pregunta), no por esos números.
+- **Las respuestas largas pueden cortarse a mitad de frase** (pasó al transcribir el
+  programa). Repreguntá con el mismo `conversation_id`: "tu respuesta se cortó en
+  '<últimas palabras>'; continuá desde ahí". Mejor aún: pedí de a una unidad o sección.
+- **Lee imágenes**: con `source_ids` apuntando a PNG/JPG, transcribe su texto (así se
+  obtuvo el programa de Arquitectura).
 - Suele cerrar con una oferta ("¿Te gustaría profundizar…?"): ignorala.
 - **Seguimiento**: pasá el `conversation_id` de la respuesta anterior para preguntas
   encadenadas sobre el mismo tema.
@@ -57,15 +62,15 @@ Plantillas de pregunta que conviene usar:
 
 ## Cómo están organizados los notebooks
 
-Estado al 2026-09-23 (no es una materia por notebook en todos los casos):
-
-- Hay notebooks **por materia** (por ejemplo "Simulacion", 4 PDFs; "Primer Parcial DdS", 9 PDFs)
-  y notebooks **de una sola fuente** que repiten material ("UML", "GUI", "Web",
-  "Entradas y Salidas"… son PDFs que también están en "Primer Parcial DdS").
+- **Un notebook por materia** (desde el 2026-09-23 el estudiante borró los notebooks
+  viejos y dejó sólo "Arquitectura de computadoras"). El id de cada uno queda en el
+  puntero `CLAUDE.md` y en `fuentes.md` de la materia.
+- Un notebook puede tener **muchas fuentes** (el de Arquitectura tenía 106 el día
+  que se creó): teoría, guías de autoestudio, videos de YouTube y **modelos de examen**
+  (PDFs e imágenes con fecha en el nombre, algunos "(resuelto)"). Acotá con `source_ids`.
+- Las fuentes se siguen cargando: antes de procesar, corré `list_sources` de nuevo.
 - Al crear una materia (`/nueva-materia`), se listan los notebooks y el estudiante
-  elige; puede haber más de uno por materia. Queda registrado en `fuentes.md`.
-- Si un tema está en un notebook agregado y en uno de fuente única, **preferí el
-  agregado** (más contexto) salvo que se quiera acotar.
+  elige. Queda registrado en `fuentes.md`.
 
 ## Límites y fallas
 
