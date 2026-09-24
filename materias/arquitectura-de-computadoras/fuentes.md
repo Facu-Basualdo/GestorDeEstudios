@@ -71,5 +71,10 @@ Los ids de cada modelo se obtienen con `list_sources` (el título es la fecha).
 
 ## Pendiente de cobertura
 
-**La Unidad III entra al parcial y, por los títulos, no hay fuentes de teoría de U3**
-(salvo, quizás, los tres videos de YouTube sin título). Confirmar al procesar.
+- La U3 no entra a la Evaluación Nº 1, así que la falta de teoría de U3 no es urgente.
+- **Secuenciales es el 45–80% del parcial y, por los títulos, no hay fuentes de
+  secuenciales** (sólo combinacionales y lógica). Faltarían la Guía de Circuitos
+  Secuenciales y los videos 10–18 del campus (ver el
+  [cronograma](../../docs/cronograma-eval-1-arquitectura.md#material-del-campus-por-tema)).
+- Los 5 parciales analizados (2022 T1/T2, 2023 T2, 2024 T1/T2) no se identifican
+  entre las fuentes: conviene cargarlos para poder corregir ejercicios contra la cátedra.

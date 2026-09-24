@@ -32,7 +32,7 @@ Este repo es un vault de Obsidian: todo se escribe para leerse ahí.
 
 | Materia | Notebook | Próxima fecha | Índice |
 |---|---|---|---|
-| Arquitectura de Computadoras | Arquitectura de computadoras | 2026-09-30 · 1er parcial (U1–U3) | [INDICE](materias/arquitectura-de-computadoras/INDICE.md) |
+| Arquitectura de Computadoras | Arquitectura de computadoras | 2026-09-30 · Eval. Nº 1 (codificación, combinacionales, secuenciales) | [INDICE](materias/arquitectura-de-computadoras/INDICE.md) |
 
 Fechas completas en [calendario.md](calendario.md).
 

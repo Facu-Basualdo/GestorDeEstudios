@@ -10,4 +10,4 @@ Parciales, finales, recuperatorios y entregas. La urgencia de la
 
 | Fecha | Materia | Tipo | Unidades/temas | Estado |
 |---|---|---|---|---|
-| 2026-09-30 | [Arquitectura de Computadoras](materias/arquitectura-de-computadoras/INDICE.md) | parcial | 1er parcial: U1, U2 y U3 | pendiente |
+| 2026-09-30 16 hs | [Arquitectura de Computadoras](materias/arquitectura-de-computadoras/INDICE.md) | parcial | Evaluación Nº 1. Teoría: generaciones, codificación, combinacionales y secuenciales. Práctica: codificación, combinacionales y secuenciales. **No entra U3** | pendiente |
