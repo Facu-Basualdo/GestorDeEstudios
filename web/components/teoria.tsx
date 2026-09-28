@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Chip, Header, ListBox, Select, Separator } from '@heroui/react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Fuente, Lectura, Materia, Tema, Vista } from '@/lib/tipos';
 import { ENTRA, nombreUnidad, unidadesDe } from '@/lib/util';
 import { Peso, Rico } from './piezas';
@@ -52,7 +52,7 @@ export function Teoria({ materia, fuentes, lectura, onLeer, onPracticar }: {
   };
 
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[270px_minmax(0,1fr)] lg:gap-12">
+    <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[280px_minmax(0,1fr)_230px]">
       <nav
         aria-label="Temas"
         className="hidden lg:sticky lg:top-[calc(var(--alto-barra,120px)+20px)] lg:block lg:max-h-[calc(100dvh-var(--alto-barra,120px)-40px)] lg:overflow-y-auto"
@@ -88,6 +88,8 @@ export function Teoria({ materia, fuentes, lectura, onLeer, onPracticar }: {
         <div className="prosa enriquecido" dangerouslySetInnerHTML={{ __html: fuente?.html ?? tema?.html ?? '' }} />
         {tema && !fuente && <PieNota tema={tema} materia={materia} onLeer={onLeer} />}
       </article>
+
+      <IndicePagina contenedor={articulo} clave={clave} />
     </div>
   );
 }
@@ -160,7 +162,7 @@ function CabeceraNota({ tema, materia, onPracticar, onLeer }: {
         )}
       </div>
       {secciones.length > 0 && (
-        <nav aria-label="Secciones" className="flex flex-wrap gap-x-4 gap-y-1.5 text-sm">
+        <nav aria-label="Secciones" className="flex flex-wrap gap-x-4 gap-y-1.5 text-sm xl:hidden">
           {secciones.map((s) => (
             <a
               key={s.id}
@@ -215,6 +217,57 @@ function PieNota({ tema, materia, onLeer }: { tema: Tema; materia: Materia; onLe
           {siguiente.titulo}
         </button>
       )}
+    </nav>
+  );
+}
+
+/** "En esta página": títulos de lo que se está leyendo, con el actual resaltado (sólo en pantallas anchas). */
+function IndicePagina({ contenedor, clave }: { contenedor: React.RefObject<HTMLElement | null>; clave: string }) {
+  const [titulos, setTitulos] = useState<{ id: string; texto: string; nivel: number }[]>([]);
+  const [activo, setActivo] = useState('');
+
+  useEffect(() => {
+    const el = contenedor.current;
+    if (!el) return;
+    const hs = [...el.querySelectorAll<HTMLElement>('.prosa h2, .prosa h3')].filter((h) => h.id);
+    setTitulos(hs.map((h) => ({ id: h.id, texto: h.textContent ?? '', nivel: h.tagName === 'H2' ? 2 : 3 })));
+    setActivo(hs[0]?.id ?? '');
+    const observador = new IntersectionObserver(
+      (entradas) => {
+        const visible = entradas.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+        if (visible) setActivo(visible.target.id);
+      },
+      { rootMargin: '-140px 0px -60% 0px' },
+    );
+    hs.forEach((h) => observador.observe(h));
+    return () => observador.disconnect();
+  }, [contenedor, clave]);
+
+  if (!titulos.length) return <div className="hidden xl:block" />;
+  return (
+    <nav
+      aria-label="En esta página"
+      className="hidden xl:sticky xl:top-[calc(var(--alto-barra,120px)+20px)] xl:grid xl:max-h-[calc(100dvh-var(--alto-barra,120px)-40px)] xl:gap-2 xl:overflow-y-auto"
+    >
+      <p className="etiqueta">En esta página</p>
+      <ul className="grid gap-0.5 border-l border-separator text-sm">
+        {titulos.map((t) => (
+          <li key={t.id}>
+            <a
+              href={`#${t.id}`}
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById(t.id)?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+              }}
+              className={`-ml-px block border-l py-1 leading-snug transition-colors ${t.nivel === 3 ? 'pl-6' : 'pl-3.5'} ${
+                activo === t.id ? 'border-accent font-medium text-foreground' : 'border-transparent text-muted hover:text-foreground'
+              }`}
+            >
+              {t.texto}
+            </a>
+          </li>
+        ))}
+      </ul>
     </nav>
   );
 }

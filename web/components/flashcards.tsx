@@ -4,7 +4,7 @@ import { Button, Card, Checkbox } from '@heroui/react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Flashcard, IrATeoria, Materia, Nota, Tema } from '@/lib/tipos';
 import { filtrarPorTema, guardado, hash, mezclar, porPeso, type Filtro } from '@/lib/util';
-import { FiltroTemas, Peso, Progreso, Rico } from './piezas';
+import { FiltroTemas, PanelSesion, Peso, Progreso, Rico, filasPorTema } from './piezas';
 
 type Tarjeta = Flashcard & { tema: Tema; clave: string };
 type Sesion = { mazo: Tarjeta[]; i: number; girada: boolean; notas: (Nota | undefined)[] };
@@ -151,83 +151,89 @@ export function Flashcards({ materia, activo, historial, onCalificar, irATeoria,
           irATeoria={irATeoria}
         />
       ) : (
-        <>
-          <Progreso
-            estados={estados}
-            actual={i}
-            cifras={`Tarjeta ${i + 1} de ${mazo.length} · ${cuenta(2)} sabidas · ${cuenta(1)} dudadas · ${cuenta(0)} no`}
-            leyenda={LEYENDA}
+        <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 xl:grid-cols-[minmax(0,1fr)_340px] 2xl:gap-8">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-5">
+              <Progreso
+                estados={estados}
+                actual={i}
+                cifras={`Tarjeta ${i + 1} de ${mazo.length} · ${cuenta(2)} sabidas · ${cuenta(1)} dudadas · ${cuenta(0)} no`}
+                leyenda={LEYENDA}
+              />
+    
+              {/* key = índice: cada tarjeta es un elemento nuevo, así no se ve la respuesta
+                  de la siguiente mientras la anterior se da vuelta. */}
+              <div key={`${i}-${mazo.length}`} className="carta entra" data-girada={girada}>
+                <div className="carta-in">
+                  <Card
+                    className="cara frente min-h-[min(46vh,400px)] cursor-pointer select-none p-6 sm:p-10"
+                    role="button"
+                    tabIndex={girada ? -1 : 0}
+                    aria-hidden={girada}
+                    aria-label="Pregunta. Tocá para ver la respuesta"
+                    onClick={girar}
+                  >
+                    <Card.Header className="flex-row items-baseline justify-between gap-3">
+                      <span className="etiqueta truncate">{actual.tema.titulo}</span>
+                      <Peso peso={actual.tema.peso} />
+                    </Card.Header>
+                    <Card.Content className="flex flex-1 flex-col justify-center">
+                      <p className="font-titulo text-[clamp(1.35rem,3.3vw,1.9rem)] font-semibold leading-tight text-balance">
+                        <Rico html={actual.q} />
+                      </p>
+                    </Card.Content>
+                    <Card.Footer>
+                      <span className="font-mono text-xs text-muted">
+                        Tocá la tarjeta para ver la respuesta<span className="solo-teclado"> · Espacio</span>
+                      </span>
+                    </Card.Footer>
+                  </Card>
+    
+                  <Card className="cara dorso min-h-[min(46vh,400px)] p-6 sm:p-10" aria-hidden={!girada}>
+                    <Card.Header className="flex-row items-baseline justify-between gap-3">
+                      <span className="etiqueta truncate">{actual.tema.titulo}</span>
+                      <span className="etiqueta">Respuesta</span>
+                    </Card.Header>
+                    <Card.Content className="grid gap-4">
+                      <p className="text-[15px] font-medium text-muted">
+                        <Rico html={actual.q} />
+                      </p>
+                      <p className="text-[clamp(1.1rem,2.4vw,1.3rem)] leading-relaxed">
+                        <Rico html={actual.a} />
+                      </p>
+                    </Card.Content>
+                    <Card.Footer className="mt-auto">
+                      <EnlaceTeoria tema={actual.tema} ancla={actual.ref} irATeoria={irATeoria} />
+                    </Card.Footer>
+                  </Card>
+                </div>
+              </div>
+    
+              {girada ? (
+                <div className="grid grid-cols-3 gap-2 sm:gap-3" role="group" aria-label="¿La sabías?">
+                  <BotonNota nota={0} texto="No la sabía" clase="text-danger" onPress={calificar} />
+                  <BotonNota nota={1} texto="Dudé" clase="text-warning" onPress={calificar} />
+                  <BotonNota nota={2} texto="La sabía" clase="text-success" onPress={calificar} />
+                </div>
+              ) : (
+                <Button fullWidth size="lg" onPress={girar}>
+                  Ver respuesta
+                </Button>
+              )}
+    
+              <div className="flex justify-between">
+                <Button variant="ghost" size="sm" isDisabled={i === 0} onPress={() => mover(-1)}>
+                  ← Anterior
+                </Button>
+                <Button variant="ghost" size="sm" onPress={() => mover(1)}>
+                  Saltar →
+                </Button>
+              </div>
+          </div>
+          <PanelSesion
+            filas={filasPorTema(mazo, (k) => notas[k])}
+            atajos={[[['Espacio'], 'Ver la respuesta'], [['1', '2', '3'], 'No la sabía · Dudé · La sabía'], [['←', '→'], 'Anterior · Saltar']]}
           />
-
-          {/* key = índice: cada tarjeta es un elemento nuevo, así no se ve la respuesta
-              de la siguiente mientras la anterior se da vuelta. */}
-          <div key={`${i}-${mazo.length}`} className="carta entra" data-girada={girada}>
-            <div className="carta-in">
-              <Card
-                className="cara frente min-h-[min(46vh,400px)] cursor-pointer select-none p-6 sm:p-10"
-                role="button"
-                tabIndex={girada ? -1 : 0}
-                aria-hidden={girada}
-                aria-label="Pregunta. Tocá para ver la respuesta"
-                onClick={girar}
-              >
-                <Card.Header className="flex-row items-baseline justify-between gap-3">
-                  <span className="etiqueta truncate">{actual.tema.titulo}</span>
-                  <Peso peso={actual.tema.peso} />
-                </Card.Header>
-                <Card.Content className="flex flex-1 flex-col justify-center">
-                  <p className="font-titulo text-[clamp(1.35rem,3.3vw,1.9rem)] font-semibold leading-tight text-balance">
-                    <Rico html={actual.q} />
-                  </p>
-                </Card.Content>
-                <Card.Footer>
-                  <span className="font-mono text-xs text-muted">
-                    Tocá la tarjeta para ver la respuesta<span className="solo-teclado"> · Espacio</span>
-                  </span>
-                </Card.Footer>
-              </Card>
-
-              <Card className="cara dorso min-h-[min(46vh,400px)] p-6 sm:p-10" aria-hidden={!girada}>
-                <Card.Header className="flex-row items-baseline justify-between gap-3">
-                  <span className="etiqueta truncate">{actual.tema.titulo}</span>
-                  <span className="etiqueta">Respuesta</span>
-                </Card.Header>
-                <Card.Content className="grid gap-4">
-                  <p className="text-[15px] font-medium text-muted">
-                    <Rico html={actual.q} />
-                  </p>
-                  <p className="text-[clamp(1.1rem,2.4vw,1.3rem)] leading-relaxed">
-                    <Rico html={actual.a} />
-                  </p>
-                </Card.Content>
-                <Card.Footer className="mt-auto">
-                  <EnlaceTeoria tema={actual.tema} ancla={actual.ref} irATeoria={irATeoria} />
-                </Card.Footer>
-              </Card>
-            </div>
-          </div>
-
-          {girada ? (
-            <div className="grid grid-cols-3 gap-2 sm:gap-3" role="group" aria-label="¿La sabías?">
-              <BotonNota nota={0} texto="No la sabía" clase="text-danger" onPress={calificar} />
-              <BotonNota nota={1} texto="Dudé" clase="text-warning" onPress={calificar} />
-              <BotonNota nota={2} texto="La sabía" clase="text-success" onPress={calificar} />
-            </div>
-          ) : (
-            <Button fullWidth size="lg" onPress={girar}>
-              Ver respuesta
-            </Button>
-          )}
-
-          <div className="flex justify-between">
-            <Button variant="ghost" size="sm" isDisabled={i === 0} onPress={() => mover(-1)}>
-              ← Anterior
-            </Button>
-            <Button variant="ghost" size="sm" onPress={() => mover(1)}>
-              Saltar →
-            </Button>
-          </div>
-        </>
+        </div>
       )}
     </div>
   );

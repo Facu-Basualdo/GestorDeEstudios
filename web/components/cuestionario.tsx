@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { IrATeoria, Materia, Pregunta, Tema } from '@/lib/tipos';
 import { filtrarPorTema, guardado, hash, mezclar, plural, porPeso, type Filtro } from '@/lib/util';
 import { EnlaceTeoria } from './flashcards';
-import { FiltroTemas, Peso, Progreso, Rico } from './piezas';
+import { FiltroTemas, PanelSesion, Peso, Progreso, Rico, filasPorTema } from './piezas';
 
 type Item = Pregunta & { tema: Tema; clave: string };
 /** `orden`: índices de las opciones originales en el orden en que se muestran. */
@@ -163,74 +163,80 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
           irATeoria={irATeoria}
         />
       ) : (
-        <>
-          <Progreso
-            estados={estados}
-            actual={i}
-            cifras={`Pregunta ${i + 1} de ${items.length} · ${plural(bien, 'correcta', 'correctas')}`}
-            leyenda={LEYENDA}
-          />
-          <Card key={`${i}-${actual.p.clave}`} className="entra p-6 sm:p-9">
-            <Card.Header className="flex-row items-baseline justify-between gap-3">
-              <span className="etiqueta truncate">{actual.p.tema.titulo}</span>
-              <Peso peso={actual.p.tema.peso} />
-            </Card.Header>
-            <Card.Content className="grid gap-5">
-              <p className="font-titulo text-[clamp(1.25rem,3vw,1.6rem)] font-semibold leading-snug text-balance">
-                <Rico html={actual.p.q} />
-              </p>
-              <ul className="grid gap-2.5">
-                {actual.orden.map((o, k) => {
-                  const esCorrecta = o === actual.p.correcta;
-                  const estado = !respondida ? '' : esCorrecta ? 'ok' : o === elegida ? 'mal' : 'resto';
-                  const clases = {
-                    '': '',
-                    ok: 'border-success bg-success-soft',
-                    mal: 'border-danger bg-danger-soft',
-                    resto: 'opacity-55',
-                  }[estado];
-                  return (
-                    <li key={o}>
-                      <Button
-                        variant="outline"
-                        fullWidth
-                        className={`h-auto min-h-12 justify-start gap-3 whitespace-normal py-3 text-left font-normal ${clases}`}
-                        onPress={() => elegir(k)}
-                      >
-                        <span
-                          className={`grid size-7 shrink-0 place-items-center rounded-md font-mono text-[13px] font-medium ${
-                            estado === 'ok' ? 'bg-success text-success-foreground' : estado === 'mal' ? 'bg-danger text-danger-foreground' : 'bg-default text-muted'
-                          }`}
-                        >
-                          {LETRAS[k] ?? k + 1}
-                        </span>
-                        <Rico html={actual.p.opciones[o]} />
-                      </Button>
-                    </li>
-                  );
-                })}
-              </ul>
-              {respondida && (
-                <div className="grid gap-3 pt-1" aria-live="polite">
-                  <p className={`font-titulo text-lg font-semibold ${elegida === actual.p.correcta ? 'text-success' : 'text-danger'}`}>
-                    {elegida === actual.p.correcta ? '✓ Correcto' : `✗ Incorrecto: era la ${LETRAS[actual.orden.indexOf(actual.p.correcta)]}`}
+        <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 xl:grid-cols-[minmax(0,1fr)_340px] 2xl:gap-8">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-5">
+              <Progreso
+                estados={estados}
+                actual={i}
+                cifras={`Pregunta ${i + 1} de ${items.length} · ${plural(bien, 'correcta', 'correctas')}`}
+                leyenda={LEYENDA}
+              />
+              <Card key={`${i}-${actual.p.clave}`} className="entra p-6 sm:p-9">
+                <Card.Header className="flex-row items-baseline justify-between gap-3">
+                  <span className="etiqueta truncate">{actual.p.tema.titulo}</span>
+                  <Peso peso={actual.p.tema.peso} />
+                </Card.Header>
+                <Card.Content className="grid gap-5">
+                  <p className="font-titulo text-[clamp(1.25rem,3vw,1.6rem)] font-semibold leading-snug text-balance">
+                    <Rico html={actual.p.q} />
                   </p>
-                  {actual.p.exp && (
-                    <p className="text-muted">
-                      <Rico html={actual.p.exp} />
-                    </p>
+                  <ul className="grid gap-2.5">
+                    {actual.orden.map((o, k) => {
+                      const esCorrecta = o === actual.p.correcta;
+                      const estado = !respondida ? '' : esCorrecta ? 'ok' : o === elegida ? 'mal' : 'resto';
+                      const clases = {
+                        '': '',
+                        ok: 'border-success bg-success-soft',
+                        mal: 'border-danger bg-danger-soft',
+                        resto: 'opacity-55',
+                      }[estado];
+                      return (
+                        <li key={o}>
+                          <Button
+                            variant="outline"
+                            fullWidth
+                            className={`h-auto min-h-12 justify-start gap-3 whitespace-normal py-3 text-left font-normal ${clases}`}
+                            onPress={() => elegir(k)}
+                          >
+                            <span
+                              className={`grid size-7 shrink-0 place-items-center rounded-md font-mono text-[13px] font-medium ${
+                                estado === 'ok' ? 'bg-success text-success-foreground' : estado === 'mal' ? 'bg-danger text-danger-foreground' : 'bg-default text-muted'
+                              }`}
+                            >
+                              {LETRAS[k] ?? k + 1}
+                            </span>
+                            <Rico html={actual.p.opciones[o]} />
+                          </Button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  {respondida && (
+                    <div className="grid gap-3 pt-1" aria-live="polite">
+                      <p className={`font-titulo text-lg font-semibold ${elegida === actual.p.correcta ? 'text-success' : 'text-danger'}`}>
+                        {elegida === actual.p.correcta ? '✓ Correcto' : `✗ Incorrecto: era la ${LETRAS[actual.orden.indexOf(actual.p.correcta)]}`}
+                      </p>
+                      {actual.p.exp && (
+                        <p className="text-muted">
+                          <Rico html={actual.p.exp} />
+                        </p>
+                      )}
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <EnlaceTeoria tema={actual.p.tema} ancla={actual.p.ref} irATeoria={irATeoria} />
+                        <Button ref={siguienteRef} onPress={siguiente}>
+                          {i + 1 < items.length ? 'Siguiente →' : 'Ver resultado'}
+                        </Button>
+                      </div>
+                    </div>
                   )}
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <EnlaceTeoria tema={actual.p.tema} ancla={actual.p.ref} irATeoria={irATeoria} />
-                    <Button ref={siguienteRef} onPress={siguiente}>
-                      {i + 1 < items.length ? 'Siguiente →' : 'Ver resultado'}
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </Card.Content>
-          </Card>
-        </>
+                </Card.Content>
+              </Card>
+          </div>
+          <PanelSesion
+            filas={filasPorTema(items.map((it) => it.p), (k) => estados[k])}
+            atajos={[[['1', '2', '3', '4'], 'Elegir opción (o A–D)'], [['Enter'], 'Siguiente pregunta']]}
+          />
+        </div>
       )}
     </div>
   );

@@ -86,8 +86,15 @@ body {
 }
 
 .prosa {
-  max-width: 70ch;
   line-height: 1.6;
+}
+.prosa > :where(p, ul, ol, blockquote, pre) {
+  max-width: 84ch;
+}
+@media (min-width: 1280px) {
+  .prosa {
+    font-size: 1.0625rem;
+  }
 }
 .prosa h2 {
   font-family: var(--font-titulo);

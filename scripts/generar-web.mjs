@@ -82,10 +82,21 @@ function lista(lineas, ctx) {
   const sangria = lineas[0].match(/^\s*/)[0].length;
   const ordenada = /^\s*\d+\./.test(lineas[0]);
   const items = [];
+  // Las líneas sangradas que siguen al texto del ítem (sin marcador de lista, cita ni
+  // tabla) son su continuación; lo que viene después de un bloque o una línea en blanco
+  // es contenido anidado.
+  let continuando = false;
   for (const l of lineas) {
     const m = l.match(ES_ITEM);
-    if (m && m[1].length <= sangria) items.push({ texto: m[3], hijos: [] });
-    else items.at(-1)?.hijos.push(l);
+    if (m && m[1].length <= sangria) {
+      items.push({ texto: m[3], hijos: [] });
+      continuando = true;
+    } else if (continuando && l.trim() && !ES_INICIO_DE_BLOQUE.test(l.trim())) {
+      items.at(-1).texto += ' ' + l.trim();
+    } else {
+      continuando = false;
+      items.at(-1)?.hijos.push(l);
+    }
   }
   const html = items.map(({ texto, hijos }) => {
     const tarea = texto.match(/^\[( |x|X)\]\s+(.*)$/);

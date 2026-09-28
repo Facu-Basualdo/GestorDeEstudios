@@ -102,7 +102,7 @@ export function Estudio({ datos }: { datos: Datos }) {
         ref={barra}
         className="sticky top-0 z-30 border-b border-separator bg-background/90 pt-[env(safe-area-inset-top)] backdrop-blur-md"
       >
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-5 gap-y-3 px-4 py-3 sm:px-7">
+        <div className="mx-auto flex max-w-[1680px] flex-wrap items-center gap-x-5 gap-y-3 px-4 py-3 sm:px-8 xl:px-10">
           <div className="flex items-center gap-2.5 font-titulo text-xl font-semibold tracking-tight">
             <svg viewBox="0 0 34 20" className="h-5 w-[34px] text-accent" aria-hidden="true">
               <path d="M1 16H8V4H17V16H26V4H33" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinejoin="round" />
@@ -154,7 +154,7 @@ export function Estudio({ datos }: { datos: Datos }) {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:px-7 sm:pt-8">
+      <main className="mx-auto max-w-[1680px] px-4 pb-28 pt-6 sm:px-8 sm:pt-8 xl:px-10">
         <section hidden={vista !== 'flashcards'} aria-label="Flashcards">
           <Flashcards
             materia={materia}
@@ -173,7 +173,7 @@ export function Estudio({ datos }: { datos: Datos }) {
         </section>
       </main>
 
-      <footer className="mx-auto max-w-6xl px-4 pb-10 font-mono text-xs leading-relaxed text-muted sm:px-7">
+      <footer className="mx-auto max-w-[1680px] px-4 pb-10 font-mono text-xs leading-relaxed text-muted sm:px-8 xl:px-10">
         Generada el {datos.generado} desde las notas del vault · {materia.temas.length} temas · {nFc} flashcards · {nCu} preguntas.
         <br />
         Cada tema dice de qué fuente sale su contenido. Si algo choca con la cátedra, manda la cátedra.

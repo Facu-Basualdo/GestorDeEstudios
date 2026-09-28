@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Header, ListBox, Select, Separator } from '@heroui/react';
+import { Button, Card, Header, Kbd, ListBox, Select, Separator } from '@heroui/react';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import type { Materia, Tema } from '@/lib/tipos';
@@ -142,5 +142,75 @@ export function InterruptorTema() {
         )}
       </svg>
     </Button>
+  );
+}
+
+export type FilaSesion = { tema: Tema; total: number; bien: number; dudas: number; mal: number };
+
+/** Agrupa los ítems de la sesión por tema, en el orden en que aparecen. */
+export function filasPorTema<T extends { tema: Tema }>(items: T[], estado: (k: number) => number | undefined): FilaSesion[] {
+  const filas = new Map<string, FilaSesion>();
+  items.forEach((it, k) => {
+    const f = filas.get(it.tema.id) ?? { tema: it.tema, total: 0, bien: 0, dudas: 0, mal: 0 };
+    const e = estado(k);
+    f.total++;
+    if (e === 2) f.bien++;
+    else if (e === 1) f.dudas++;
+    else if (e === 0) f.mal++;
+    filas.set(it.tema.id, f);
+  });
+  return [...filas.values()];
+}
+
+/** Panel lateral en pantallas anchas: cómo va la sesión por tema y los atajos de teclado. */
+export function PanelSesion({ filas, atajos }: { filas: FilaSesion[]; atajos: [string[], string][] }) {
+  const pct = (n: number, total: number) => `${(n / total) * 100}%`;
+  return (
+    <aside className="hidden xl:sticky xl:top-[calc(var(--alto-barra,120px)+20px)] xl:grid xl:min-w-0 xl:grid-cols-[minmax(0,1fr)] xl:gap-4">
+      <Card className="min-w-0 p-5">
+        <Card.Header>
+          <span className="etiqueta">Esta sesión, por tema</span>
+        </Card.Header>
+        <Card.Content>
+          <ul className="grid max-h-[46dvh] grid-cols-[minmax(0,1fr)] gap-3.5 overflow-y-auto pr-1">
+            {filas.map((f) => (
+              <li key={f.tema.id} className="grid min-w-0 gap-1.5" title={f.tema.titulo}>
+                <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-baseline gap-2 text-sm">
+                  <Peso peso={f.tema.peso} />
+                  <span className="truncate">{f.tema.titulo}</span>
+                  <span className="font-mono text-xs tabular-nums text-muted">
+                    {f.bien}/{f.total}
+                  </span>
+                </div>
+                <div className="flex h-1.5 overflow-hidden rounded-full bg-default" aria-hidden="true">
+                  <span className="bg-success" style={{ width: pct(f.bien, f.total) }} />
+                  <span className="bg-warning" style={{ width: pct(f.dudas, f.total) }} />
+                  <span className="bg-danger" style={{ width: pct(f.mal, f.total) }} />
+                </div>
+              </li>
+            ))}
+          </ul>
+        </Card.Content>
+      </Card>
+      <Card className="p-5">
+        <Card.Header>
+          <span className="etiqueta">Atajos</span>
+        </Card.Header>
+        <Card.Content>
+          <dl className="grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-2 text-sm">
+            {atajos.map(([teclas, que]) => (
+              <div key={que} className="contents">
+                <dt className="flex gap-1">
+                  {teclas.map((t) => (
+                    <Kbd key={t}>{t}</Kbd>
+                  ))}
+                </dt>
+                <dd className="text-muted">{que}</dd>
+              </div>
+            ))}
+          </dl>
+        </Card.Content>
+      </Card>
+    </aside>
   );
 }
