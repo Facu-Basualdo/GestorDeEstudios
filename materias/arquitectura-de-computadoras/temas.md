@@ -9,23 +9,23 @@
 | Tema | Unidad | Eval 1 | Peso (0-3) | Dominio (0-3) | Intervalo (días) | Último repaso | Próximo repaso | Nota |
 |---|---|---|---|---|---|---|---|---|
 | Sistemas de información y sistemas digitales | 1 | — | 1 | 0 | | — | — | — |
-| Generaciones de computadoras | 1 | teoría | 1 | 0 | | — | — | — |
-| Sistemas de numeración y conversiones | 1 | sí | 2 | 0 | | — | — | — |
+| Generaciones de computadoras | 1 | teoría | 1 | 0 | | — | — | [nota](notas/generaciones-de-computadoras.md) |
+| Sistemas de numeración y conversiones | 1 | sí | 2 | 0 | | — | — | [nota](notas/sistemas-de-numeracion.md) |
 | Representación de números en la máquina (bit, byte, palabra) | 1 | teoría | 1 | 0 | | — | — | — |
 | Operaciones con números binarios | 1 | teoría | 1 | 0 | | — | — | — |
-| Complementos y aritmética digital | 1 | teoría | 1 | 0 | | — | — | — |
+| Complementos y aritmética digital | 1 | teoría | 1 | 0 | | — | — | [nota](notas/complementos-y-aritmetica-digital.md) |
 | Punto fijo y punto flotante | 1 | teoría | 1 | 0 | | — | — | — |
-| Códigos numéricos (binario puro, BCD, otros) | 1 | sí | 3 | 0 | | — | — | — |
-| Códigos alfanuméricos | 1 | sí | 2 | 0 | | — | — | — |
-| Códigos redundantes (detección y corrección de errores) | 1 | sí | 3 | 0 | | — | — | — |
-| Álgebra de Boole | 2 | sí | 3 | 0 | | — | — | — |
-| Funciones y formas canónicas | 2 | sí | 2 | 0 | | — | — | — |
-| Simplificación de funciones | 2 | sí | 3 | 0 | | — | — | — |
-| Circuitos combinacionales (sumadores, sustractores, convertidores de código) | 2 | sí | 2 | 0 | | — | — | — |
-| Biestables (funcionamiento, excitación y conversión) | 2 | sí | 3 | 0 | | — | — | — |
-| Análisis de circuitos secuenciales | 2 | sí | 3 | 0 | | — | — | — |
-| Diseño secuencial y detectores de secuencia | 2 | sí | 3 | 0 | | — | — | — |
-| Registros y contadores | 2 | dudoso | 1 | 0 | | — | — | — |
+| Códigos numéricos (binario puro, BCD, otros) | 1 | sí | 3 | 0 | | — | — | [nota](notas/codigos-numericos.md) |
+| Códigos alfanuméricos | 1 | sí | 2 | 0 | | — | — | [nota](notas/codigos-alfanumericos.md) |
+| Códigos redundantes (detección y corrección de errores) | 1 | sí | 3 | 0 | | — | — | [nota](notas/codigos-redundantes.md) |
+| Álgebra de Boole | 2 | sí | 3 | 0 | | — | — | [nota](notas/algebra-de-boole.md) |
+| Funciones y formas canónicas | 2 | sí | 2 | 0 | | — | — | [nota](notas/simplificacion-de-funciones.md) |
+| Simplificación de funciones | 2 | sí | 3 | 0 | | — | — | [nota](notas/simplificacion-de-funciones.md) |
+| Circuitos combinacionales (sumadores, sustractores, convertidores de código) | 2 | sí | 2 | 0 | | — | — | [nota](notas/circuitos-combinacionales.md) |
+| Biestables (funcionamiento, excitación y conversión) | 2 | sí | 3 | 0 | | — | — | [nota](notas/biestables.md) |
+| Análisis de circuitos secuenciales | 2 | sí | 3 | 0 | | — | — | [nota](notas/analisis-de-circuitos-secuenciales.md) |
+| Diseño secuencial y detectores de secuencia | 2 | sí | 3 | 0 | | — | — | [nota](notas/diseno-secuencial-y-detectores.md) |
+| Registros y contadores | 2 | dudoso | 1 | 0 | | — | — | [nota](notas/registros-y-contadores.md) |
 | Elementos auxiliares y tipos de circuitos integrados | 2 | dudoso | 1 | 0 | | — | — | — |
 | Componentes del computador y arquitectura Von Neumann | 3 | — | 1 | 0 | | — | — | — |
 | Memorias (características, clasificación, jerarquía) | 3 | — | 1 | 0 | | — | — | — |

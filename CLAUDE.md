@@ -56,6 +56,9 @@ Fechas completas en [calendario.md](calendario.md).
 - Una nota, un tema. Si el mismo tema está en dos materias, mismo nombre de archivo en las dos.
 - Toda nota de materia tiene breadcrumb `[← Índice <Materia>](../INDICE.md)` y figura en su `INDICE.md`.
 - Después de tocar el grafo: `node scripts/verificar-docs.mjs` hasta que dé OK.
+- Las notas llevan "Preguntas de recuperación" (`pregunta :: respuesta`) y "Cuestionario"
+  (opción múltiple) en el [formato de la web](metodo/recuperacion-activa.md#formato-de-las-preguntas-en-las-notas).
+  La [web de estudio](web/README.md) (`cd web && npm run dev`) las convierte en flashcards y cuestionarios.
 - Commits sin co-autor.
 
 ## Qué no va en el grafo

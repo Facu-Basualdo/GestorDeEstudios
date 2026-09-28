@@ -71,6 +71,10 @@ Los ids de cada modelo se obtienen con `list_sources` (el título es la fecha).
 
 ## Pendiente de cobertura
 
+- **Las 13 notas del 2026-09-28 salen del [cronograma](../../docs/cronograma-eval-1-arquitectura.md)
+  del estudiante, no del notebook** (la sesión de NotebookLM estaba vencida). Hay que
+  verificarlas contra las fuentes de arriba y agregar fuente y página a cada bloque.
+
 - La U3 no entra a la Evaluación Nº 1, así que la falta de teoría de U3 no es urgente.
 - **Secuenciales es el 45–80% del parcial y, por los títulos, no hay fuentes de
   secuenciales** (sólo combinacionales y lógica). Faltarían la Guía de Circuitos

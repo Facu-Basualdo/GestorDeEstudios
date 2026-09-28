@@ -37,6 +37,7 @@ sin abrir nada de más.** Se reservan 5 minutos para esto en cada sesión.
    - "Ver también" **en las dos puntas**: si A enlaza a B, B enlaza a A.
    - Si el tema existe en otra materia con el mismo nombre de archivo, enlazalas.
 6. **Verificar** — `node scripts/verificar-docs.mjs`. **Se repite hasta que dé OK.**
+   Si se tocaron preguntas o cuestionarios, también `cd web && npm run datos` sin avisos.
    Nunca se commitea con el verificador en rojo.
 7. **Commit** (ver abajo).
 8. **Resumen al estudiante**: qué se actualizó (en 3–5 líneas) y **cuándo es el

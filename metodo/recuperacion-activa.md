@@ -69,6 +69,38 @@ Cada error que no sea un despiste aislado se anota **en la sesión** para el cie
 qué respondió, qué era lo correcto, y la causa probable (confunde A con B, olvida un
 paso, error de cálculo). En [/cerrar-sesion](cierre-de-sesion.md) pasa a la nota y al índice.
 
+## Formato de las preguntas en las notas
+
+Las notas guardan las preguntas en un formato que la [web de estudio](../web/README.md)
+convierte en flashcards y cuestionario. En Obsidian se leen como listas comunes.
+
+**Preguntas de recuperación** (flashcards): una por línea, pregunta y respuesta separadas
+por ` :: `, y al final, opcional, la sección de la teoría donde está la respuesta:
+
+```
+## Preguntas de recuperación
+
+- ¿Qué indica el síndrome? :: La posición del bit erróneo; 0 = sin error. [→ Código de Hamming](#Código%20de%20Hamming)
+```
+
+**Cuestionario** (opción múltiple): lista numerada, una opción `- [x]` correcta y el
+resto `- [ ]`, explicación en `>` con el mismo enlace a la sección:
+
+```
+## Cuestionario
+
+1. ¿Qué indica un síndrome 0000?
+   - [x] Que no hay error
+   - [ ] Que el bit 0 está mal
+   > Síndrome 0 = sin error. [→ Código de Hamming](#Código%20de%20Hamming)
+```
+
+- Las opciones incorrectas salen de errores reales o probables (confundir C1 con C2,
+  el orden de los bits), no de relleno.
+- Las anclas van estilo Obsidian (`#Título%20con%20espacios`) para que funcionen en
+  Obsidian, en `verificar-docs.mjs` y en la web.
+- Después de tocar preguntas: `cd web && npm run datos` avisa si alguna quedó mal armada.
+
 ## Ver también
 
 - [Repetición espaciada](repeticion-espaciada.md) — qué se hace con el dominio.

@@ -25,11 +25,13 @@ Procesar fuente: $ARGUMENTS
    > Unidad N · Peso en exámenes: X/3 · Fuentes: <fuente> (págs./min)
 
    ## Preguntas de recuperación
+   ## Cuestionario
    ## Contenido
    ## Dónde me equivoco
    ## Ver también
    ```
-   - 4–8 preguntas de recuperación. Cada bloque de contenido con su cita.
+   - 4–8 preguntas de recuperación y 4–6 de cuestionario, en el formato de
+     `metodo/recuperacion-activa.md` (lo lee la web de estudio). Cada bloque de contenido con su cita.
    - Lo propio va marcado "(explicación del tutor, no está en las fuentes)".
    - **Si NotebookLM no tiene contenido real, no crees la nota** (una nota vacía es
      peor que no tenerla). "Dónde me equivoco" arranca con "_Sin errores registrados todavía._"
