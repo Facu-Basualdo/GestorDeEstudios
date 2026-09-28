@@ -181,6 +181,11 @@ body {
 .carta .dorso {
   transform: rotateY(180deg);
 }
+/* La cara que queda de espaldas no recibe toques (Safari no respeta backface-visibility al tocar). */
+.carta[data-girada="true"] .frente,
+.carta:not([data-girada="true"]) .dorso {
+  pointer-events: none;
+}
 .entra {
   animation: entra 0.28s ease-out;
 }

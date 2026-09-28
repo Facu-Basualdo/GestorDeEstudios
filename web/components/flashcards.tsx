@@ -7,7 +7,8 @@ import { filtrarPorTema, guardado, hash, mezclar, porPeso, type Filtro } from '@
 import { FiltroTemas, PanelSesion, Peso, Progreso, Rico, filasPorTema } from './piezas';
 
 type Tarjeta = Flashcard & { tema: Tema; clave: string };
-type Sesion = { mazo: Tarjeta[]; i: number; girada: boolean; notas: (Nota | undefined)[] };
+/** `vista`: ya se mostró la respuesta de la tarjeta actual (se puede volver a la pregunta y calificar igual). */
+type Sesion = { mazo: Tarjeta[]; i: number; girada: boolean; vista: boolean; notas: (Nota | undefined)[] };
 type Opciones = { filtro: Filtro; mezclado: boolean; soloFalladas: boolean };
 
 const fallada = (n: Nota | undefined) => n === 0 || n === 1;
@@ -33,7 +34,7 @@ export function Flashcards({ materia, activo, historial, onCalificar, irATeoria,
     [materia],
   );
   const [opciones, setOpciones] = useState<Opciones>({ filtro: 'todos', mezclado: false, soloFalladas: false });
-  const [sesion, setSesion] = useState<Sesion>({ mazo: todas, i: 0, girada: false, notas: [] });
+  const [sesion, setSesion] = useState<Sesion>({ mazo: todas, i: 0, girada: false, vista: false, notas: [] });
 
   const armar = useCallback(
     (o: Opciones, lista?: Tarjeta[]) => {
@@ -41,7 +42,7 @@ export function Flashcards({ materia, activo, historial, onCalificar, irATeoria,
       let mazo = lista ?? filtrarPorTema(todas, o.filtro);
       if (!lista && o.soloFalladas) mazo = mazo.filter((c) => fallada(historial[c.clave]));
       if (!lista && o.mezclado) mazo = mezclar(mazo);
-      setSesion({ mazo, i: 0, girada: false, notas: [] });
+      setSesion({ mazo, i: 0, girada: false, vista: false, notas: [] });
     },
     [todas, historial],
   );
@@ -66,21 +67,28 @@ export function Flashcards({ materia, activo, historial, onCalificar, irATeoria,
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pedido?.n]);
 
-  const { mazo, i, girada, notas } = sesion;
+  const { mazo, i, girada, vista, notas } = sesion;
   const actual = mazo[i];
-  const girar = useCallback(() => setSesion((s) => (s.i < s.mazo.length ? { ...s, girada: true } : s)), []);
-  const mover = useCallback((delta: number) => setSesion((s) => ({ ...s, i: Math.max(0, s.i + delta), girada: false })), []);
+  // Da vuelta la tarjeta en los dos sentidos: se puede volver a leer la pregunta.
+  const girar = useCallback(
+    () => setSesion((s) => (s.i < s.mazo.length ? { ...s, girada: !s.girada, vista: true } : s)),
+    [],
+  );
+  const mover = useCallback(
+    (delta: number) => setSesion((s) => ({ ...s, i: Math.max(0, s.i + delta), girada: false, vista: false })),
+    [],
+  );
   const calificar = useCallback(
     (nota: Nota) => {
-      if (!actual || !girada) return;
+      if (!actual || !vista) return;
       onCalificar(actual.clave, nota);
       setSesion((s) => {
         const n = [...s.notas];
         n[s.i] = nota;
-        return { ...s, notas: n, i: s.i + 1, girada: false };
+        return { ...s, notas: n, i: s.i + 1, girada: false, vista: false };
       });
     },
-    [actual, girada, onCalificar],
+    [actual, vista, onCalificar],
   );
 
   useEffect(() => {
@@ -90,16 +98,16 @@ export function Flashcards({ materia, activo, historial, onCalificar, irATeoria,
       const t = e.target as HTMLElement;
       if (t.closest('input, textarea, select, [role="listbox"], [role="combobox"]')) return;
       const enBoton = t.tagName === 'BUTTON';
-      if ((e.key === ' ' || e.key === 'Enter') && !girada && !enBoton) {
+      if ((e.key === ' ' || e.key === 'Enter') && !enBoton) {
         e.preventDefault();
         girar();
-      } else if (['1', '2', '3'].includes(e.key) && girada) calificar((Number(e.key) - 1) as Nota);
+      } else if (['1', '2', '3'].includes(e.key) && vista) calificar((Number(e.key) - 1) as Nota);
       else if (e.key === 'ArrowRight') mover(1);
       else if (e.key === 'ArrowLeft' && i > 0) mover(-1);
     };
     window.addEventListener('keydown', alTeclear);
     return () => window.removeEventListener('keydown', alTeclear);
-  }, [activo, actual, girada, i, girar, calificar, mover]);
+  }, [activo, actual, vista, i, girar, calificar, mover]);
 
   const nFalladas = filtrarPorTema(todas, opciones.filtro).filter((c) => fallada(historial[c.clave])).length;
   const estados = Array.from({ length: mazo.length }, (_, k) => notas[k]);
@@ -169,7 +177,7 @@ export function Flashcards({ materia, activo, historial, onCalificar, irATeoria,
                     role="button"
                     tabIndex={girada ? -1 : 0}
                     aria-hidden={girada}
-                    aria-label="Pregunta. Tocá para ver la respuesta"
+                    aria-label={vista ? 'Pregunta. Tocá para volver a la respuesta' : 'Pregunta. Tocá para ver la respuesta'}
                     onClick={girar}
                   >
                     <Card.Header className="flex-row items-baseline justify-between gap-3">
@@ -183,12 +191,19 @@ export function Flashcards({ materia, activo, historial, onCalificar, irATeoria,
                     </Card.Content>
                     <Card.Footer>
                       <Typography type="body-xs" color="muted" className="font-mono">
-                        Tocá la tarjeta para ver la respuesta<span className="solo-teclado"> · Espacio</span>
+                        Tocá la tarjeta para {vista ? 'volver a la respuesta' : 'ver la respuesta'}<span className="solo-teclado"> · Espacio</span>
                       </Typography>
                     </Card.Footer>
                   </Card>
 
-                  <Card className="cara dorso min-h-[min(46vh,400px)] p-6 sm:p-10" aria-hidden={!girada}>
+                  <Card
+                    className="cara dorso min-h-[min(46vh,400px)] cursor-pointer p-6 sm:p-10"
+                    aria-hidden={!girada}
+                    onClick={(e) => {
+                      // Los botones y enlaces del dorso (por ejemplo, "Leer la teoría") no dan vuelta la tarjeta.
+                      if (!(e.target as HTMLElement).closest('button, a')) girar();
+                    }}
+                  >
                     <Card.Header className="flex-row items-baseline justify-between gap-3">
                       <span className="etiqueta truncate">{actual.tema.titulo}</span>
                       <span className="etiqueta">Respuesta</span>
@@ -201,14 +216,17 @@ export function Flashcards({ materia, activo, historial, onCalificar, irATeoria,
                         <Rico html={actual.a} />
                       </Typography>
                     </Card.Content>
-                    <Card.Footer className="mt-auto">
+                    <Card.Footer className="mt-auto flex-wrap items-center justify-between gap-2">
                       <EnlaceTeoria tema={actual.tema} ancla={actual.ref} irATeoria={irATeoria} />
+                      <Typography type="body-xs" color="muted" className="font-mono">
+                        Tocá la tarjeta para volver a la pregunta<span className="solo-teclado"> · Espacio</span>
+                      </Typography>
                     </Card.Footer>
                   </Card>
                 </div>
               </div>
 
-              {girada ? (
+              {vista ? (
                 <div className="grid grid-cols-3 gap-2 sm:gap-3" role="group" aria-label="¿La sabías?">
                   <BotonNota nota={0} texto="No la sabía" clase="text-danger" onPress={calificar} />
                   <BotonNota nota={1} texto="Dudé" clase="text-warning" onPress={calificar} />
@@ -231,7 +249,7 @@ export function Flashcards({ materia, activo, historial, onCalificar, irATeoria,
           </div>
           <PanelSesion
             filas={filasPorTema(mazo, (k) => notas[k])}
-            atajos={[[['Espacio'], 'Ver la respuesta'], [['1', '2', '3'], 'No la sabía · Dudé · La sabía'], [['←', '→'], 'Anterior · Saltar']]}
+            atajos={[[['Espacio'], 'Dar vuelta la tarjeta'], [['1', '2', '3'], 'No la sabía · Dudé · La sabía'], [['←', '→'], 'Anterior · Saltar']]}
           />
         </div>
       )}
