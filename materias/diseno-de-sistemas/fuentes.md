@@ -7,21 +7,21 @@ están en `material/pdfs/`. Las notas citan **documento + página** tal como las
 
 | Doc | Fuente | Págs. | Texto seleccionable | Unidad | Procesada |
 |---|---|---|---|---|---|
-| 1 | SOLID y GRASP — Buenas prácticas hacia el éxito en el desarrollo de software | 43 | sí | 3 | [SOLID](notas/principios-solid.md), [GRASP](notas/patrones-grasp.md) |
-| 2 | Gamma et al., *Design Patterns* (GoF, 1998) | 349 | sí | 3, 4 | [principios OO](notas/principios-de-diseno-orientado-a-objetos.md), U4 completa |
-| 3 | Apunte Agile | 34 | sí | 2 | [manifiesto](notas/manifiesto-agil.md), [XP](notas/programacion-extrema.md), [AM](notas/modelado-agil.md) |
+| 1 | SOLID y GRASP — Buenas prácticas hacia el éxito en el desarrollo de software (Carmona García) | 43 | sí | 3.3 | [SOLID](notas/principios-solid.md), [GRASP](notas/patrones-grasp.md) |
+| 2 | Gamma et al., *Design Patterns* (GoF, 1998) | 349 | sí | 3 | [principios OO](notas/principios-de-diseno-orientado-a-objetos.md) y las 4 notas de patrones |
+| 3 | Apunte Agile | 34 | sí | 5 (supuesto) | [manifiesto](notas/manifiesto-agil.md), [XP](notas/programacion-extrema.md), [AM](notas/modelado-agil.md) |
 | 4 | Pressman y Maxim (2019), caps. 15–17 | 46 | **no (escaneado)** | 6 | — |
-| 9 | diseño3-8 | 3 | **no (escaneado)** | 1 | — |
+| 9 | diseño3-8 | 3 | **no (escaneado)** | 5.1 | — |
 | 10 | solid y grasp (filminas) | 18 | sí | 3 | [SOLID](notas/principios-solid.md) |
-| 11 | Arq. sistemas distribuidos | 29 | sí | 5 | — |
-| 12 | Arquitectura (filminas) | 57 | sí | 5 | — |
-| 13 | Proceso Unificado (filminas) | 133 | sí | 1 | — |
-| 14 | Flujos de trabajo | 25 | **casi sin texto** | 1 | — |
-| 15 | Agilidad (filminas) | 30 | **casi sin texto** | 2 | [manifiesto](notas/manifiesto-agil.md), [XP](notas/programacion-extrema.md) |
-| 16 | Patrones de diseño (filminas) | 26 | sí | 4 | [fundamentos](notas/fundamentos-de-patrones-de-diseno.md) |
+| 11 | Arq. sistemas distribuidos | 29 | sí | 4.2 | [distribuidos](notas/arquitecturas-de-sistemas-distribuidos.md) |
+| 12 | Arquitectura (filminas) | 57 | sí | 4.1 | [arquitectura](notas/arquitectura-de-software.md), [estilos](notas/estilos-arquitectonicos.md) |
+| 13 | Proceso Unificado (filminas) | 133 | sí | 5.1 | [PUDS](notas/proceso-unificado.md), [requisitos](notas/captura-de-requisitos-en-el-pu.md) (hasta la p. 46) |
+| 14 | Flujos de trabajo | 25 | **casi sin texto** | 5.1 | [PUDS](notas/proceso-unificado.md), [requisitos](notas/captura-de-requisitos-en-el-pu.md) (sólo requisitos) |
+| 15 | Agilidad (filminas) | 30 | **casi sin texto** | 5 (supuesto) | [manifiesto](notas/manifiesto-agil.md), [XP](notas/programacion-extrema.md) |
+| 16 | Patrones de diseño (filminas) | 26 | sí | 3 (supuesto) | [fundamentos](notas/fundamentos-de-patrones-de-diseno.md) |
 | 17 | Calidad (filminas) | 20 | sí | 6 | — |
-| 33 | Larman, cap. 17: UML y patrones | 49 | sí | 3 | [GRASP](notas/patrones-grasp.md) |
-| 59 | Bass, Clements y Kazman, *Software Architecture in Practice* (4ª ed.) | 497 | sí | 5 | — |
+| 33 | Larman, cap. 17: UML y patrones | 49 | sí | 3.3 | [GRASP](notas/patrones-grasp.md) |
+| 59 | Bass, Clements y Kazman, *Software Architecture in Practice* (4ª ed.) | 497 | sí | 4.1 | [arquitectura](notas/arquitectura-de-software.md) (caps. 1–2; faltan 3, 8 y 9) |
 
 Los escaneados ya tienen sus conceptos extraídos en Faro; el PDF sólo hace falta para
 verificar una cita o sacar un diagrama (con Gemini o leyéndolo directo).

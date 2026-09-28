@@ -33,7 +33,7 @@ Este repo es un vault de Obsidian: todo se escribe para leerse ahí.
 | Materia | Notebook | Próxima fecha | Índice |
 |---|---|---|---|
 | Arquitectura de Computadoras | Arquitectura de computadoras | 2026-09-30 · Eval. Nº 1 (codificación, combinacionales, secuenciales) | [INDICE](materias/arquitectura-de-computadoras/INDICE.md) |
-| Diseño de Sistemas de Información | — (export de Faro en `material/`) | 2026-10-21 · IE3 Diseño de solución informática | [INDICE](materias/diseno-de-sistemas/INDICE.md) |
+| Diseño de Sistemas de Información | — (export de Faro en `material/`) | 2026-10-21 · 2º parcial IE3 (SOLID, GRASP, arquitectura, PUDS) · antes, cuestionario 16 cierra 2026-09-30 13 hs | [INDICE](materias/diseno-de-sistemas/INDICE.md) |
 
 Fechas completas en [calendario.md](calendario.md).
 

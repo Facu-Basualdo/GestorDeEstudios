@@ -10,8 +10,9 @@ Parciales, finales, recuperatorios y entregas. La urgencia de la
 
 | Fecha | Materia | Tipo | Unidades/temas | Estado |
 |---|---|---|---|---|
+| 2026-09-30 13 hs | [Diseño de Sistemas](materias/diseno-de-sistemas/INDICE.md) | entrega | Cierra el cuestionario 16 · PUDS intro (IE6, secuencial) | pendiente |
 | 2026-09-30 16 hs | [Arquitectura de Computadoras](materias/arquitectura-de-computadoras/INDICE.md) | parcial | Evaluación Nº 1. Teoría: generaciones, codificación, combinacionales y secuenciales. Práctica: codificación, combinacionales y secuenciales. **No entra U3** | pendiente |
-| 2026-10-21 | [Diseño de Sistemas](materias/diseno-de-sistemas/INDICE.md) | parcial | IE3 Diseño de solución informática (cuenta para cursada). Supuesto: U3 y U4, quizás U2 y U5 | pendiente |
+| 2026-10-21 | [Diseño de Sistemas](materias/diseno-de-sistemas/INDICE.md) | parcial | 2º parcial, IE3 Diseño de solución informática (cuenta para cursada): SOLID, GRASP, Arquitectura I (diseño arquitectónico y estilos) y II (distribuidos), PUDS I y II (fases, requisitos) | pendiente |
 | 2026-11-04 | [Diseño de Sistemas](materias/diseno-de-sistemas/INDICE.md) | entrega | IE4 TPI 2ª etapa: entrega | pendiente |
 | 2026-11-11 | [Diseño de Sistemas](materias/diseno-de-sistemas/INDICE.md) | recuperatorio | IR de IE3 | pendiente |
 | 2026-11-18 | [Diseño de Sistemas](materias/diseno-de-sistemas/INDICE.md) | parcial | IE5 Fundamentos teóricos (cuenta para cursada; se movió del 25/11) | pendiente |
