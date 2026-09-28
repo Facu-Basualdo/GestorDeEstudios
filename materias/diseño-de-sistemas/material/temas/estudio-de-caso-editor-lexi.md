@@ -1,0 +1,27 @@
+# Estudio de Caso: Editor Lexi
+
+Aplicación de patrones en el diseño de un editor de documentos WYSIWYG
+
+- [[composition|Composition]]
+- [[compositor|Compositor]]
+- [[discretionary-glyph|Discretionary Glyph]]
+- [[encapsulating-the-analysis|Encapsulating the Analysis]]
+- [[encapsulating-the-formatting-algorithm|Encapsulating the Formatting Algorithm]]
+- [[formatting|Formatting]]
+- [[glyph|Glyph]]
+- [[lexi-design-problems|Lexi Design Problems]]
+- [[list|List]]
+- [[list-iterator|ListIterator]]
+- [[listiterator|ListIterator]]
+- [[monoglyph|MonoGlyph]]
+- [[null-iterator|NullIterator]]
+- [[point|Point]]
+- [[preorder-iterator|PreorderIterator]]
+- [[rect|Rect]]
+- [[recursive-composition|Recursive Composition]]
+- [[transparent-enclosure|Transparent Enclosure]]
+- [[traversal-vs-traversal-actions|Traversal versus Traversal Actions]]
+- [[window-class|Window class]]
+- [[windowimp|WindowImp]]
+- [[windowimp-subclasses|WindowImp subclasses]]
+- [[windowsystemfactory|WindowSystemFactory]]

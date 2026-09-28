@@ -1,0 +1,23 @@
+Buenas...
+En la PRÁCTICA tomaron 3 ejercicios:
+1) Ejercicio de lenguaje de máquina. Planteaban el formato del registro de instrucción y un set de instrucciones. Había que sumar 
+los contenidos (números en BCD) de un intervalo con las posiciones análogas de otro intervalo, para luego ir guardando en las posiciones 
+análogas de un tercer intervalo.
+Cabe aclarar que no había una instrucción SUMAR o algo por el estilo, con lo cual, después de pensar en artilugios para resolver, 
+lo llamo a Rodrigo Vigil y le pregunto si por las dudas faltaba una instrucción para poder sumar. Agarró la hoja, estuvo unos minutos 
+leyendo y pensando, hasta que la llama a Mendez y le dice "¿vos subiste... [palabras inteligibles]...?". Después de unos minutos de
+hablar en voz baja entre ellos, se acerca Vigil y me dice que agregue una instrucción más.
+Tampoco estaba aclarado cuántos dígitos en BCD eran, preguntamos y Vigil quedó mirando al aire un rato, después dijo 
+"es un dígito no más". No pedía hacer un diagrama de flujo el enunciado; sin embargo, si no lo hacías te descontaban puntos 
+por más que argumentes diciendo que no pedía y que lo podías hacer sin drama de haberlo pedido, o si te facilitaban la hoja lo
+ planteabas en un toque.
+2) Dado un circuito secuencial dibujado en la hoja de forma asquerosa (no se comprendía bien lo que había), había que corregirlo.
+ Tuvieron la "amabilidad" de dibujarlo en el pizarrón. El circuito intentaba detectar 3 o más unos seguidos. Con lo cual, contaba con
+ una entrada y una salida. Esta última valía 1 en caso de detectar los tres unos seguidos y si se seguían presentando unos en la entrada 
+consecutivos a estos, seguía valiendo 1. Había que indicar cuál era el fallo y corregir el circuito. Creo que la mayoría optamos por 
+diseñar el circuito de cero, utilizar los mismos tipos de biestables del dibujo y mantener la señal de clock, la de reset, la de entrada 
+y la de salida.
+3) Típico ejercicio de código de Hamming. Dado un mensaje, verificar de que sea correcto; en caso de no serlo, indicar la posición del 
+error e indicar el mensaje corregido. Del mensaje corregido, indicar cuál es la representación en los códigos AIKEN y Gray. Aclaración 
+personal: recordar que AIKEN admite una sola representación para los dígitos decimales 5,6,7,8 y 9; que no es el caso que se presenta en 
+la codificación (2 4 2 1).
