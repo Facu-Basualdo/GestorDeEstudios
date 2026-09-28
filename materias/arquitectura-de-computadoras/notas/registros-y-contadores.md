@@ -4,7 +4,7 @@
 > Unidad 2 · Peso en exámenes: 1/3 (no aparece en ejercicios; dudoso si entra) · Fuente:
 > [cronograma del estudiante](../../../docs/cronograma-eval-1-arquitectura.md#Secuenciales),
 > sección "Secuenciales".
-> **Sin verificar contra NotebookLM**: la sesión del MCP estaba vencida el 2026-09-28. Si algo choca con la cátedra, manda la cátedra.
+> **Sin verificar todavía** contra NotebookLM ni el *Apunte teórico* (el MCP ya anda: pendiente). Si algo choca con la cátedra, manda la cátedra.
 
 ## Preguntas de recuperación
 

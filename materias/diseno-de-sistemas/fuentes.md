@@ -23,5 +23,19 @@ están en `material/pdfs/`. Las notas citan **documento + página** tal como las
 | 33 | Larman, cap. 17: UML y patrones | 49 | sí | 3.3 | [GRASP](notas/patrones-grasp.md) |
 | 59 | Bass, Clements y Kazman, *Software Architecture in Practice* (4ª ed.) | 497 | sí | 4.1 | [arquitectura](notas/arquitectura-de-software.md) (caps. 1–2; faltan 3, 8 y 9) |
 
+## Notebook de NotebookLM
+
+"diseño de sistemas" (`9bcdb8d1-e4b6-4dd4-af41-09fe898b3524`), creado el 2026-09-28 con 21 fuentes: los
+15 PDFs de arriba más seis que **no están en Faro** y todavía no se usaron en las notas:
+
+| Fuente | Para qué nota |
+|---|---|
+| *PrinciplesInPractice.pdf* (Wirfs-Brock, 2009) | [SOLID](notas/principios-solid.md), [GRASP](notas/patrones-grasp.md) |
+| *SOLID y GRASP… (2).pdf* (Carmona García, otra copia) | ídem |
+| *RealizaciónCU.pdf* | [GRASP](notas/patrones-grasp.md) (Guía de TP N° 6) |
+| *Microservices.pdf* (Fowler, 2015) | [sistemas distribuidos](notas/arquitecturas-de-sistemas-distribuidos.md) |
+| *Web Services Architecture.pdf* (W3C, 2004) | ídem (SOA) |
+| Bass et al., 4ª ed. completo | [arquitectura](notas/arquitectura-de-software.md) (caps. 3, 8 y 9) |
+
 Los escaneados ya tienen sus conceptos extraídos en Faro; el PDF sólo hace falta para
 verificar una cita o sacar un diagrama (con Gemini o leyéndolo directo).

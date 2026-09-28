@@ -4,12 +4,13 @@
 > Unidad 2 · Peso en exámenes: 3/3 (tipo F: 15% en los dos 2024, el formato más probable) · Fuente:
 > [cronograma del estudiante](../../../docs/cronograma-eval-1-arquitectura.md#F.%20Detector%20de%20secuencia%20serie),
 > secciones "F. Detector de secuencia serie" y "Secuenciales".
-> **Sin verificar contra NotebookLM**: la sesión del MCP estaba vencida el 2026-09-28. Si algo choca con la cátedra, manda la cátedra.
+> **Consultado con NotebookLM el 2026-09-28**: el procedimiento de la cátedra (tabla de estados + columnas de excitación + Karnaugh) coincide. **Ninguna fuente resuelve el detector "prende con una secuencia y apaga con otra"**: el único detector resuelto (final 2018-12-20, patrón 001011) es **Mealy**, con 7 estados, 3 biestables y una mezcla de JK, T y D.
 
 ## Preguntas de recuperación
 
 - ¿Cuáles son los pasos para diseñar un circuito secuencial? :: Diagrama de estados → tabla de estados → codificación de estados → tabla de excitación → Karnaugh por entrada de biestable → circuito. [→ Pasos del diseño](#Pasos%20del%20diseño)
-- ¿Por qué se elige Moore para un detector que prende y apaga una salida? :: Porque la salida tiene que mantenerse entre una detección y la otra, y en Moore depende sólo del estado. [→ Receta del detector](#Receta%20del%20detector)
+- Moore vs. Mealy :: **Moore**: la salida depende sólo del estado (se escribe en el estado). **Mealy**: depende del estado y de la entrada (se escribe en el arco, X/Z). Los detectores resueltos de la cátedra usan **Mealy**; Moore aparece en problemas como las luces intermitentes o los contadores. [→ Receta del detector](#Receta%20del%20detector)
+- ¿Por qué conviene Moore para un detector que prende y apaga una salida? :: *(Criterio del tutor)* Porque la salida tiene que **mantenerse** entre una detección y la otra, y en Moore la salida es del estado. Con Mealy también sale, pero la salida mantenida igual obliga a separar los estados en dos grupos. [→ Receta del detector](#Receta%20del%20detector)
 - ¿Cómo se organizan los estados de un detector que prende con una secuencia y apaga con otra? :: En dos grupos: salida en 0 buscando la secuencia que la prende, y salida en 1 buscando la que la apaga. Un estado por cada prefijo recibido. [→ Receta del detector](#Receta%20del%20detector)
 - ¿Qué significa reusar el sufijo más largo? :: Al llegar un bit, se pasa al estado del prefijo más largo que coincide con el final de lo recibido, sin volver al inicio. [→ Receta del detector](#Receta%20del%20detector)
 - ¿Cuántos biestables hacen falta para N estados? :: El menor n con 2ⁿ ≥ N. Con 5 o 6 estados, 3 biestables. [→ Receta del detector](#Receta%20del%20detector)
@@ -41,23 +42,36 @@
    - [ ] A S1 ("0", salida 0)
    - [ ] A S5
    > Completaste 100 y la salida vuelve a 0. Lo recibido termina en "00", que es el comienzo de 001. [→ Ejemplo 001 y 100](#Ejemplo%20001%20y%20100)
-5. ¿Por qué el detector se arma como máquina de Moore?
-   - [x] Porque la salida tiene que mantenerse entre detecciones
-   - [ ] Porque usa menos biestables que Mealy siempre
-   - [ ] Porque Mealy no admite entradas serie
-   - [ ] Porque Moore no necesita reloj
-   > [→ Receta del detector](#Receta%20del%20detector)
+5. En una máquina de Mealy, ¿de qué depende la salida?
+   - [x] Del estado actual y de la entrada presente
+   - [ ] Sólo del estado actual
+   - [ ] Sólo de la entrada presente
+   - [ ] Del estado siguiente
+   > Por eso se anota en los arcos como X/Z. En Moore depende sólo del estado. [→ Receta del detector](#Receta%20del%20detector)
+6. En el final 2018-12-20 (detector de 001011, 7 estados), ¿cuántos biestables se usan?
+   - [x] 3
+   - [ ] 7
+   - [ ] 2
+   - [ ] 6
+   > 2³ = 8 ≥ 7. Ese final además pide mezclar tipos: A con JK, B con T y C con D. [→ Receta del detector](#Receta%20del%20detector)
 
 ## Contenido
 
 ### Pasos del diseño
 
-Diagrama de estados → tabla de estados → codificación → tabla de excitación →
-Karnaugh por entrada de biestable → circuito.
+Como en los resueltos de la cátedra (verificado con NotebookLM):
+
+1. **Especificar y codificar** estados, entradas (X) y salidas (Z).
+2. **Diagrama de transición** de estados.
+3. **Tabla de estados**: columnas de entradas, estado actual Q(t), estado siguiente Q(t+1) y salidas.
+4. **Columnas de excitación** a la derecha: por cada biestable, comparar Q(t) con Q(t+1) fila por fila y completar J/K, T o D según su tabla de excitación, con X donde no importa.
+5. **Karnaugh** de cada entrada de biestable y de cada salida, con las entradas y el estado actual como variables. Dibujar el circuito.
+
+Cantidad de biestables: el menor n con **2ⁿ ≥ cantidad de estados** (4 estados → 2; 7 → 3).
 
 ### Receta del detector
 
-1. Elegir **Moore** (la salida depende del estado) porque la salida se mantiene entre detecciones.
+1. Elegir el modelo. **Mealy** (salida en los arcos, X/Z) es lo que usan los detectores resueltos de la cátedra. Para un detector cuya salida **se mantiene** entre detecciones, **Moore** (salida en el estado) es más natural *(criterio del tutor)*: si el enunciado no lo fija, cualquiera vale bien justificado.
 2. Dos grupos de estados: salida en 0 buscando la secuencia que la prende; salida en 1 buscando la que la apaga.
 3. Cada grupo lleva un estado por prefijo recibido.
 4. En cada estado, dibujar a dónde va con 0 y con 1, **reusando el sufijo más largo** que sirva.

@@ -4,7 +4,7 @@
 > Unidad 2 · Peso en exámenes: 3/3 (tipo D en 3/5 parciales y base del análisis secuencial) · Fuente:
 > [cronograma del estudiante](../../../docs/cronograma-eval-1-arquitectura.md#Secuenciales),
 > secciones "Secuenciales" y "D. Biestable definido por ecuación".
-> **Sin verificar contra NotebookLM**: la sesión del MCP estaba vencida el 2026-09-28. Si algo choca con la cátedra, manda la cátedra.
+> **Sin verificar todavía** contra NotebookLM ni el *Apunte teórico* (el MCP ya anda: pendiente). Si algo choca con la cátedra, manda la cátedra.
 
 ## Preguntas de recuperación
 

@@ -12,8 +12,8 @@
 > IE5 18/11. Todas las instancias en el [programa](programa.md#Instancias%20de%20evaluación).
 
 > Las notas salen del **export de Faro IA** (conceptos extraídos de los PDFs de la cátedra,
-> con documento y página: ver [fuentes](fuentes.md)). No hay notebook de NotebookLM para
-> esta materia todavía. Las preguntas marcadas *(cátedra)* son de los cuestionarios semanales.
+> con documento y página: ver [fuentes](fuentes.md)). Desde el 2026-09-28 también hay notebook de
+> NotebookLM ("diseño de sistemas"), con 6 fuentes que Faro no tenía. Las preguntas marcadas *(cátedra)* son de los cuestionarios semanales.
 > Para practicar: [web de estudio](../../web/README.md).
 
 ## Unidad 3 — Modelado y diseño orientado a objetos

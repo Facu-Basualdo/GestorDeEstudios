@@ -1,18 +1,20 @@
 # Códigos numéricos (BCD, ponderados, Exceso 3, Gray)
 [← Índice Arquitectura de Computadoras](../INDICE.md)
 
-> Unidad 1 · Peso en exámenes: 3/3 (decodificar después del Hamming, 5/5 parciales) · Fuente:
-> [cronograma del estudiante](../../../docs/cronograma-eval-1-arquitectura.md#Codificación),
-> secciones "Codificación" y "A. Hamming + códigos".
-> **Sin verificar contra NotebookLM**: la sesión del MCP estaba vencida el 2026-09-28. Si algo choca con la cátedra, manda la cátedra.
+> Unidad 1 · Peso en exámenes: 3/3 (decodificar después del Hamming, 5/5 parciales) · Fuentes:
+> [cronograma del estudiante](../../../docs/cronograma-eval-1-arquitectura.md#Codificación)
+> ("Codificación" y "A. Hamming + códigos"); *Apunte teórico* (pp. 12–13, vía Faro); **tabla
+> verificada con NotebookLM el 2026-09-28**: *2025 - Guía Autoestudio Codificación* (pp. 2–4) y
+> *Sist. Numeración y Codificación 2018* (filminas 67, 70 y 73).
 
 ## Preguntas de recuperación
 
 - ¿Qué es un código? :: Una correspondencia entre un conjunto de símbolos y combinaciones binarias. Con n bits se codifican hasta 2ⁿ símbolos. [→ Definiciones](#Definiciones)
 - ¿Cuántos bits hacen falta como mínimo para codificar 40 símbolos? :: 6, porque 2⁵ = 32 < 40 ≤ 64 = 2⁶. [→ Definiciones](#Definiciones)
 - ¿Qué es BCD y cuántas combinaciones quedan sin usar? :: Cada dígito decimal se codifica en 4 bits; de las 16 combinaciones se usan 10 y quedan 6 sin usar. [→ BCD y códigos ponderados](#BCD%20y%20códigos%20ponderados)
-- Nombrá dos códigos ponderados y dos no ponderados. :: Ponderados: 8421, 2421/Aiken, 5421. No ponderados: Exceso 3 y Gray. [→ BCD y códigos ponderados](#BCD%20y%20códigos%20ponderados)
-- ¿Qué es un código autocomplementario? ¿Cuáles lo son? :: Aquel en que el complemento a 9 de un dígito se obtiene invirtiendo sus bits. Lo son Aiken y Exceso 3. [→ Propiedades](#Propiedades)
+- Nombrá tres códigos ponderados y dos no ponderados. :: Ponderados: BCD 8421, Aiken (2421) y 8 4 -2 -1. No ponderados: Exceso 3 y Gray. [→ BCD y códigos ponderados](#BCD%20y%20códigos%20ponderados)
+- ¿Aiken y 2421 son lo mismo? :: Aiken es **una elección dentro del 2421**: con pesos 2421 los dígitos 2 a 7 tienen dos combinaciones posibles, y Aiken toma la que lo hace autocomplementario (0 a 4 empiezan con 0; 5 a 9, con 1). [→ BCD y códigos ponderados](#BCD%20y%20códigos%20ponderados)
+- ¿Qué es un código autocomplementario? ¿Cuáles lo son? :: Aquel en que el complemento a 9 de un dígito se obtiene invirtiendo sus bits. Lo son **Aiken, 8 4 -2 -1 y Exceso 3**. BCD y Gray no. [→ Propiedades](#Propiedades)
 - ¿Qué significa que un código sea continuo y que sea cíclico? :: Continuo (progresivo): combinaciones consecutivas difieren en un solo bit. Cíclico: además, la última difiere en un bit de la primera. [→ Propiedades](#Propiedades)
 - ¿Cómo se pasa de Gray a binario? :: El primer bit se copia; cada bit siguiente = bit binario anterior XOR bit Gray actual. [→ Gray a binario](#Gray%20a%20binario)
 - ¿Cuánto vale 7 en Exceso 3? :: 1010 (7 + 3 = 10). [→ Tabla 0–9](#Tabla%200–9)
@@ -20,12 +22,12 @@
 
 ## Cuestionario
 
-1. ¿Cuál de estos códigos es autocomplementario?
+1. ¿Cuáles de estos códigos son autocomplementarios?
    - [x] Exceso 3
+   - [x] Aiken
+   - [x] 8 4 -2 -1
    - [ ] BCD 8421
-   - [ ] Gray
-   - [ ] 5421
-   > En Exceso 3, invertir los bits de un dígito da su complemento a 9: 2 = 0101 → 1010 = 7. [→ Propiedades](#Propiedades)
+   > Invertir los bits da el complemento a 9: en Exceso 3, 2 = 0101 → 1010 = 7; en Aiken, 4 = 0100 → 1011 = 5; en 84-2-1, 1 = 0111 → 1000 = 8. En BCD, invertir 0000 da 1111, que no es 9. [→ Propiedades](#Propiedades)
 2. ¿Cuánto es 1101 (Gray) en binario?
    - [x] 1001
    - [ ] 1011
@@ -50,7 +52,13 @@
    - [ ] 7
    - [ ] 40
    > El menor n con 2ⁿ ≥ 40: 2⁵ = 32 no alcanza, 2⁶ = 64 sí. [→ Definiciones](#Definiciones)
-6. ¿Qué propiedad caracteriza al código Gray?
+6. En 2421 general, ¿cuántas representaciones tiene el dígito 5?
+   - [x] Dos: 0101 y 1011
+   - [ ] Una: 0101
+   - [ ] Una: 1011
+   - [ ] Ninguna, es inválido
+   > Con pesos 2, 4, 2, 1: 0101 = 4 + 1 y 1011 = 2 + 2 + 1. Aiken elige 1011 para ser autocomplementario. [→ BCD y códigos ponderados](#BCD%20y%20códigos%20ponderados)
+7. ¿Qué propiedad caracteriza al código Gray?
    - [x] Dos combinaciones consecutivas difieren en un solo bit
    - [ ] Es ponderado 8421
    - [ ] Es autocomplementario
@@ -67,39 +75,38 @@
 ### BCD y códigos ponderados
 
 - **BCD**: cada dígito decimal en 4 bits; quedan 6 combinaciones sin usar.
-- **Ponderados** (cada bit tiene un peso): 8421, 2421/Aiken, 5421.
-- **No ponderados**: Exceso 3, Gray.
+- **Ponderados** (cada dígito respeta el peso de cada bit según su posición): **BCD 8421**, **Aiken (2421)** y **8 4 -2 -1** (*Apunte teórico*, p. 13).
+- **No ponderados** (la representación es arbitraria o responde a otra regla): **Exceso 3** (BCD + 3) y **Gray** (reflejado).
+- **Aiken y 2421**: con pesos 2, 4, 2, 1, los dígitos **2 a 7 tienen dos combinaciones** (2 = 0010 o 1000). **Aiken** es la elección que lo vuelve **autocomplementario**: de 0 a 4 empiezan con 0 y de 5 a 9 con 1. Las filminas de 2018 los usan como sinónimos ("BCD Aiken o 2421"); la guía de autoestudio los distingue: el ejercicio "2421" admite la doble representación y el "Aiken" usa la tabla única.
 
 ### Propiedades
 
 | Propiedad | Qué significa | Ejemplos |
 |---|---|---|
-| Autocomplementario | el complemento a 9 se obtiene invirtiendo los bits | Aiken, Exceso 3 |
-| Continuo (progresivo) | combinaciones consecutivas difieren en 1 bit | Gray |
+| Autocomplementario | el complemento a 9 se obtiene invirtiendo los bits | Aiken, 8 4 -2 -1, Exceso 3 |
+| Continuo (progresivo, distancia unitaria) | combinaciones consecutivas difieren en 1 bit | Gray (los demás no) |
 | Cíclico | además, la última y la primera difieren en 1 bit | Gray |
 | Reflejado | se arma reflejando la mitad anterior | Gray |
 
 ### Tabla 0–9
 
-*(Tabla del tutor, no está en las fuentes: el cronograma pide armarla de memoria.)*
+Tabla de la guía de autoestudio (p. 3), verificada con NotebookLM:
 
-| Dígito | 8421 | Aiken (2421) | 5421 | Exceso 3 | Gray |
-|---|---|---|---|---|---|
-| 0 | 0000 | 0000 | 0000 | 0011 | 0000 |
-| 1 | 0001 | 0001 | 0001 | 0100 | 0001 |
-| 2 | 0010 | 0010 | 0010 | 0101 | 0011 |
-| 3 | 0011 | 0011 | 0011 | 0110 | 0010 |
-| 4 | 0100 | 0100 | 0100 | 0111 | 0110 |
-| 5 | 0101 | 1011 | 1000 | 1000 | 0111 |
-| 6 | 0110 | 1100 | 1001 | 1001 | 0101 |
-| 7 | 0111 | 1101 | 1010 | 1010 | 0100 |
-| 8 | 1000 | 1110 | 1011 | 1011 | 1100 |
-| 9 | 1001 | 1111 | 1100 | 1100 | 1101 |
+| Dígito | BCD 8421 | Aiken | 2421 general | 8 4 -2 -1 | Exceso 3 | Gray |
+|---|---|---|---|---|---|---|
+| 0 | 0000 | 0000 | 0000 | 0000 | 0011 | 0000 |
+| 1 | 0001 | 0001 | 0001 | 0111 | 0100 | 0001 |
+| 2 | 0010 | 0010 | 0010 o 1000 | 0110 | 0101 | 0011 |
+| 3 | 0011 | 0011 | 0011 o 1001 | 0101 | 0110 | 0010 |
+| 4 | 0100 | 0100 | 0100 o 1010 | 0100 | 0111 | 0110 |
+| 5 | 0101 | 1011 | 0101 o 1011 | 1011 | 1000 | 0111 |
+| 6 | 0110 | 1100 | 0110 o 1100 | 1010 | 1001 | 0101 |
+| 7 | 0111 | 1101 | 0111 o 1101 | 1001 | 1010 | 0100 |
+| 8 | 1000 | 1110 | 1110 | 1000 | 1011 | 1100 |
+| 9 | 1001 | 1111 | 1111 | 1111 | 1100 | 1101 |
 
-- **Ojo con 2421 y Aiken**: los parciales los nombran por separado. Hay un 2421 no
-  autocomplementario (5 = 0101, 6 = 0110, 7 = 0111) y el Aiken de la tabla
-  (autocomplementario). Confirmá cuál usa la cátedra para cada nombre.
-- Inválidas: 8421 → 1010 a 1111 · Exceso 3 → 0000, 0001, 0010, 1101, 1110, 1111 · Aiken → 0101 a 1010.
+- **Inválidas** *(calculadas por el tutor a partir de la tabla)*: 8421 → 1010 a 1111 · Aiken → 0101 a 1010 · 8 4 -2 -1 → 0001, 0010, 0011, 1100, 1101, 1110 · Exceso 3 → 0000, 0001, 0010, 1101, 1110, 1111.
+- En un ejercicio que diga "2421" sin más, las combinaciones de 2 a 7 son válidas de las dos formas: leé el enunciado.
 
 ### Gray a binario
 
