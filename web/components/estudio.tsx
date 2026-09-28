@@ -112,9 +112,9 @@ export function Estudio({ datos }: { datos: Datos }) {
 
           <div className="flex min-w-0 flex-1 flex-col gap-0.5 md:flex-none">
             {datos.materias.length > 1 ? (
-              <Select aria-label="Materia" value={materia.id} onChange={(v) => v != null && setMateriaId(String(v))} className="w-60">
+              <Select aria-label="Materia" value={materia.id} onChange={(v) => v != null && setMateriaId(String(v))} className="w-full max-w-60">
                 <Select.Trigger>
-                  <Select.Value />
+                  <Select.Value className="truncate" />
                   <Select.Indicator />
                 </Select.Trigger>
                 <Select.Popover>

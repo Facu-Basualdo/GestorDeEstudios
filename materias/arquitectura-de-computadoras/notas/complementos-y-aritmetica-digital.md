@@ -13,6 +13,7 @@
 - ¿Cómo se detecta el overflow en una suma en C2? :: Dos operandos del mismo signo dan un resultado de signo opuesto. Equivale a que el acarreo que entra al bit de signo sea distinto del que sale. [→ Overflow en C2](#Overflow%20en%20C2)
 - ¿Cómo se obtiene el C2 de un número? :: Se invierten todos los bits (C1) y se suma 1. [→ Cómo se calculan](#Cómo%20se%20calculan)
 - ¿Cómo se representa un número en exceso 2ⁿ⁻¹? :: Se le suma 2ⁿ⁻¹ y se escribe el resultado en binario. Con 4 bits (exceso 8), −5 → 3 → 0011. [→ Cómo se calculan](#Cómo%20se%20calculan)
+- ¿Cómo se hace A − B? *(cátedra, Cuestionario Teórico Nº 1)* :: Complementando el sustraendo (y sumando) o con un circuito sustractor. En la práctica se usa la suma por complemento: A − B = A + complemento de B. [→ Cómo se calculan](#Cómo%20se%20calculan)
 
 ## Cuestionario
 
@@ -46,6 +47,12 @@
    - [ ] 11
    - [ ] −3
    > 0011 = 3; se le resta el exceso: 3 − 8 = −5. [→ Cómo se calculan](#Cómo%20se%20calculan)
+6. Si se necesita hacer la operación A − B… *(cátedra, Cuestionario Teórico Nº 1)*
+   - [x] Se resuelve complementando el sustraendo o utilizando un sustractor
+   - [ ] Cuando B es mayor que A podemos utilizar solamente complementos a la base
+   - [ ] Al sumar A más el complemento a la base menos uno de B, siempre se debe cambiar el signo del resultado obtenido
+   - [ ] Ninguna es correcta
+   > Las dos del medio las marcó la cátedra como incorrectas en los intentos. *(La correcta la deduce el tutor: el apunte dice que la resta se resuelve con suma por complemento y menciona el sustractor, aunque no se use.)* [→ Cómo se calculan](#Cómo%20se%20calculan)
 
 ## Contenido
 

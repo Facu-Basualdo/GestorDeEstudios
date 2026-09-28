@@ -14,6 +14,8 @@
 - En un parcial aparecen JA, KA, TB y DC. ¿Qué biestable es cada uno? :: A es JK, B es T y C es D: el tipo se deduce del nombre de la entrada. [→ Receta de examen](#Receta%20de%20examen)
 - ¿Qué columnas tiene la tabla de estados? :: X, A, B, C (entrada y estado actual) · el valor de cada entrada de biestable · A⁺, B⁺, C⁺ (con la ecuación de cada biestable) · la salida S. [→ Receta de examen](#Receta%20de%20examen)
 - ¿Cómo se redefine el circuito con otro biestable? :: Para cada fila se mira la transición Q → Q⁺ y se sacan las entradas del biestable nuevo con su tabla de excitación. Después, un Karnaugh por entrada nueva. [→ Receta de examen](#Receta%20de%20examen)
+- Definición de circuito secuencial según la cátedra *(cátedra, Cuestionario Nº 2)* :: Aquel cuyas salidas en el instante **T+1** dependen de sus entradas en el instante **T** y de su **último estado en T**. [→ Conceptos](#Conceptos)
+- ¿Cuáles son la función de salida y la de transición de un circuito secuencial? *(cátedra, Cuestionario Nº 2)* :: Salida: **S(t+1) = F(Q(t), E(t))**. Transición: **Q(t+1) = G(Q(t), E(t))**. [→ Conceptos](#Conceptos)
 
 ## Cuestionario
 
@@ -53,12 +55,37 @@
    - [ ] J = X, K = 1
    - [ ] J = 0, K = X
    > Con J = 1 pasa a 1 tanto si K = 0 (set) como si K = 1 (conmuta). [→ Ejemplo](#Ejemplo)
+7. Elija la definición de circuitos secuenciales que más se ajuste a lo estudiado *(cátedra, Cuestionario Nº 2)*
+   - [x] Son aquellos cuyas salidas en instante T+1 dependen de sus entradas en instante T y su último estado en T
+   - [ ] Son aquellos en los que sus salidas en instante T+1 dependen de sus entradas en instante T y sus estados
+   - [ ] Son aquellos en los que sus salidas en instante T dependen de sus entradas en instante T−1 y su último estado en T
+   - [ ] Son aquellos que pueden o no tener salidas en T+1
+   > "…y **sus estados**" (todos) fue corregida como incorrecta en 2022: la cátedra pide el **último** estado. [→ Conceptos](#Conceptos)
+8. Elija la función de salida correcta para circuitos secuenciales *(cátedra, Cuestionario Nº 2)*
+   - [x] S(t+1) = F(Q(t), E(t))
+   - [ ] S(t) = F(Q(t), E(t))
+   - [ ] S(t) = F(Q(t+1), E(t+1))
+   - [ ] S(t−1) = F(Q(t−1), E(t−1))
+   > La salida del instante siguiente sale del estado y la entrada actuales. [→ Conceptos](#Conceptos)
+9. Elija la función de transición correcta para circuitos secuenciales *(cátedra, Cuestionario Nº 2)*
+   - [x] Q(t+1) = G(Q(t), E(t))
+   - [ ] Q(t) = G(Q(t), E(t))
+   - [ ] Q(t+1) = G(Q(t−1), E(t))
+   - [ ] Q(t+1) = G(Q(t+1), E(t+1))
+   > El estado siguiente depende sólo del estado y la entrada actuales (apunte, p. 20). [→ Conceptos](#Conceptos)
+10. Un sistema digital secuencial es aquel donde… *(cátedra, Cuestionario Nº 2)*
+   - [x] Sus salidas en el instante t+1 dependen de las entradas y estados en instante t
+   - [ ] Sus salidas en instante t+1 sólo dependen de su estado en t
+   - [ ] Sus salidas en instante t−1 dependen de las entradas y estados en instante t+1
+   - [ ] Sus estados anteriores en instante t
+   > "Sólo de su estado" dejaría afuera las entradas. [→ Conceptos](#Conceptos)
 
 ## Contenido
 
 ### Conceptos
 
-- **Circuito secuencial**: la salida depende de las entradas y del estado (memoria por realimentación).
+- **Circuito secuencial** (definición de la cátedra): aquel cuyas **salidas en el instante T+1 dependen de sus entradas en el instante T y de su último estado en T**. Necesita memoria para la "historia pasada".
+- **Función de salida**: S(t+1) = F(Q(t), E(t)). **Función de transición**: Q(t+1) = G(Q(t), E(t)) (apunte, p. 20).
 - **Mealy**: salida = f(estado, entrada). **Moore**: salida = f(estado).
 - **Asíncrono** (cambia con las entradas) vs. **síncrono** (cambia con el reloj).
 

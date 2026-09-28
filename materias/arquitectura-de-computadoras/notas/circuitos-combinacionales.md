@@ -15,6 +15,8 @@
 - ¿Cómo implementás una función con un MUX? :: Las variables van a las entradas de selección y cada entrada de datos recibe el valor de la función en esa fila (0 o 1). [→ Bloques MSI](#Bloques%20MSI)
 - ¿Cuáles son las ecuaciones del sumador completo? :: S = A ⊕ B ⊕ Cin · Cout = A · B + Cin · (A ⊕ B). [→ Sumadores](#Sumadores)
 - ¿Cuáles son los pasos de un combinacional de enunciado? :: Definir entradas y salidas (qué es 0 y 1) → tabla de verdad con 2ⁿ filas → un Karnaugh por salida → circuito. [→ Receta de examen](#Receta%20de%20examen)
+- ¿Qué es un sistema digital y qué es una señal digital? *(cátedra, Cuestionario Nº 2)* :: Sistema digital: cualquier dispositivo destinado a la **generación, transmisión, procesamiento y almacenamiento de señales digitales**. Señal digital: magnitud física limitada a tomar sólo valores **discretos**. [→ Definición](#Definición)
+- ¿Qué es un circuito combinacional según la cátedra? *(cátedra, Cuestionario Nº 2)* :: Aquel cuyas salidas dependen de las combinaciones de sus entradas **en el mismo instante t**, **sin tener en cuenta la variable tiempo**, y que entrega **siempre el mismo valor** para una combinación dada. Sus salidas sólo dependen de las **entradas presentes**. [→ Definición](#Definición)
 
 ## Cuestionario
 
@@ -48,6 +50,30 @@
    - [ ] Cambia sólo con el flanco del reloj
    - [ ] Tiene realimentación
    > Lo que depende del estado es un secuencial. [→ Definición](#Definición)
+6. Elija la definición de circuitos combinacionales que más se ajuste a lo estudiado *(cátedra, Cuestionario Nº 2)*
+   - [x] Sus salidas dependen de las combinaciones de sus entradas en el mismo instante t, no teniendo en cuenta la variable tiempo, entregando siempre el mismo valor de salida para una combinación dada
+   - [ ] Sus salidas dependen de sus entradas en el mismo instante t, no teniendo en cuenta la variable tiempo, entregando distintos valores de salida para una combinación dada
+   - [ ] Sus salidas dependen de sus entradas en el mismo instante, teniendo en cuenta la variable tiempo, entregando siempre el mismo valor
+   - [ ] Sus salidas dependen de sus entradas y su estado en T, entregando siempre el mismo valor
+   > Tres detalles: mismo instante, **sin** la variable tiempo y **siempre el mismo** valor. "Su estado en T" ya es secuencial. [→ Definición](#Definición)
+7. Un sistema digital combinacional es aquel donde… *(cátedra, Cuestionario Nº 2)*
+   - [x] Sus salidas sólo dependen de las entradas presentes
+   - [ ] Sus salidas sólo dependen de las entradas anteriores
+   - [ ] Sus salidas sólo dependen de las entradas futuras
+   - [ ] Sus salidas dependen de las entradas presentes y futuras
+   > No hay memoria: nada del pasado influye. [→ Definición](#Definición)
+8. Un sistema digital es cualquier dispositivo destinado a… *(cátedra, Cuestionario Nº 2)*
+   - [x] La generación, transmisión, procesamiento y almacenamiento de señales digitales
+   - [ ] La generación, transmisión, procesamiento y almacenamiento de señales analógicas y digitales
+   - [ ] La generación, transmisión, procesamiento y almacenamiento de señales analógicas
+   - [ ] La generación de señales electrónicas
+   > Sólo señales **digitales** (apunte, p. 19). [→ Definición](#Definición)
+9. Una señal digital corresponde a magnitudes físicas limitadas a tomar sólo unos determinados valores… *(cátedra, Cuestionario Nº 2)*
+   - [x] Discretos
+   - [ ] Continuos y discretos
+   - [ ] Continuos
+   - [ ] Eléctricos
+   > "Continuos y discretos" fue corregida como incorrecta en el intento de 2023. [→ Definición](#Definición)
 
 ## Contenido
 

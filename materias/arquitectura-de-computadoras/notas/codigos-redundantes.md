@@ -23,6 +23,9 @@
 - ¿Qué posiciones controla cada bit? :: Las posiciones cuyo número en binario tiene ese bit en 1. p0 → 1, 3, 5, 7, 9, 11… · p1 → 2, 3, 6, 7, 10, 11… · p2 → 4–7, 12–15 · p3 → 8–15. [→ Receta de examen](#Receta%20de%20examen)
 - ¿Cómo se lee el síndrome? :: Los bits de control **c0, c1, c2…** se leen en **orden decreciente** (…c2 c1 c0) y el número binario es la posición del error. Todos en 0 = sin error. [→ Código de Hamming](#Código%20de%20Hamming)
 - Si el mensaje tiene 11, 12 o 16 bits, ¿cuántos son de paridad? :: 11 → 4 de paridad + 7 de información · 12 → 4 + 8 · 16 → 5 + 11. [→ Receta de examen](#Receta%20de%20examen)
+- ¿Qué permite el control de paridad par? *(cátedra, Cuestionario Teórico Nº 1)* :: **Detectar sólo un error**: no corrige y no detecta dos. [→ Paridad](#Paridad)
+- En el código de paridad impar, ¿qué debe cumplirse? *(cátedra, Cuestionario Teórico Nº 1)* :: La cantidad de **ceros o unos** que llegan al receptor debe ser **impar** (la respuesta que la cátedra dio por correcta). [→ Paridad](#Paridad)
+- ¿Qué es un canal de comunicación? *(cátedra, Cuestionario Teórico Nº 1)* :: El **medio** por el cual una información binaria viaja del **emisor al receptor con algún tipo de codificación**. [→ Redundancia y distancia](#Redundancia%20y%20distancia)
 
 ## Cuestionario
 
@@ -74,6 +77,30 @@
    - [ ] Porque la paridad tiene que ser par
    - [ ] Porque los bits de paridad van en potencias de 2
    > Con p bits de control hay 2ᵖ síndromes; hacen falta i + p (un error en cada posición) + 1 (sin error). [→ Código de Hamming](#Código%20de%20Hamming)
+9. El control de paridad PAR permite… *(cátedra, Cuestionario Teórico Nº 1)*
+   - [x] Detectar sólo un error
+   - [ ] Detectar y corregir sólo un error
+   - [ ] Corregir un solo error
+   - [ ] Detectar y corregir más de un error
+   > La paridad simple tiene distancia 2: detecta un error y no corrige ninguno. Corregir uno es de Hamming. [→ Paridad](#Paridad)
+10. En el código de paridad impar… *(cátedra, Cuestionario Teórico Nº 1)*
+   - [x] La cantidad de ceros o unos que llegan al receptor debe ser impar
+   - [ ] La cantidad de ceros del mensaje debe ser impar
+   - [ ] La cantidad de unos que llegan al receptor debe ser impar
+   - [ ] Ninguna es correcta
+   > Es la opción que la cátedra corrigió como buena en dos intentos (2021 y 2022). Ojo: la opción "la cantidad de unos…" no fue marcada, así que no la elijas. [→ Paridad](#Paridad)
+11. Si la información en el transmisor es 11111001 y no hay error, ¿qué recibe el receptor con los bits de control de Hamming? *(cátedra, Cuestionario Teórico Nº 1)*
+   - [x] 111101000100
+   - [ ] 111101001110
+   - [ ] 110101001100
+   - [ ] 111101001101
+   > 8 bits de información → 4 de paridad (2⁴ ≥ 8 + 4 + 1), 12 en total. Numerando de derecha a izquierda con paridad par: p0 = 0, p1 = 0, p2 = 0, p3 = 1. *(Calculado por el tutor; coincide con la opción elegida en los intentos.)* [→ Código de Hamming](#Código%20de%20Hamming)
+12. Un CANAL de comunicación es… *(cátedra, Cuestionario Teórico Nº 1)*
+   - [x] El medio por el cual una información binaria viaja del emisor al receptor con algún tipo de codificación
+   - [ ] El medio por el cual una información binaria viaja del emisor al receptor
+   - [ ] Un sistema que codifica la información a transmitir
+   - [ ] Un sistema que codifica y decodifica la información a transmitir
+   > El detalle que suma es "con algún tipo de codificación". Codificar y decodificar lo hacen el codificador y el decodificador, no el canal. [→ Redundancia y distancia](#Redundancia%20y%20distancia)
 
 ## Contenido
 

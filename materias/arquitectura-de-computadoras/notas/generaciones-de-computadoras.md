@@ -19,6 +19,9 @@
 - ¿Cuál es el cuello de botella de Von Neumann? :: Un solo camino entre CPU y memoria, compartido por datos e instrucciones. [→ Von Neumann y Harvard](#Von%20Neumann%20y%20Harvard)
 - ¿Qué diferencia a Harvard de Von Neumann? :: Harvard tiene memorias y buses separados para instrucciones y datos. [→ Von Neumann y Harvard](#Von%20Neumann%20y%20Harvard)
 - Diferenciá arquitectura de organización. :: Arquitectura: lo visible al programador (juego de instrucciones, formatos, direccionamiento). Organización: cómo se implementa (señales de control, tecnología de memoria). [→ Arquitectura y organización](#Arquitectura%20y%20organización)
+- ¿Qué es una computadora según Stallings? *(cátedra, Cuestionario Teórico Nº 1)* :: Una **máquina digital electrónica programable** para el tratamiento automático de la información, capaz de **recibirla, operar sobre ella** mediante procesos determinados y **suministrar los resultados**. [→ Definiciones de la cátedra](#Definiciones%20de%20la%20cátedra)
+- ¿Cuáles son los 8 niveles de la organización estructurada de un computador (Tanenbaum), de menor a mayor? *(cátedra, Cuestionario Teórico Nº 1)* :: 0 capa física · 1 lógica digital · 2 microprogramación · 3 máquina convencional (lenguaje de máquina) · 4 sistema operativo · 5 compiladores y ensambladores · 6 lenguaje de alto nivel · 7 aplicaciones del usuario. [→ Definiciones de la cátedra](#Definiciones%20de%20la%20cátedra)
+- ¿Qué hito define cada generación en el cuestionario de la cátedra? *(cátedra, Cuestionario Teórico Nº 1)* :: 0 sistemas mecánicos y electromecánicos · 1 válvulas y tubos al vacío · 2 transistores y sistemas batch · 3 multiprogramación y circuitos integrados · 4 **computadores portátiles** (personales) · 5 computación cuántica. [→ Las generaciones según la cátedra](#Las%20generaciones%20según%20la%20cátedra)
 
 ## Cuestionario
 
@@ -76,6 +79,24 @@
    - [ ] 3ª
    - [ ] 4ª
    > Junto con el ensamblador y la memoria de núcleos de ferrita. [→ Las generaciones según la cátedra](#Las%20generaciones%20según%20la%20cátedra)
+10. Según William Stallings, un computador es… *(cátedra, Cuestionario Teórico Nº 1)*
+   - [ ] Máquina digital para el tratamiento automático de la información, capaz de operar sobre ella mediante procesos determinados y suministrar los resultados
+   - [x] Máquina digital electrónica programable para el tratamiento automático de la información, capaz de recibirla, operar sobre ella mediante procesos determinados y suministrar los resultados de tales operaciones
+   - [ ] Máquina digital eléctrica para el tratamiento automático de la información, capaz de recibirla mediante procesos determinados y suministrar los resultados
+   - [ ] Máquina digital electromecánica para el tratamiento automático de la información, capaz de recibirla, operar sobre ella y suministrar los resultados
+   > Las palabras clave son **electrónica** y **programable**, y los tres verbos: recibir, operar y suministrar. Los distractores cambian el adjetivo o se saltean un verbo. [→ Definiciones de la cátedra](#Definiciones%20de%20la%20cátedra)
+11. En la organización estructurada de Tanenbaum, ¿qué hay en el nivel 4? *(cátedra, Cuestionario Teórico Nº 1)*
+   - [x] El sistema operativo
+   - [ ] Compiladores y ensambladores
+   - [ ] La máquina convencional (lenguaje de máquina)
+   - [ ] La microprogramación
+   > De abajo hacia arriba: 0 capa física, 1 lógica digital, 2 microprogramación, 3 máquina convencional, 4 sistema operativo, 5 compiladores y ensambladores, 6 lenguaje de alto nivel, 7 aplicaciones. En los intentos corregidos, poner el SO en el 5 y los compiladores en el 4 contó como error. [→ Definiciones de la cátedra](#Definiciones%20de%20la%20cátedra)
+12. ¿Qué hito define a la generación 4 (desde 1980) en el cuestionario de la cátedra? *(cátedra, Cuestionario Teórico Nº 1)*
+   - [x] Computadores portátiles (personales)
+   - [ ] Multiprogramación y circuitos integrados
+   - [ ] Transistores y sistemas batch
+   - [ ] Computación cuántica
+   > Circuitos integrados es la 3, transistores la 2 y cuántica la 5. [→ Las generaciones según la cátedra](#Las%20generaciones%20según%20la%20cátedra)
 
 ## Contenido
 
@@ -112,6 +133,26 @@ tarjetas y un programa que la controlaba.
 
 *(Ejemplo del tutor)*: que exista una instrucción de multiplicar es arquitectura; que
 se haga con un multiplicador dedicado o con sumas sucesivas es organización.
+
+### Definiciones de la cátedra
+
+Del Cuestionario Teórico Nº 1 (respuestas marcadas como correctas en los intentos corregidos):
+
+- **Computadora (Stallings)**: máquina digital **electrónica programable** para el tratamiento automático de la información, capaz de **recibirla, operar sobre ella** mediante procesos determinados y **suministrar los resultados** de tales operaciones.
+- **Organización estructurada de un computador (Tanenbaum)**, de menor a mayor:
+
+| Nivel | Nombre |
+|---|---|
+| 7 | Aplicaciones del usuario |
+| 6 | Lenguaje de alto nivel |
+| 5 | Compiladores y ensambladores |
+| 4 | Sistema operativo |
+| 3 | Máquina convencional o lenguaje de máquina |
+| 2 | Microprogramación |
+| 1 | Lógica digital |
+| 0 | Capa física |
+
+*(Los niveles 4 y 5 los deduce el tutor: en el intento corregido, SO en el 5 y compiladores en el 4 dieron error, así que van al revés. Los demás están confirmados.)*
 
 ## Dónde me equivoco
 

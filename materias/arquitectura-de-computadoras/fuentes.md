@@ -69,11 +69,29 @@ confirmar)*. Además hay dos recopilaciones: **"Algunos finales resueltos.pdf"**
 
 Los ids de cada modelo se obtienen con `list_sources` (el título es la fecha).
 
+## Material local (`material/`)
+
+- **Export de Faro IA** (`material/faro.json`): el *Apunte teórico* de la cátedra (123 págs.)
+  en 296 conceptos con página. Ya se usó para codificación, circuitos y generaciones.
+- **Cuestionarios de la cátedra** (`material/cuestionarios/`, revisiones de intentos de Moodle 2020–2023):
+
+| Cuestionario | Tema | Archivos | Estado |
+|---|---|---|---|
+| Teórico Nº 1 | Evolución de los sistemas de información y codificación | 3 PDF + `Cuestionario_No_1.docx` | **Cargado**: 10 preguntas en [generaciones](notas/generaciones-de-computadoras.md), [redundantes](notas/codigos-redundantes.md), [numéricos](notas/codigos-numericos.md) y [complementos](notas/complementos-y-aritmetica-digital.md) |
+| Nº 2 | Combinacionales, secuenciales, buses, registros, señales de gobierno | 2 PDF con texto + `Cuest_2_.pdf` y `cuest2_Arq` (capturas) | **Cargado**: 18 preguntas en [simplificación](notas/simplificacion-de-funciones.md), [combinacionales](notas/circuitos-combinacionales.md), [biestables](notas/biestables.md), [secuenciales](notas/analisis-de-circuitos-secuenciales.md) y [registros](notas/registros-y-contadores.md) |
+| Nº 3 | Unidad aritmético-lógica | 5 PDF | Sin cargar (U3, no entra en la Eval. 1) |
+| Nº 4 y Nº 5 | Memoria central | 4 PDF + `Memoria_arquitectura.docx` | Sin cargar (U3) |
+
+  Las respuestas se tomaron de las marcas de correcto o incorrecto de los intentos. Cuando el intento
+  no mostraba la correcta, la nota lo aclara (deducida del apunte o calculada por el tutor).
+- `Apunte_Arquitectura_Black.pdf` (15 MB, con texto) y dos fotos de WhatsApp: sin revisar.
+
 ## Pendiente de cobertura
 
-- **Las 13 notas del 2026-09-28 salen del [cronograma](../../docs/cronograma-eval-1-arquitectura.md)
-  del estudiante, no del notebook** (la sesión de NotebookLM estaba vencida). Hay que
-  verificarlas contra las fuentes de arriba y agregar fuente y página a cada bloque.
+- **Las 13 notas salen del [cronograma](../../docs/cronograma-eval-1-arquitectura.md) del
+  estudiante.** El 2026-09-28 se verificaron Hamming, códigos numéricos, alfanuméricos,
+  generaciones y diseño secuencial contra el *Apunte teórico* y NotebookLM. Las demás
+  siguen pendientes.
 
 - La U3 no entra a la Evaluación Nº 1, así que la falta de teoría de U3 no es urgente.
 - **Secuenciales es el 45–80% del parcial y, por los títulos, no hay fuentes de

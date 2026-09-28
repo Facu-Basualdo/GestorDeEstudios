@@ -19,6 +19,8 @@
 - ¿Cómo se pasa de Gray a binario? :: El primer bit se copia; cada bit siguiente = bit binario anterior XOR bit Gray actual. [→ Gray a binario](#Gray%20a%20binario)
 - ¿Cuánto vale 7 en Exceso 3? :: 1010 (7 + 3 = 10). [→ Tabla 0–9](#Tabla%200–9)
 - ¿Qué combinaciones son inválidas en BCD 8421? :: De 1010 a 1111 (10 a 15). [→ Tabla 0–9](#Tabla%200–9)
+- ¿Qué permite el código BCD Aiken? *(cátedra, Cuestionario Teórico Nº 1)* :: Hallar el **complemento restringido** (a 9) de un número decimal invirtiendo sus bits: es autocomplementario. [→ Propiedades](#Propiedades)
+- ¿Cuántos bits hacen falta para 52 símbolos? *(cátedra, Cuestionario Teórico Nº 1)* :: **log₂ 52** redondeado para arriba: 6 bits (2⁶ = 64 ≥ 52). [→ Definiciones](#Definiciones)
 
 ## Cuestionario
 
@@ -64,6 +66,18 @@
    - [ ] Es autocomplementario
    - [ ] Todas sus palabras tienen la misma cantidad de unos
    > Gray es continuo, cíclico y reflejado. [→ Propiedades](#Propiedades)
+8. El sistema de codificación BCD AIKEN… *(cátedra, Cuestionario Teórico Nº 1)*
+   - [x] Permite hallar el complemento restringido de un número decimal BCD invirtiendo sus bits
+   - [ ] Permite hallar el complemento de un número decimal BCD invirtiendo sus bits
+   - [ ] No permite hallar el complemento restringido invirtiendo sus bits
+   - [ ] Ninguna es correcta
+   > El complemento **restringido** es el complemento a la base menos uno (a 9). Poner "el complemento" a secas contó como error. [→ Propiedades](#Propiedades)
+9. Para representar las letras del alfabeto, los dígitos decimales y los signos de puntuación (52 símbolos en total) se necesitan… *(cátedra, Cuestionario Teórico Nº 1)*
+   - [x] log base dos de 52 bits
+   - [ ] La base elevada a la 52
+   - [ ] Log natural de 52
+   - [ ] 2 elevado a la 52
+   > Con n bits hay 2ⁿ combinaciones: n = log₂ 52 ≈ 5,7 → 6 bits. [→ Definiciones](#Definiciones)
 
 ## Contenido
 

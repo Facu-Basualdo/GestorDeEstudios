@@ -15,6 +15,9 @@
 - ¿Qué es un implicante primo y cuándo es esencial? :: Primo: un grupo que no se puede agrandar. Esencial: cubre algún 1 que ningún otro implicante primo cubre. [→ Mapas de Karnaugh](#Mapas%20de%20Karnaugh)
 - ¿Cómo se usan las condiciones indiferentes (X)? :: Se toman como 1 sólo si ayudan a agrandar un grupo; si no, se dejan afuera. [→ Mapas de Karnaugh](#Mapas%20de%20Karnaugh)
 - Para un circuito sólo NAND, ¿qué agrupás? ¿Y para sólo NOR? :: NAND: unos (suma de productos). NOR: ceros (producto de sumas). [→ Mapas de Karnaugh](#Mapas%20de%20Karnaugh)
+- ¿Qué es la forma normal disyuntiva (FND)? *(cátedra, Cuestionario Nº 2)* :: Una **disyunción de conjunciones** de literales: (L11 y … y L1n) o (L21 y … y L2n) o … Es la suma de mintérminos. [→ Formas canónicas](#Formas%20canónicas)
+- ¿Qué es la forma normal conjuntiva (FNC)? *(cátedra, Cuestionario Nº 2)* :: Una **conjunción de disyunciones** de literales: (L11 o … o L1n) y (L21 o … o L2n) y … Es el producto de maxtérminos. [→ Formas canónicas](#Formas%20canónicas)
+- ¿Qué es un minitérmino y qué un maxitérmino? *(cátedra, Cuestionario Nº 2)* :: Minitérmino: el **producto** de las variables o sus negaciones que hace que el producto **valga uno**. Maxitérmino: la **suma** de las variables o sus negaciones que hace que la suma **valga cero**. [→ Formas canónicas](#Formas%20canónicas)
 
 ## Cuestionario
 
@@ -54,6 +57,30 @@
    - [ ] 00, 10, 01, 11
    - [ ] 11, 10, 01, 00
    > Orden Gray: vecinos difieren en un bit. [→ Mapas de Karnaugh](#Mapas%20de%20Karnaugh)
+7. La forma normal disyuntiva de una función (FND) es… *(cátedra, Cuestionario Nº 2)*
+   - [x] Una disyunción de conjunciones de literales: (L11 y L12 y … y L1n) o (L21 y … y L2n) o …
+   - [ ] Una conjunción de disyunciones de literales: (L11 o … o L1n) y (L21 o … o L2n) y …
+   - [ ] Una conjunción de conjunciones de literales
+   - [ ] Una disyunción de disyunciones de literales
+   > Disyunción = "o" (suma) por fuera; conjunciones = "y" (productos) adentro: suma de mintérminos. [→ Formas canónicas](#Formas%20canónicas)
+8. La forma normal conjuntiva de una función (FNC) es… *(cátedra, Cuestionario Nº 2)*
+   - [x] La conjunción de disyunciones de literales: (L11 o … o L1n) y (L21 o … o L2n) y …
+   - [ ] La disyunción de conjunciones de literales
+   - [ ] La conjunción de conjunciones de literales
+   - [ ] La disyunción de disyunciones de literales
+   > Conjunción = "y" (producto) por fuera; disyunciones = "o" (sumas) adentro: producto de maxtérminos. [→ Formas canónicas](#Formas%20canónicas)
+9. Minitérmino es… *(cátedra, Cuestionario Nº 2)*
+   - [x] El producto de las variables en juego o sus negaciones individuales que hacen que el producto valga uno
+   - [ ] La suma de las variables en juego o sus negaciones individuales que hacen que el producto valga uno
+   - [ ] La suma de las variables en juego negadas que hacen que el producto valga uno
+   - [ ] Ninguna de las anteriores
+   > Mintérmino = producto que vale 1 en una sola fila. [→ Formas canónicas](#Formas%20canónicas)
+10. Maxitérmino es… *(cátedra, Cuestionario Nº 2)*
+   - [x] La suma de las variables en juego o sus negaciones individuales, que hacen que la suma valga cero
+   - [ ] La suma de las variables en juego o sus negaciones individuales, que hacen que la suma valga uno
+   - [ ] El producto de las variables en juego sin negar, que hacen que la suma valga uno
+   - [ ] Ninguna de las anteriores
+   > Maxitérmino = suma que vale 0 en una sola fila (el apunte lo define así, p. 19). El distractor "valga uno" es el más elegido. *(Respuesta según el apunte; los intentos del cuestionario no la muestran corregida.)* [→ Formas canónicas](#Formas%20canónicas)
 
 ## Contenido
 

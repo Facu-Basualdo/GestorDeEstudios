@@ -16,6 +16,9 @@
 - Tabla de excitación del D y del T. :: D = Q⁺ (0→0: 0, 0→1: 1, 1→0: 0, 1→1: 1). T = 1 cuando cambia el estado (0→1 y 1→0), 0 cuando se mantiene. [→ Tablas de excitación](#Tablas%20de%20excitación)
 - ¿Para qué sirve el maestro-esclavo? :: Para evitar el "race-around" (que el JK conmute varias veces durante el mismo pulso de reloj). [→ Disparo y maestro-esclavo](#Disparo%20y%20maestro-esclavo)
 - ¿Cómo se construye "un JK a partir de un UZ"? :: Tabla con J, K, Q → Q⁺ del JK → las entradas U y Z que producen esa transición, sacadas de la tabla de excitación del UZ. Después, Karnaugh de U y de Z en función de J, K y Q. [→ Receta de examen](#Receta%20de%20examen)
+- Tabla de estados del RS: ¿qué pasa con cada combinación de R y S? *(cátedra, Cuestionario Nº 2)* :: R = S = 0 → mantiene (Qt+1 = Qt) · S = 1, R = 0 → 1 · R = 1, S = 0 → 0 · R = S = 1 → **indeterminado** (?). [→ Los cuatro biestables](#Los%20cuatro%20biestables)
+- Tabla de estados del JK :: J = K = 0 → mantiene · J = 0, K = 1 → 0 · J = 1, K = 0 → 1 · J = K = 1 → **complementa** (Qt+1 = Q̅t). [→ Los cuatro biestables](#Los%20cuatro%20biestables)
+- Tabla de excitación del RS (Qt → Qt+1 : R S) *(cátedra, Cuestionario Nº 2)* :: 0→0 : X 0 · 0→1 : 0 1 · 1→0 : 1 0 · 1→1 : 0 X. [→ Tablas de excitación](#Tablas%20de%20excitación)
 
 ## Cuestionario
 
@@ -61,6 +64,24 @@
    - [ ] El retardo acumulado de los contadores asíncronos
    - [ ] El rebote de los pulsadores
    > [→ Disparo y maestro-esclavo](#Disparo%20y%20maestro-esclavo)
+8. En la tabla de excitación del RS, para la transición Qt = 0 → Qt+1 = 0, ¿qué valores llevan R y S? *(cátedra, Cuestionario Nº 2)*
+   - [x] R = X, S = 0
+   - [ ] R = 1, S = 0
+   - [ ] R = 0, S = X
+   - [ ] R = 0, S = 0
+   > Para quedarse en 0 alcanza con no hacer Set (S = 0); R puede ser 0 (mantener) o 1 (reset): X. Poner R = 1 fijo contó como error en el intento de 2022. [→ Tablas de excitación](#Tablas%20de%20excitación)
+9. En la tabla de excitación del JK, para la transición 1 → 0, ¿qué valores llevan J y K? *(cátedra, Cuestionario Nº 2)*
+   - [x] J = X, K = 1
+   - [ ] J = 0, K = 1
+   - [ ] J = 1, K = X
+   - [ ] J = X, K = 0
+   > Para pasar de 1 a 0 hace falta K = 1; J da igual (reset con J = 0 o complemento con J = 1). [→ Tablas de excitación](#Tablas%20de%20excitación)
+10. En el biestable RS, ¿qué pasa con R = S = 1? *(cátedra, Cuestionario Nº 2)*
+   - [x] Es un estado indeterminado (se evita)
+   - [ ] Mantiene el estado anterior
+   - [ ] Complementa el estado
+   - [ ] Pone la salida en 0
+   > Es el caso que el JK resuelve complementando y el D evita con una sola entrada. [→ Los cuatro biestables](#Los%20cuatro%20biestables)
 
 ## Contenido
 
@@ -80,7 +101,7 @@
 
 ### Tablas de excitación
 
-*(Tabla del tutor, no está en las fuentes: el cronograma pide escribirla de memoria.)*
+*(Coincide con las tablas que la cátedra corrigió como buenas en el Cuestionario Nº 2: RS y JK.)*
 
 | Q → Q⁺ | S R | J K | D | T |
 |---|---|---|---|---|
