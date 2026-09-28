@@ -215,14 +215,14 @@ function cuestionarioDe(cuerpo, ctx, ruta) {
   let actual = null;
   for (const l of lineasDe(cuerpo)) {
     let m;
-    if ((m = l.match(/^\d+\.\s+(.*)$/))) crudas.push((actual = { q: m[1], opciones: [], correcta: -1, exp: [] }));
+    if ((m = l.match(/^\d+\.\s+(.*)$/))) crudas.push((actual = { q: m[1], opciones: [], correctas: [], exp: [] }));
     else if (actual && (m = l.match(/^\s+[-*]\s+\[( |x|X)\]\s+(.*)$/))) {
-      if (m[1] !== ' ') actual.correcta = actual.opciones.length;
+      if (m[1] !== ' ') actual.correctas.push(actual.opciones.length);
       actual.opciones.push(m[2]);
     } else if (actual && (m = l.match(/^\s+>\s?(.*)$/))) actual.exp.push(m[1]);
   }
   return crudas.flatMap((p) => {
-    if (p.opciones.length < 2 || p.correcta === -1) {
+    if (p.opciones.length < 2 || !p.correctas.length) {
       avisos.push(`${rel(ruta)}: pregunta sin opciones o sin la correcta marcada [x] → ${p.q.slice(0, 60)}`);
       return [];
     }
@@ -230,7 +230,7 @@ function cuestionarioDe(cuerpo, ctx, ruta) {
     return [{
       q: inline(p.q, ctx),
       opciones: p.opciones.map((o) => inline(o, ctx)),
-      correcta: p.correcta,
+      correctas: p.correctas,
       exp: texto ? inline(texto, ctx) : '',
       ref,
     }];

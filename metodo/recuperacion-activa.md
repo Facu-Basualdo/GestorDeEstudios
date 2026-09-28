@@ -83,8 +83,8 @@ por ` :: `, y al final, opcional, la sección de la teoría donde está la respu
 - ¿Qué indica el síndrome? :: La posición del bit erróneo; 0 = sin error. [→ Código de Hamming](#Código%20de%20Hamming)
 ```
 
-**Cuestionario** (opción múltiple): lista numerada, una opción `- [x]` correcta y el
-resto `- [ ]`, explicación en `>` con el mismo enlace a la sección:
+**Cuestionario** (opción múltiple): lista numerada, la opción correcta con `- [x]` y el
+resto con `- [ ]`, explicación en `>` con el mismo enlace a la sección:
 
 ```
 ## Cuestionario
@@ -95,6 +95,12 @@ resto `- [ ]`, explicación en `>` con el mismo enlace a la sección:
    > Síndrome 0 = sin error. [→ Código de Hamming](#Código%20de%20Hamming)
 ```
 
+- **Varias correctas**: marcá con `- [x]` todas las que correspondan. La web la muestra
+  como "Varias correctas": hay que tildar todas y tocar Comprobar, y sólo cuenta como
+  bien si coincide exactamente. Usalo cuando la cátedra pregunta así ("¿cuáles de las
+  siguientes…?", como en los cuestionarios semanales de Diseño).
+- Preguntas copiadas de un cuestionario o examen de la cátedra: agregá *(cátedra)* al
+  final del enunciado.
 - Las opciones incorrectas salen de errores reales o probables (confundir C1 con C2,
   el orden de los bits), no de relleno.
 - Las anclas van estilo Obsidian (`#Título%20con%20espacios`) para que funcionen en

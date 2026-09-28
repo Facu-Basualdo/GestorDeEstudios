@@ -8,10 +8,21 @@ import { EnlaceTeoria } from './flashcards';
 import { FiltroTemas, PanelSesion, Peso, Progreso, Rico, filasPorTema } from './piezas';
 
 type Item = Pregunta & { tema: Tema; clave: string };
-/** `orden`: índices de las opciones originales en el orden en que se muestran. */
-type Sesion = { items: { p: Item; orden: number[] }[]; i: number; elegidas: (number | undefined)[] };
+/**
+ * `orden`: índices de las opciones originales en el orden en que se muestran.
+ * `elegidas`: por pregunta, las opciones originales que respondió (undefined = sin responder).
+ */
+type Sesion = { items: { p: Item; orden: number[] }[]; i: number; elegidas: (number[] | undefined)[] };
 
-const LETRAS = 'ABCD';
+const LETRAS = 'ABCDEF';
+
+const acierta = (p: Pregunta, sel: number[] | undefined) =>
+  !!sel && sel.length === p.correctas.length && sel.every((o) => p.correctas.includes(o));
+
+const letras = (ks: number[]) => {
+  const l = ks.map((k) => LETRAS[k] ?? String(k + 1)).sort();
+  return l.length > 1 ? `${l.slice(0, -1).join(', ')} y ${l.at(-1)}` : l[0];
+};
 const LEYENDA = (
   <>
     <b className="font-medium text-success">1</b> correcta · <b className="font-medium text-danger">0</b> incorrecta
@@ -68,18 +79,31 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
   const actual = items[i];
   const elegida = elegidas[i];
   const respondida = elegida !== undefined;
+  const multiple = (actual?.p.correctas.length ?? 0) > 1;
+  // Opciones tildadas (originales) de una pregunta con varias correctas, antes de comprobar.
+  const [marcadas, setMarcadas] = useState<number[]>([]);
+  useEffect(() => setMarcadas([]), [i, items]);
 
-  const elegir = useCallback(
-    (k: number) =>
+  const responder = useCallback(
+    (sel: number[]) =>
       setSesion((s) => {
-        const it = s.items[s.i];
-        if (!it || s.elegidas[s.i] !== undefined || k >= it.orden.length) return s;
+        if (!s.items[s.i] || s.elegidas[s.i] !== undefined || !sel.length) return s;
         const e = [...s.elegidas];
-        e[s.i] = it.orden[k];
+        e[s.i] = sel;
         return { ...s, elegidas: e };
       }),
     [],
   );
+  const elegir = useCallback(
+    (k: number) => {
+      if (!actual || respondida || k >= actual.orden.length) return;
+      const o = actual.orden[k];
+      if (!multiple) responder([o]);
+      else setMarcadas((m) => (m.includes(o) ? m.filter((x) => x !== o) : [...m, o]));
+    },
+    [actual, respondida, multiple, responder],
+  );
+  const comprobar = useCallback(() => responder(marcadas), [marcadas, responder]);
   const siguiente = useCallback(() => {
     setSesion((s) => ({ ...s, i: s.i + 1 }));
     window.scrollTo({ top: 0 });
@@ -95,15 +119,19 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
       if (e.ctrlKey || e.metaKey || e.altKey || !actual) return;
       const t = e.target as HTMLElement;
       if (t.closest('input, textarea, select, [role="listbox"], [role="combobox"]')) return;
-      const k = '1234'.includes(e.key) ? Number(e.key) - 1 : 'abcd'.indexOf(e.key.toLowerCase());
+      const k = '123456'.includes(e.key) ? Number(e.key) - 1 : 'abcdef'.indexOf(e.key.toLowerCase());
       if (e.key.length === 1 && k >= 0 && !respondida) elegir(k);
-      else if (e.key === 'Enter' && respondida && t.tagName !== 'BUTTON') siguiente();
+      else if (e.key === 'Enter' && t.tagName !== 'BUTTON') {
+        if (respondida) siguiente();
+        else if (multiple) comprobar();
+      }
     };
     window.addEventListener('keydown', alTeclear);
     return () => window.removeEventListener('keydown', alTeclear);
-  }, [activo, actual, respondida, elegir, siguiente]);
+  }, [activo, actual, respondida, multiple, elegir, comprobar, siguiente]);
 
-  const estados = items.map((it, k) => (elegidas[k] === undefined ? undefined : elegidas[k] === it.p.correcta ? 2 : 0));
+  const estados = items.map((it, k) => (elegidas[k] === undefined ? undefined : acierta(it.p, elegidas[k]) ? 2 : 0));
+  const correctasVisibles = actual ? actual.p.correctas.map((o) => actual.orden.indexOf(o)) : [];
   const bien = estados.filter((e) => e === 2).length;
 
   return (
@@ -180,13 +208,23 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
                   <Typography className="font-titulo text-[clamp(1.25rem,3vw,1.6rem)] font-semibold leading-snug text-balance">
                     <Rico html={actual.p.q} />
                   </Typography>
+                  {multiple && (
+                    <Typography type="body-sm" color="muted" className="-mt-2">
+                      <b className="font-medium text-accent">Varias correctas</b> · marcá todas y tocá Comprobar
+                    </Typography>
+                  )}
                   <ul className="grid gap-2.5">
                     {actual.orden.map((o, k) => {
-                      const esCorrecta = o === actual.p.correcta;
-                      const estado = !respondida ? '' : esCorrecta ? 'ok' : o === elegida ? 'mal' : 'resto';
+                      const esCorrecta = actual.p.correctas.includes(o);
+                      const fueElegida = !!elegida?.includes(o);
+                      const estado = !respondida
+                        ? marcadas.includes(o) ? 'marcada' : ''
+                        : esCorrecta ? (fueElegida || !multiple ? 'ok' : 'falto') : fueElegida ? 'mal' : 'resto';
                       const clases = {
                         '': '',
+                        marcada: 'border-accent bg-accent-soft',
                         ok: 'border-success bg-success-soft',
+                        falto: 'border-success border-dashed',
                         mal: 'border-danger bg-danger-soft',
                         resto: 'opacity-55',
                       }[estado];
@@ -200,8 +238,8 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
                           >
                             <Chip
                               size="sm"
-                              color={estado === 'ok' ? 'success' : estado === 'mal' ? 'danger' : 'default'}
-                              variant={estado === 'ok' || estado === 'mal' ? 'primary' : 'secondary'}
+                              color={estado === 'ok' || estado === 'falto' ? 'success' : estado === 'mal' ? 'danger' : estado === 'marcada' ? 'accent' : 'default'}
+                              variant={estado === 'ok' || estado === 'mal' || estado === 'marcada' ? 'primary' : 'secondary'}
                               className="size-7 shrink-0 justify-center rounded-md font-mono"
                             >
                               {LETRAS[k] ?? k + 1}
@@ -212,10 +250,19 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
                       );
                     })}
                   </ul>
+                  {multiple && !respondida && (
+                    <Button className="justify-self-start" isDisabled={!marcadas.length} onPress={comprobar}>
+                      Comprobar
+                    </Button>
+                  )}
                   {respondida && (
                     <div className="grid gap-3 pt-1" aria-live="polite">
-                      <Typography className={`font-titulo text-lg font-semibold ${elegida === actual.p.correcta ? 'text-success' : 'text-danger'}`}>
-                        {elegida === actual.p.correcta ? '✓ Correcto' : `✗ Incorrecto: era la ${LETRAS[actual.orden.indexOf(actual.p.correcta)]}`}
+                      <Typography className={`font-titulo text-lg font-semibold ${acierta(actual.p, elegida) ? 'text-success' : 'text-danger'}`}>
+                        {acierta(actual.p, elegida)
+                          ? '✓ Correcto'
+                          : multiple
+                            ? `✗ Incorrecto: las correctas eran la ${letras(correctasVisibles)}`
+                            : `✗ Incorrecto: era la ${letras(correctasVisibles)}`}
                       </Typography>
                       {actual.p.exp && (
                         <Typography color="muted">
@@ -235,7 +282,7 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
           </div>
           <PanelSesion
             filas={filasPorTema(items.map((it) => it.p), (k) => estados[k])}
-            atajos={[[['1', '2', '3', '4'], 'Elegir opción (o A–D)'], [['Enter'], 'Siguiente pregunta']]}
+            atajos={[[['1', '2', '3', '4'], 'Elegir o marcar opción (o A–D)'], [['Enter'], 'Comprobar · siguiente pregunta']]}
           />
         </div>
       )}
@@ -252,7 +299,7 @@ function Resultado({ sesion, estados, bien, onRehacer, onNuevo, irATeoria }: {
   irATeoria: IrATeoria;
 }) {
   const { items, elegidas } = sesion;
-  const mal = items.map((it, k) => ({ ...it, elegida: elegidas[k] })).filter((it) => it.elegida !== it.p.correcta);
+  const mal = items.map((it, k) => ({ ...it, elegida: elegidas[k] })).filter((it) => !acierta(it.p, it.elegida));
   return (
     <Card className="p-6 sm:p-8">
       <Card.Header>
@@ -282,10 +329,10 @@ function Resultado({ sesion, estados, bien, onRehacer, onNuevo, irATeoria }: {
                 <Typography color="muted">
                   {elegida !== undefined && (
                     <>
-                      Respondiste <Rico className="text-danger line-through" html={p.opciones[elegida]} /> ·{' '}
+                      Respondiste <Opciones p={p} ks={elegida} className="text-danger line-through" /> ·{' '}
                     </>
                   )}
-                  era <Rico className="font-medium text-success" html={p.opciones[p.correcta]} />
+                  {p.correctas.length > 1 ? 'eran' : 'era'} <Opciones p={p} ks={p.correctas} className="font-medium text-success" />
                 </Typography>
                 {p.exp && (
                   <Typography color="muted">
@@ -302,5 +349,18 @@ function Resultado({ sesion, estados, bien, onRehacer, onNuevo, irATeoria }: {
         )}
       </Card.Content>
     </Card>
+  );
+}
+
+function Opciones({ p, ks, className }: { p: Pregunta; ks: number[]; className: string }) {
+  return (
+    <>
+      {ks.map((k, j) => (
+        <Fragment key={k}>
+          {j > 0 && ' + '}
+          <Rico className={className} html={p.opciones[k]} />
+        </Fragment>
+      ))}
+    </>
   );
 }

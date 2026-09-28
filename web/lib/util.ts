@@ -53,7 +53,7 @@ export const nombreUnidad = (m: Materia, u: number) =>
 
 export const plural = (n: number, uno: string, varios: string) => `${n} ${n === 1 ? uno : varios}`;
 
-export const ENTRA: Record<string, string> = { 'sí': 'Entra: práctica', 'teoría': 'Entra: teoría', dudoso: 'Dudoso' };
+export const ENTRA: Record<string, string> = { 'sí': 'Entra', 'teoría': 'Entra: sólo teoría', dudoso: 'Dudoso' };
 
 export function cuentaRegresiva(m: Materia) {
   if (!m.fecha) return '';

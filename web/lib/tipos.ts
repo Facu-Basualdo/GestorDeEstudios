@@ -15,7 +15,8 @@ export type Seccion = { nivel: number; titulo: string; id: string };
 
 export type Flashcard = { q: string; a: string; ref: string };
 
-export type Pregunta = { q: string; opciones: string[]; correcta: number; exp: string; ref: string };
+/** `correctas`: índices de las opciones correctas; con más de una, se marcan todas y se comprueba. */
+export type Pregunta = { q: string; opciones: string[]; correctas: number[]; exp: string; ref: string };
 
 export type Tema = {
   id: string;

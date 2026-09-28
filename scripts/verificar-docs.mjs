@@ -16,7 +16,8 @@ const rel = (p) => relative(RAIZ, p).replaceAll('\\', '/');
 function listarMd(dir) {
   const salida = [];
   for (const entrada of readdirSync(dir)) {
-    if (entrada.startsWith('.')) continue;
+    // material/: exportaciones crudas (Faro, PDFs) que no son notas del grafo.
+    if (entrada.startsWith('.') || entrada === 'material') continue;
     const p = join(dir, entrada);
     if (statSync(p).isDirectory()) salida.push(...listarMd(p));
     else if (entrada.endsWith('.md')) salida.push(p);

@@ -33,6 +33,7 @@ Este repo es un vault de Obsidian: todo se escribe para leerse ahí.
 | Materia | Notebook | Próxima fecha | Índice |
 |---|---|---|---|
 | Arquitectura de Computadoras | Arquitectura de computadoras | 2026-09-30 · Eval. Nº 1 (codificación, combinacionales, secuenciales) | [INDICE](materias/arquitectura-de-computadoras/INDICE.md) |
+| Diseño de Sistemas de Información | — (export de Faro en `material/`) | 2026-10-21 · IE3 Diseño de solución informática | [INDICE](materias/diseno-de-sistemas/INDICE.md) |
 
 Fechas completas en [calendario.md](calendario.md).
 
@@ -64,4 +65,5 @@ Fechas completas en [calendario.md](calendario.md).
 ## Qué no va en el grafo
 
 - `docs/`: planes y borradores (por ejemplo [el prompt inicial](docs/prompt-inicial.md)). Se leen a demanda.
+- `materias/<materia>/material/`: material crudo importado (PDFs, export de Faro IA con `faro.json`). El verificador lo ignora; se usa como fuente para escribir las notas.
 - Los PDFs de `materias/<materia>/examenes/`: se leen sólo al correr `/cargar-examen`; lo que importa queda en `examenes/analisis.md`.

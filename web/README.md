@@ -25,7 +25,7 @@ hosting estático para abrirla desde el celular.
 | En la web | En la nota |
 |---|---|
 | Flashcards | `## Preguntas de recuperación`: `- pregunta :: respuesta [→ Sección](#Sección)` |
-| Cuestionario | `## Cuestionario`: lista numerada con opciones `- [ ]` / `- [x]` y explicación en `>` |
+| Cuestionario | `## Cuestionario`: lista numerada con opciones `- [ ]` / `- [x]` y explicación en `>`. Con más de una `- [x]` es de varias correctas: se tildan todas y se comprueba |
 | Teoría | el resto de la nota; los enlaces a `docs/` aparecen como "Fuentes citadas" |
 | Orden, unidad y peso | `INDICE.md` y la columna Nota de `temas.md` |
 
