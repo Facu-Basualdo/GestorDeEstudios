@@ -98,22 +98,34 @@ function lista(lineas, ctx) {
       items.at(-1)?.hijos.push(l);
     }
   }
-  const html = items.map(({ texto, hijos }) => {
-    const tarea = texto.match(/^\[( |x|X)\]\s+(.*)$/);
-    const cuerpo = tarea
-      ? `<span class="casilla${tarea[1] === ' ' ? '' : ' marcada'}" aria-hidden="true"></span>${inline(tarea[2], ctx)}`
-      : inline(texto, ctx);
-    const conHijos = hijos.filter((h) => h.trim());
-    if (!conHijos.length) return `<li>${cuerpo}</li>`;
-    const minimo = Math.min(...conHijos.map((h) => h.match(/^\s*/)[0].length));
-    return `<li>${cuerpo}${bloques(hijos.map((h) => h.slice(minimo)).join('\n'), ctx)}</li>`;
-  });
-  return ordenada ? `<ol>${html.join('')}</ol>` : `<ul>${html.join('')}</ul>`;
+  return {
+    t: 'lista',
+    ordenada,
+    items: items.map(({ texto, hijos }) => {
+      const tarea = texto.match(/^\[( |x|X)\]\s+(.*)$/);
+      const conHijos = hijos.filter((h) => h.trim());
+      const minimo = conHijos.length ? Math.min(...conHijos.map((h) => h.match(/^\s*/)[0].length)) : 0;
+      return {
+        html: inline(tarea ? tarea[2] : texto, ctx),
+        tarea: tarea ? tarea[1] !== ' ' : null,
+        hijos: conHijos.length ? bloques(hijos.map((h) => h.slice(minimo)).join('\n'), ctx) : [],
+      };
+    }),
+  };
 }
 
+// La teoría sale como bloques (no como HTML) para que la web dibuje cada uno con su
+// componente de HeroUI: tabla, alerta, casilla, separador, tipografía. El texto dentro
+// de cada bloque sí es HTML inline ya escapado (énfasis, código, enlaces).
+//   { t: 'titulo', nivel, id, html }      { t: 'parrafo', html }
+//   { t: 'lista', ordenada, items: [{ html, tarea: null | true | false, hijos: [bloques] }] }
+//   { t: 'tabla', titulo, cabecera: [html], filas: [[html]] }
+//   { t: 'cita', tono: 'warning' | 'default', hijos: [bloques] }
+//   { t: 'codigo', texto }                { t: 'separador' }
 function bloques(md, ctx) {
   const lineas = lineasDe(md);
-  let html = '';
+  const salida = [];
+  let ultimoTitulo = '';
   let i = 0;
   while (i < lineas.length) {
     const l = lineas[i];
@@ -123,37 +135,33 @@ function bloques(md, ctx) {
       const codigo = [];
       for (i++; i < lineas.length && !/^```/.test(lineas[i]); i++) codigo.push(lineas[i]);
       i++;
-      html += `<div class="desborde"><pre><code>${esc(codigo.join('\n'))}</code></pre></div>`;
+      salida.push({ t: 'codigo', texto: codigo.join('\n') });
       continue;
     }
 
     let m = l.match(/^(#{1,6})\s+(.*)$/);
     if (m) {
-      const nivel = m[1].length;
-      const id = `${ctx.notaId}--${anclaDe(m[2].replace(/[*`_]/g, ''))}`;
-      html += `<h${nivel} id="${esc(id)}">${inline(m[2], ctx)}</h${nivel}>`;
+      ultimoTitulo = m[2].replace(/[*`_]/g, '');
+      salida.push({ t: 'titulo', nivel: m[1].length, id: `${ctx.notaId}--${anclaDe(ultimoTitulo)}`, html: inline(m[2], ctx) });
       i++;
       continue;
     }
 
-    if (/^(-{3,}|\*{3,})\s*$/.test(l)) { html += '<hr>'; i++; continue; }
+    if (/^(-{3,}|\*{3,})\s*$/.test(l)) { salida.push({ t: 'separador' }); i++; continue; }
 
     if (/^\|/.test(l) && /^\|?\s*:?-{3,}/.test(lineas[i + 1] ?? '')) {
-      const cabecera = celdas(l);
+      const cabecera = celdas(l).map((c) => inline(c, ctx));
       const filas = [];
-      for (i += 2; i < lineas.length && /^\|/.test(lineas[i]); i++) filas.push(celdas(lineas[i]));
-      html += '<div class="desborde tabla"><table><thead><tr>'
-        + cabecera.map((c) => `<th>${inline(c, ctx)}</th>`).join('')
-        + '</tr></thead><tbody>'
-        + filas.map((f) => `<tr>${f.map((c) => `<td>${inline(c, ctx)}</td>`).join('')}</tr>`).join('')
-        + '</tbody></table></div>';
+      for (i += 2; i < lineas.length && /^\|/.test(lineas[i]); i++) filas.push(celdas(lineas[i]).map((c) => inline(c, ctx)));
+      salida.push({ t: 'tabla', titulo: ultimoTitulo || 'Tabla', cabecera, filas });
       continue;
     }
 
     if (/^>/.test(l)) {
       const cita = [];
       for (; i < lineas.length && /^>/.test(lineas[i]); i++) cita.push(lineas[i].replace(/^>\s?/, ''));
-      html += `<blockquote>${bloques(cita.join('\n'), ctx)}</blockquote>`;
+      const texto = cita.join('\n');
+      salida.push({ t: 'cita', tono: /sin verificar/i.test(texto) ? 'warning' : 'default', hijos: bloques(texto, ctx) });
       continue;
     }
 
@@ -166,16 +174,16 @@ function bloques(md, ctx) {
         if (!actual.trim() && (ES_ITEM.test(lineas[i + 1] ?? '') || /^\s+\S/.test(lineas[i + 1] ?? ''))) { items.push(actual); continue; }
         break;
       }
-      html += lista(items, ctx);
+      salida.push(lista(items, ctx));
       continue;
     }
 
     const parrafo = [];
     for (; i < lineas.length && lineas[i].trim() && !ES_INICIO_DE_BLOQUE.test(lineas[i]); i++) parrafo.push(lineas[i].trim());
     if (!parrafo.length) { parrafo.push(l.trim()); i++; }
-    html += `<p>${inline(parrafo.join(' '), ctx)}</p>`;
+    salida.push({ t: 'parrafo', html: inline(parrafo.join(' '), ctx) });
   }
-  return html;
+  return salida;
 }
 
 // ---------------------------------------------------------------- notas
@@ -269,7 +277,7 @@ function leerNota(ruta, id, notas) {
     }
   }
 
-  return { titulo, html: bloques(md, ctx), secciones: indiceDeSecciones, flashcards, preguntas };
+  return { titulo, bloques: bloques(md, ctx), secciones: indiceDeSecciones, flashcards, preguntas };
 }
 
 // ---------------------------------------------------------------- materias
@@ -354,7 +362,7 @@ const fuentes = [...FUENTES].map(([ruta, id]) => {
   const md = readFileSync(ruta, 'utf8');
   const titulo = md.match(/^#\s+(.*)$/m)?.[1].trim() ?? id;
   const ctx = { dir: dirname(ruta), notaId: id, notas: new Map() };
-  return { id, titulo, ruta: rel(ruta), html: bloques(md.replace(/^#\s+.*$/m, ''), ctx) };
+  return { id, titulo, ruta: rel(ruta), bloques: bloques(md.replace(/^#\s+.*$/m, ''), ctx) };
 });
 
 const hoy = new Date();

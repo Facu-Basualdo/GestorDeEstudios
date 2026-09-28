@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Header, Kbd, ListBox, Select, Separator } from '@heroui/react';
+import { Button, Card, Header, Kbd, ListBox, ScrollShadow, Select, Separator, Typography } from '@heroui/react';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import type { Materia, Tema } from '@/lib/tipos';
@@ -65,8 +65,12 @@ export function Progreso({ estados, actual, cifras, leyenda }: {
   return (
     <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-1.5">
       <div className="flex flex-wrap justify-between gap-x-4 gap-y-1">
-        <span className="font-mono text-[13px] font-medium tabular-nums text-muted">{cifras}</span>
-        <span className="font-mono text-xs text-muted">{leyenda}</span>
+        <Typography type="body-sm" color="muted" weight="medium" className="font-mono tabular-nums">
+          {cifras}
+        </Typography>
+        <Typography type="body-xs" color="muted" className="font-mono">
+          {leyenda}
+        </Typography>
       </div>
       <Onda estados={estados} actual={actual} />
     </div>
@@ -172,7 +176,8 @@ export function PanelSesion({ filas, atajos }: { filas: FilaSesion[]; atajos: [s
           <span className="etiqueta">Esta sesión, por tema</span>
         </Card.Header>
         <Card.Content>
-          <ul className="grid max-h-[46dvh] grid-cols-[minmax(0,1fr)] gap-3.5 overflow-y-auto pr-1">
+          <ScrollShadow hideScrollBar size={40} className="max-h-[46dvh]">
+          <ul className="grid grid-cols-[minmax(0,1fr)] gap-3.5 py-1">
             {filas.map((f) => (
               <li key={f.tema.id} className="grid min-w-0 gap-1.5" title={f.tema.titulo}>
                 <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-baseline gap-2 text-sm">
@@ -190,6 +195,7 @@ export function PanelSesion({ filas, atajos }: { filas: FilaSesion[]; atajos: [s
               </li>
             ))}
           </ul>
+          </ScrollShadow>
         </Card.Content>
       </Card>
       <Card className="p-5">

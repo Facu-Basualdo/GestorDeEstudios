@@ -23,7 +23,7 @@
    - [ ] 2
    - [ ] 4
    > 2² = 4 no alcanza; 2³ = 8 sí. [→ Receta del detector](#Receta%20del%20detector)
-2. ¿Y para 9 estados?
+2. ¿Cuántos biestables necesitás para 9 estados?
    - [x] 4
    - [ ] 3
    - [ ] 9
@@ -35,7 +35,7 @@
    - [ ] A S0 (nada, salida 0)
    - [ ] Te quedás en S2
    > Completaste 001: la salida pasa a 1 y ese 1 es el comienzo de 100. [→ Ejemplo 001 y 100](#Ejemplo%20001%20y%20100)
-4. En el mismo detector estás en "10" (salida 1) y llega un 0. ¿A dónde vas?
+4. En el detector que prende con 001 y apaga con 100 estás en "10" (salida 1) y llega un 0. ¿A dónde vas?
    - [x] A S2 ("00", salida 0)
    - [ ] A S0 (nada, salida 0)
    - [ ] A S1 ("0", salida 0)

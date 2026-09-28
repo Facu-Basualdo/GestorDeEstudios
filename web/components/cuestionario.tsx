@@ -1,7 +1,7 @@
 'use client';
 
-import { Button, Card, Label, ListBox, Select } from '@heroui/react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Button, Card, Chip, Label, ListBox, Select, Separator, Typography } from '@heroui/react';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { IrATeoria, Materia, Pregunta, Tema } from '@/lib/tipos';
 import { filtrarPorTema, guardado, hash, mezclar, plural, porPeso, type Filtro } from '@/lib/util';
 import { EnlaceTeoria } from './flashcards';
@@ -152,7 +152,7 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
       </div>
 
       {items.length === 0 ? (
-        <p className="text-muted">No hay preguntas con este filtro.</p>
+        <Typography color="muted">No hay preguntas con este filtro.</Typography>
       ) : !actual ? (
         <Resultado
           sesion={sesion}
@@ -177,9 +177,9 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
                   <Peso peso={actual.p.tema.peso} />
                 </Card.Header>
                 <Card.Content className="grid gap-5">
-                  <p className="font-titulo text-[clamp(1.25rem,3vw,1.6rem)] font-semibold leading-snug text-balance">
+                  <Typography className="font-titulo text-[clamp(1.25rem,3vw,1.6rem)] font-semibold leading-snug text-balance">
                     <Rico html={actual.p.q} />
-                  </p>
+                  </Typography>
                   <ul className="grid gap-2.5">
                     {actual.orden.map((o, k) => {
                       const esCorrecta = o === actual.p.correcta;
@@ -198,13 +198,14 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
                             className={`h-auto min-h-12 justify-start gap-3 whitespace-normal py-3 text-left font-normal ${clases}`}
                             onPress={() => elegir(k)}
                           >
-                            <span
-                              className={`grid size-7 shrink-0 place-items-center rounded-md font-mono text-[13px] font-medium ${
-                                estado === 'ok' ? 'bg-success text-success-foreground' : estado === 'mal' ? 'bg-danger text-danger-foreground' : 'bg-default text-muted'
-                              }`}
+                            <Chip
+                              size="sm"
+                              color={estado === 'ok' ? 'success' : estado === 'mal' ? 'danger' : 'default'}
+                              variant={estado === 'ok' || estado === 'mal' ? 'primary' : 'secondary'}
+                              className="size-7 shrink-0 justify-center rounded-md font-mono"
                             >
                               {LETRAS[k] ?? k + 1}
-                            </span>
+                            </Chip>
                             <Rico html={actual.p.opciones[o]} />
                           </Button>
                         </li>
@@ -213,13 +214,13 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
                   </ul>
                   {respondida && (
                     <div className="grid gap-3 pt-1" aria-live="polite">
-                      <p className={`font-titulo text-lg font-semibold ${elegida === actual.p.correcta ? 'text-success' : 'text-danger'}`}>
+                      <Typography className={`font-titulo text-lg font-semibold ${elegida === actual.p.correcta ? 'text-success' : 'text-danger'}`}>
                         {elegida === actual.p.correcta ? '✓ Correcto' : `✗ Incorrecto: era la ${LETRAS[actual.orden.indexOf(actual.p.correcta)]}`}
-                      </p>
+                      </Typography>
                       {actual.p.exp && (
-                        <p className="text-muted">
+                        <Typography color="muted">
                           <Rico html={actual.p.exp} />
-                        </p>
+                        </Typography>
                       )}
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <EnlaceTeoria tema={actual.p.tema} ancla={actual.p.ref} irATeoria={irATeoria} />
@@ -269,32 +270,35 @@ function Resultado({ sesion, estados, bien, onRehacer, onNuevo, irATeoria }: {
           </Button>
         </div>
         {mal.length > 0 && (
-          <ul className="divide-y divide-separator border-t border-separator">
+          <div className="grid">
             {mal.map(({ p, elegida }) => (
-              <li key={p.clave} className="grid gap-1.5 py-4">
+              <Fragment key={p.clave}>
+              <Separator />
+              <div className="grid gap-1.5 py-4">
                 <span className="etiqueta">{p.tema.titulo}</span>
-                <span className="font-semibold">
+                <Typography weight="semibold">
                   <Rico html={p.q} />
-                </span>
-                <span className="text-muted">
+                </Typography>
+                <Typography color="muted">
                   {elegida !== undefined && (
                     <>
                       Respondiste <Rico className="text-danger line-through" html={p.opciones[elegida]} /> ·{' '}
                     </>
                   )}
                   era <Rico className="font-medium text-success" html={p.opciones[p.correcta]} />
-                </span>
+                </Typography>
                 {p.exp && (
-                  <span className="text-muted">
+                  <Typography color="muted">
                     <Rico html={p.exp} />
-                  </span>
+                  </Typography>
                 )}
                 <div>
                   <EnlaceTeoria tema={p.tema} ancla={p.ref} irATeoria={irATeoria} />
                 </div>
-              </li>
+              </div>
+              </Fragment>
             ))}
-          </ul>
+          </div>
         )}
       </Card.Content>
     </Card>

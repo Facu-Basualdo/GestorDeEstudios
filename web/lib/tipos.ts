@@ -1,5 +1,15 @@
 // Forma de web/datos/datos.json, que arma scripts/generar-web.mjs desde las notas.
-// Los campos *html ya vienen renderizados y escapados por el generador.
+// Los campos *html son HTML inline ya escapado por el generador (énfasis, código, enlaces);
+// la teoría viene en bloques para dibujar cada uno con su componente de HeroUI.
+
+export type Bloque =
+  | { t: 'titulo'; nivel: number; id: string; html: string }
+  | { t: 'parrafo'; html: string }
+  | { t: 'lista'; ordenada: boolean; items: { html: string; tarea: boolean | null; hijos: Bloque[] }[] }
+  | { t: 'tabla'; titulo: string; cabecera: string[]; filas: string[][] }
+  | { t: 'cita'; tono: 'warning' | 'default'; hijos: Bloque[] }
+  | { t: 'codigo'; texto: string }
+  | { t: 'separador' };
 
 export type Seccion = { nivel: number; titulo: string; id: string };
 
@@ -16,7 +26,7 @@ export type Tema = {
   entra: string;
   dominio: number;
   descripcion: string;
-  html: string;
+  bloques: Bloque[];
   secciones: Seccion[];
   flashcards: Flashcard[];
   preguntas: Pregunta[];
@@ -31,7 +41,7 @@ export type Materia = {
   temas: Tema[];
 };
 
-export type Fuente = { id: string; titulo: string; ruta: string; html: string };
+export type Fuente = { id: string; titulo: string; ruta: string; bloques: Bloque[] };
 
 export type Datos = { generado: string; materias: Materia[]; fuentes: Fuente[] };
 

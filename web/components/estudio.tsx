@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Label, ListBox, Select, Tabs } from '@heroui/react';
+import { Button, Label, ListBox, Select, Separator, Tabs, Typography } from '@heroui/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Datos, Lectura, Nota, Vista } from '@/lib/tipos';
 import { cuentaRegresiva, guardado } from '@/lib/util';
@@ -129,9 +129,15 @@ export function Estudio({ datos }: { datos: Datos }) {
                 </Select.Popover>
               </Select>
             ) : (
-              <span className="truncate text-sm font-medium">{materia.nombre}</span>
+              <Typography type="body-sm" weight="medium" truncate>
+                {materia.nombre}
+              </Typography>
             )}
-            {cuenta && <span className="font-mono text-xs font-medium text-accent">{cuenta}</span>}
+            {cuenta && (
+              <Typography type="body-xs" weight="medium" className="font-mono text-accent">
+                {cuenta}
+              </Typography>
+            )}
           </div>
 
           <div className="order-last w-full md:order-none md:ml-auto md:w-auto">
@@ -173,10 +179,13 @@ export function Estudio({ datos }: { datos: Datos }) {
         </section>
       </main>
 
-      <footer className="mx-auto max-w-[1680px] px-4 pb-10 font-mono text-xs leading-relaxed text-muted sm:px-8 xl:px-10">
-        Generada el {datos.generado} desde las notas del vault · {materia.temas.length} temas · {nFc} flashcards · {nCu} preguntas.
-        <br />
-        Cada tema dice de qué fuente sale su contenido. Si algo choca con la cátedra, manda la cátedra.
+      <footer className="mx-auto grid max-w-[1680px] gap-4 px-4 pb-10 sm:px-8 xl:px-10">
+        <Separator />
+        <Typography type="body-xs" color="muted" className="font-mono leading-relaxed">
+          Generada el {datos.generado} desde las notas del vault · {materia.temas.length} temas · {nFc} flashcards · {nCu} preguntas.
+          <br />
+          Cada tema dice de qué fuente sale su contenido. Si algo choca con la cátedra, manda la cátedra.
+        </Typography>
       </footer>
 
       {volver && vista === 'teoria' && (

@@ -1,7 +1,7 @@
 'use client';
 
-import { Button, Card, Checkbox } from '@heroui/react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Button, Card, Checkbox, Separator, Typography } from '@heroui/react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import type { Flashcard, IrATeoria, Materia, Nota, Tema } from '@/lib/tipos';
 import { filtrarPorTema, guardado, hash, mezclar, porPeso, type Filtro } from '@/lib/util';
 import { FiltroTemas, PanelSesion, Peso, Progreso, Rico, filasPorTema } from './piezas';
@@ -137,10 +137,10 @@ export function Flashcards({ materia, activo, historial, onCalificar, irATeoria,
       </div>
 
       {mazo.length === 0 ? (
-        <p className="text-muted">
+        <Typography color="muted">
           No hay tarjetas con este filtro.
           {opciones.soloFalladas ? ' Todavía no marcaste ninguna como "No la sabía" o "Dudé".' : ''}
-        </p>
+        </Typography>
       ) : !actual ? (
         <Resumen
           mazo={mazo}
@@ -159,7 +159,7 @@ export function Flashcards({ materia, activo, historial, onCalificar, irATeoria,
                 cifras={`Tarjeta ${i + 1} de ${mazo.length} · ${cuenta(2)} sabidas · ${cuenta(1)} dudadas · ${cuenta(0)} no`}
                 leyenda={LEYENDA}
               />
-    
+
               {/* key = índice: cada tarjeta es un elemento nuevo, así no se ve la respuesta
                   de la siguiente mientras la anterior se da vuelta. */}
               <div key={`${i}-${mazo.length}`} className="carta entra" data-girada={girada}>
@@ -177,29 +177,29 @@ export function Flashcards({ materia, activo, historial, onCalificar, irATeoria,
                       <Peso peso={actual.tema.peso} />
                     </Card.Header>
                     <Card.Content className="flex flex-1 flex-col justify-center">
-                      <p className="font-titulo text-[clamp(1.35rem,3.3vw,1.9rem)] font-semibold leading-tight text-balance">
+                      <Typography className="font-titulo text-[clamp(1.35rem,3.3vw,1.9rem)] font-semibold leading-tight text-balance">
                         <Rico html={actual.q} />
-                      </p>
+                      </Typography>
                     </Card.Content>
                     <Card.Footer>
-                      <span className="font-mono text-xs text-muted">
+                      <Typography type="body-xs" color="muted" className="font-mono">
                         Tocá la tarjeta para ver la respuesta<span className="solo-teclado"> · Espacio</span>
-                      </span>
+                      </Typography>
                     </Card.Footer>
                   </Card>
-    
+
                   <Card className="cara dorso min-h-[min(46vh,400px)] p-6 sm:p-10" aria-hidden={!girada}>
                     <Card.Header className="flex-row items-baseline justify-between gap-3">
                       <span className="etiqueta truncate">{actual.tema.titulo}</span>
                       <span className="etiqueta">Respuesta</span>
                     </Card.Header>
                     <Card.Content className="grid gap-4">
-                      <p className="text-[15px] font-medium text-muted">
+                      <Typography type="body-sm" color="muted" weight="medium">
                         <Rico html={actual.q} />
-                      </p>
-                      <p className="text-[clamp(1.1rem,2.4vw,1.3rem)] leading-relaxed">
+                      </Typography>
+                      <Typography className="text-[clamp(1.1rem,2.4vw,1.3rem)] leading-relaxed">
                         <Rico html={actual.a} />
-                      </p>
+                      </Typography>
                     </Card.Content>
                     <Card.Footer className="mt-auto">
                       <EnlaceTeoria tema={actual.tema} ancla={actual.ref} irATeoria={irATeoria} />
@@ -207,7 +207,7 @@ export function Flashcards({ materia, activo, historial, onCalificar, irATeoria,
                   </Card>
                 </div>
               </div>
-    
+
               {girada ? (
                 <div className="grid grid-cols-3 gap-2 sm:gap-3" role="group" aria-label="¿La sabías?">
                   <BotonNota nota={0} texto="No la sabía" clase="text-danger" onPress={calificar} />
@@ -219,7 +219,7 @@ export function Flashcards({ materia, activo, historial, onCalificar, irATeoria,
                   Ver respuesta
                 </Button>
               )}
-    
+
               <div className="flex justify-between">
                 <Button variant="ghost" size="sm" isDisabled={i === 0} onPress={() => mover(-1)}>
                   ← Anterior
@@ -293,22 +293,25 @@ function Resumen({ mazo, notas, estados, onRepasar, onReiniciar, irATeoria }: {
           </Button>
         </div>
         {falladas.length > 0 && (
-          <ul className="divide-y divide-separator border-t border-separator">
+          <div className="grid">
             {falladas.map((c) => (
-              <li key={c.clave} className="grid gap-1.5 py-4">
-                <span className="etiqueta">{c.tema.titulo}</span>
-                <span className="font-semibold">
-                  <Rico html={c.q} />
-                </span>
-                <span className="text-muted">
-                  <Rico html={c.a} />
-                </span>
-                <div>
-                  <EnlaceTeoria tema={c.tema} ancla={c.ref} irATeoria={irATeoria} />
+              <Fragment key={c.clave}>
+                <Separator />
+                <div className="grid gap-1.5 py-4">
+                  <span className="etiqueta">{c.tema.titulo}</span>
+                  <Typography weight="semibold">
+                    <Rico html={c.q} />
+                  </Typography>
+                  <Typography color="muted">
+                    <Rico html={c.a} />
+                  </Typography>
+                  <div>
+                    <EnlaceTeoria tema={c.tema} ancla={c.ref} irATeoria={irATeoria} />
+                  </div>
                 </div>
-              </li>
+              </Fragment>
             ))}
-          </ul>
+          </div>
         )}
       </Card.Content>
     </Card>
