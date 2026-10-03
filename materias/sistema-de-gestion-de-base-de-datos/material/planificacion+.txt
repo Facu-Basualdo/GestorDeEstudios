@@ -1,0 +1,148 @@
+Programa Analítico, Unidades Temáticas:
+BLOQUE TEMÁTICO 1: ADMINISTRACION DE BASES DE DATOS RELACIONALES
+
+Tema 1
+
+Arquitectura e Instalación de un motor de base de datos relacional
+
+Contenidos
+
+Instancia. Estructura de memoria. Procesos. Archivos de la base de datos y otros archivos involucrados. Estructura lógica y física de una base de datos. Bloques, extensiones, páginas, segmentos, tablespaces/datafiles o equivalentes según el motor. Diccionario de Datos. Introducción comparativa a la arquitectura de motores comerciales y open source. Procesamiento de sentencias SQL. Optimizador de consultas SQL y lectura inicial de planes de ejecución.
+
+Resultados de Aprendizaje
+
+RA 1 y RA 2
+
+Tema 2
+
+Diseño físico de una base de datos relacional
+
+Contenidos
+
+Diseño físico de bases de datos. Estructura del almacenamiento. Administración de tablespaces, archivos, tablas, índices y particiones según el motor utilizado. Estadísticas, planes de ejecución, ajuste de consultas, criterios de diseño de archivos, tablas e índices.
+
+Resultados de Aprendizaje
+
+RA 1 y RA 2
+
+Tema 3
+
+Lenguaje SQL avanzado
+
+Contenidos
+
+Funciones avanzadas para manejo de valores alfanuméricos y fechas, funciones de agregación y de ventana. Expresiones de tablas comunes (CTE). Tipos de joins en bases de datos. Consultas recursivas. Carga masiva de datos. Resolución de problemas frecuentes de consulta, transformación y análisis sobre motores relacionales.
+
+Resultados de Aprendizaje
+
+RA 1 y RA 2
+
+Tema 4
+
+Herramientas de programación en los motores de base de datos relacionales
+
+Contenidos
+
+Funciones, procedimientos almacenados y disparadores. Conceptos y casos de uso. Lenguaje de programación en el motor relacional. Versionamiento de esquemas, migraciones, pruebas y nociones de CI/CD para proyectos de base de datos SQL.
+
+Resultados de Aprendizaje
+
+RA 1 y RA 2
+
+Tema 5
+
+Conectividad del RDBMS
+
+Contenidos
+
+Introducción a ODBC y JDBC, arquitectura y configuración. Técnicas de programación para acceso a bases de datos remotas. Conectividad con .NET/Java. Connection pooling, cadenas de conexión, buenas prácticas de acceso a datos y nociones de integración mediante APIs y ORMs.
+
+Resultados de Aprendizaje
+
+RA 2
+
+Tema 6
+
+Seguridad, copias de resguardo y alta disponibilidad
+
+Contenidos
+
+Privilegios de sistema y objetos. Administración de usuarios, roles y privilegios. Vistas, auditoría básica y cifrado. Técnicas de backup y restore. Backup físico y lógico, backup del log de transacciones, restauración a punto en el tiempo, RPO/RTO, alta disponibilidad, replicación y buenas prácticas operativas.
+
+Resultados de Aprendizaje
+
+RA 2
+
+BLOQUE TEMÁTICO 2: BASE DE DATOS NOSQL Y EN LA NUBE
+
+Tema 7
+
+Datos Semiestructurados (XML y JSON)
+
+Contenidos
+
+Datos semiestructurados. Introducción y conceptos de XML. JSON como formato de intercambio y almacenamiento. Tipos de datos JSON soportados por gestores reales, indexación y consultas sobre documentos JSON.
+
+Resultados de Aprendizaje
+
+RA 3
+
+Tema 8
+
+Introducción a los motores NoSQL
+
+Contenidos
+
+Valor de las bases de datos RDBMS. Cambios en la evolución tecnológica a partir de los cuales las RDBMS no siempre resultan óptimas. Surgimiento de NoSQL. Necesidades que cubren las bases de datos NoSQL. Tipos de bases de datos NoSQL: key-value, documentales, column-family y grafos. Persistencia políglota y criterios de selección.
+
+Resultados de Aprendizaje
+
+RA 3
+
+Tema 9
+
+Modelos de datos basados en Agregados y basados en Relaciones
+
+Contenidos
+
+Definición de agregados. Ejemplos. Uso de agregados en bases de datos key-value y documentales. Uso de agregados en bases column-family. Modelado de datos en bases de datos basadas en agregados. Desnormalización, vistas materializadas y consultas orientadas al caso de uso. Modelos basados en relaciones: bases de datos de grafos. Bases de datos sin esquema rígido.
+
+Resultados de Aprendizaje
+
+RA 3
+
+Tema 10
+
+Modelos de distribución de datos
+
+Contenidos
+
+Introducción. Single server. Almacenamiento de datos en diferentes máquinas: sharding. Replicación primaria-secundaria y peer to peer. Combinación de sharding y replicación. Consistencia, disponibilidad, tolerancia a particiones, consistencia eventual y criterios CAP.
+
+Resultados de Aprendizaje
+
+RA 3
+
+Tema 11
+
+Introducción a bases de datos en la nube
+
+Contenidos
+
+Bases de datos en la nube. Evolución a la nube. DBaaS. Obtención y migración de datos en la nube. Gestión de costos, escalabilidad, seguridad, backup administrado, observabilidad y adaptación del rol del DBA en entornos cloud e híbridos.
+
+Resultados de Aprendizaje
+
+RA 3
+
+Tema 12
+
+Herramientas para almacenamiento, procesamiento y análisis de datos distribuidos
+
+Contenidos
+
+Herramientas para almacenamiento, procesamiento y análisis de datos distribuidos. Panorama del ecosistema Hadoop y Spark. HDFS, YARN, motores de procesamiento distribuido, consultas SQL sobre datos distribuidos y relación con arquitecturas modernas de datos.
+
+Resultados de Aprendizaje
+
+RA 3

@@ -1,0 +1,522 @@
+-- =====================================================================
+--  SISTEMAS DE GESTION DE BASES DE DATOS
+--  Actividad: indices en PostgreSQL - medicion de planes de ejecucion
+--
+--  Motor  : PostgreSQL 18.4 (Ubuntu 18.4-0ubuntu0.26.04.1)
+--  Host   : VM VirtualBox UbuntuServer - Ubuntu 26.04 LTS
+--  Base   : sgbd_lab
+--  Fecha  : 2026-08-23
+--
+--  OBJETO DE LA ACTIVIDAD
+--  Medir el impacto de los indices B-tree sobre la columna nro_cuenta,
+--  que vincula la tabla cuentas con la tabla movimientos_nro. Se compara
+--  el plan de ejecucion y el tiempo de respuesta con y sin indice, para
+--  tres tipos de acceso: igualdad, reunion (JOIN) y prefijo con LIKE.
+--
+--  NOTA SOBRE EL ALCANCE
+--  Las secciones 1, 2.1 y 3.1 reconstruyen sentencias ejecutadas en
+--  clases anteriores (creacion de la base, de la tabla cuentas y carga
+--  del CSV). El DDL de cuentas se obtuvo con pg_dump --schema-only, por
+--  lo que refleja la estructura real. El resto se ejecuto durante esta
+--  actividad. Los conteos y tiempos de la seccion 9 son mediciones
+--  reales tomadas sobre la base al momento de la practica.
+-- =====================================================================
+
+
+-- =====================================================================
+--  1. CREACION DE LA BASE Y DE LOS ROLES        [reconstruido]
+-- =====================================================================
+
+-- Rol de grupo: todos los objetos quedan a su nombre, de modo que
+-- cualquier integrante puede ALTER/DROP lo que creo otro.
+CREATE ROLE sdg NOLOGIN;
+
+-- Roles individuales (uno por integrante). Conservan su identidad en
+-- session_user para trazabilidad, pero operan como sdg.
+CREATE ROLE maria LOGIN PASSWORD '123';
+CREATE ROLE agus  LOGIN PASSWORD '123';
+CREATE ROLE fran  LOGIN PASSWORD '123';
+CREATE ROLE romi  LOGIN PASSWORD '123';
+CREATE ROLE yas   LOGIN PASSWORD '123';
+
+GRANT sdg TO maria, agus, fran, romi, yas;
+ALTER ROLE maria SET role TO sdg;
+ALTER ROLE agus  SET role TO sdg;
+ALTER ROLE fran  SET role TO sdg;
+ALTER ROLE romi  SET role TO sdg;
+ALTER ROLE yas   SET role TO sdg;
+
+CREATE DATABASE sgbd_lab OWNER sdg;
+
+-- \c sgbd_lab      -- en psql, conectarse a la base recien creada
+
+
+-- =====================================================================
+--  2. CREACION DE LAS TABLAS
+-- =====================================================================
+
+-- Todo objeto debe crearse como sdg, no como postgres. Crear como
+-- postgres deja la tabla fuera del esquema de permisos del grupo y el
+-- resto del equipo no puede verla ni modificarla.
+SET ROLE sdg;
+
+-- ---------------------------------------------------------------
+-- 2.1  Tabla cuentas                            [reconstruido]
+--      La restriccion UNIQUE sobre nro_cuenta crea automaticamente
+--      un indice B-tree. Ese indice, que nadie escribio a mano, es
+--      el que sostiene el lado "cuentas" de todas las reuniones.
+-- ---------------------------------------------------------------
+CREATE TABLE cuentas (
+    id         integer       GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nro_cuenta varchar(20)   NOT NULL UNIQUE,
+    titular    varchar(100)  NOT NULL,
+    saldo      numeric(12,2) NOT NULL,
+    fecha_alta date          NOT NULL
+);
+
+-- ---------------------------------------------------------------
+-- 2.2  Tabla movimientos_nro
+--      Registra los movimientos de cada cuenta. La clave foranea es
+--      nro_cuenta, es decir la clave natural del negocio, en lugar
+--      de la clave subrogada id.
+-- ---------------------------------------------------------------
+CREATE TABLE movimientos_nro (
+    id         bigint        GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nro_cuenta varchar(20)   NOT NULL,
+    fecha      date          NOT NULL,
+    importe    numeric(12,2) NOT NULL,
+    tipo       varchar(10)   NOT NULL
+);
+
+
+-- =====================================================================
+--  3. INSERCION DE DATOS
+-- =====================================================================
+
+-- ---------------------------------------------------------------
+-- 3.1  Carga inicial de cuentas                 [reconstruido]
+--      El CSV lo genera script_Datos.py con la libreria Faker (es_AR).
+--      \copy es un comando de psql (cliente), no SQL: lee el archivo
+--      desde la maquina donde corre psql. COPY a secas lo leeria desde
+--      el servidor y exigiria permisos de superusuario.
+-- ---------------------------------------------------------------
+\copy cuentas (nro_cuenta, titular, saldo, fecha_alta) FROM 'cuentas_masivas.csv' WITH (FORMAT csv, HEADER true)
+
+-- ---------------------------------------------------------------
+-- 3.2  Ampliacion de cuentas a escala de millones
+--      Se generan 2.000.020 filas adicionales por SQL. Se usa
+--      generate_series en lugar de Faker porque tarda 12 segundos
+--      contra varios minutos del script de Python.
+--
+--      El nro_cuenta sigue el patron CTA-000000000001 en adelante:
+--      un formato predecible permite despues generar movimientos
+--      que referencian cuentas existentes, sin filas huerfanas.
+-- ---------------------------------------------------------------
+INSERT INTO cuentas (nro_cuenta, titular, saldo, fecha_alta)
+SELECT
+  'CTA-' || lpad(g::text, 12, '0'),
+  (ARRAY['Benjamin','Martina','Isabella','Bautista','Mateo','Valentina',
+         'Santiago','Emma','Joaquin','Catalina','Lucas','Renata','Thiago',
+         'Olivia','Facundo','Delfina','Ignacio','Julieta','Tomas','Camila'
+        ])[1 + (random() * 19)::int]
+  || ' ' ||
+  (ARRAY['Gonzalez','Lopez','Rodriguez','Fernandez','Martinez','Perez',
+         'Garcia','Sanchez','Romero','Sosa','Torres','Alvarez','Ruiz',
+         'Ramirez','Flores','Acosta','Benitez','Medina','Suarez','Herrera'
+        ])[1 + (random() * 19)::int]
+  || ' ' ||
+  (ARRAY['Vega','Cruz','Ortiz','Silva','Rojas','Molina','Castro',
+         'Aguirre','Cabrera','Paz'])[1 + (random() * 9)::int],
+  (random() * 100000)::numeric(12,2),
+  DATE '2015-01-01' + (random() * 4000)::int
+FROM generate_series(1, 2000000) g;
+
+-- ---------------------------------------------------------------
+-- 3.3  Carga de movimientos_nro: 10.000.000 de filas (~40 s)
+--      El nro_cuenta se sortea dentro del rango de cuentas ya
+--      cargadas, de modo que toda fila referencia una cuenta real
+--      y la clave foranea de la seccion 4.1 valida sin depuracion
+--      previa.
+-- ---------------------------------------------------------------
+INSERT INTO movimientos_nro (nro_cuenta, fecha, importe, tipo)
+SELECT
+  'CTA-' || lpad((1 + (random() * 1999999)::int)::text, 12, '0'),
+  DATE '2020-01-01' + (random() * 2000)::int,
+  (random() * 50000)::numeric(12,2),
+  (ARRAY['deposito','extraccion','transfer'])[1 + (random() * 2)::int]
+FROM generate_series(1, 10000000);
+
+
+-- =====================================================================
+--  4. MODIFICACIONES
+-- =====================================================================
+
+-- ---------------------------------------------------------------
+-- 4.1  Clave foranea por nro_cuenta
+--      Valida en ~2 segundos sobre 10.000.000 de filas, porque
+--      reutiliza el indice UNIQUE que ya existia en cuentas. Sin
+--      ese indice, PostgreSQL deberia recorrer la tabla entera por
+--      cada fila a validar.
+--
+--      Requisito: la columna referenciada debe tener UNIQUE o
+--      PRIMARY KEY. Referenciar una columna sin indice unico
+--      produce el error "there is no unique constraint matching
+--      given keys for referenced table".
+-- ---------------------------------------------------------------
+ALTER TABLE movimientos_nro
+  ADD CONSTRAINT fk_movnro_cuenta
+  FOREIGN KEY (nro_cuenta) REFERENCES cuentas (nro_cuenta);
+
+-- Verificacion de que no quedaron filas sin cuenta asociada.
+SELECT count(*) AS huerfanas
+FROM movimientos_nro m
+WHERE NOT EXISTS (SELECT 1 FROM cuentas c WHERE c.nro_cuenta = m.nro_cuenta);
+-- Resultado: 0
+
+
+-- =====================================================================
+--  5. CREACION DE LOS INDICES
+-- =====================================================================
+
+-- ---------------------------------------------------------------
+-- 5.1  Indice B-tree sobre la clave foranea
+--      Es el indice central de la actividad. Resuelve tanto la
+--      busqueda por igualdad como la reunion con cuentas.
+--
+--      Se crea DESPUES de la carga masiva: hacerlo antes obliga al
+--      motor a mantener el indice fila por fila durante el INSERT,
+--      lo que alarga la carga de forma considerable.
+-- ---------------------------------------------------------------
+CREATE INDEX idx_movnro_nro_cuenta
+    ON movimientos_nro (nro_cuenta);
+
+-- ---------------------------------------------------------------
+-- 5.2  Indice B-tree con clase de operadores para patrones
+--
+--      Un B-tree comun NO resuelve LIKE 'CTA-0000%', ni siquiera
+--      con el comodin al final. El motivo es la intercalacion: la
+--      base usa el locale en_US.UTF-8, cuyo orden alfabetico no
+--      coincide con el orden byte a byte que necesita la comparacion
+--      de prefijos. Se verifico ejecutando la consulta con el indice
+--      de 5.1 ya creado: el plan siguio siendo Parallel Seq Scan.
+--
+--      varchar_pattern_ops fuerza la comparacion byte a byte y
+--      habilita el uso del indice para prefijos.
+-- ---------------------------------------------------------------
+CREATE INDEX idx_movnro_nro_pattern
+    ON movimientos_nro (nro_cuenta varchar_pattern_ops);
+
+-- ---------------------------------------------------------------
+-- 5.3  Actualizacion de estadisticas
+--      Sin ANALYZE el planificador trabaja con estimaciones
+--      desactualizadas y puede ignorar un indice recien creado.
+-- ---------------------------------------------------------------
+ANALYZE cuentas;
+ANALYZE movimientos_nro;
+
+
+-- =====================================================================
+--  6. CONSULTAS
+-- =====================================================================
+
+-- ---------------------------------------------------------------
+-- 6.1  Busqueda por igualdad
+--      Caso de maxima selectividad: devuelve 2 filas de 10.000.000.
+-- ---------------------------------------------------------------
+SELECT * FROM movimientos_nro
+WHERE nro_cuenta = 'CTA-000000000042';
+
+-- ---------------------------------------------------------------
+-- 6.2  Reunion con agregacion: resumen de movimientos por cuenta
+--      Es la consulta pesada de la actividad.
+-- ---------------------------------------------------------------
+SELECT c.nro_cuenta, c.titular, count(*) AS movs, sum(m.importe) AS total
+FROM cuentas c
+JOIN movimientos_nro m ON m.nro_cuenta = c.nro_cuenta
+WHERE c.nro_cuenta IN ('CTA-000000000042',
+                       'CTA-000000000043',
+                       'CTA-000000000044')
+GROUP BY 1, 2;
+
+-- ---------------------------------------------------------------
+-- 6.3  Busqueda por prefijo: devuelve 48 filas de 10.000.000
+-- ---------------------------------------------------------------
+SELECT * FROM movimientos_nro
+WHERE nro_cuenta LIKE 'CTA-00000000004%';
+
+-- ---------------------------------------------------------------
+-- 6.4  Conteos de control
+-- ---------------------------------------------------------------
+SELECT count(*) FROM cuentas;          -- 2.200.026
+SELECT count(*) FROM movimientos_nro;  -- 9.999.996
+
+
+-- =====================================================================
+--  7. CONSULTAS DE METADATOS
+-- =====================================================================
+
+-- 7.1  Version del motor y datos de la conexion
+SELECT version();
+
+SELECT current_database() AS base,
+       current_user       AS rol,
+       session_user       AS usuario_real,
+       inet_server_addr() AS ip_servidor,
+       inet_server_port() AS puerto,
+       pg_backend_pid()   AS pid_backend;
+
+-- 7.2  Existencia de una tabla (NULL = no existe)
+SELECT to_regclass('public.movimientos_nro') AS existe;
+
+-- 7.3  Listado de tablas (information_schema: estandar SQL, portable)
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public' AND table_type = 'BASE TABLE'
+ORDER BY 1;
+
+-- 7.4  Tablas con propietario (pg_tables: especifico de PostgreSQL)
+SELECT tablename, tableowner
+FROM pg_tables
+WHERE schemaname = 'public'
+ORDER BY 1;
+
+-- 7.5  Estructura de una tabla
+SELECT column_name, data_type, character_maximum_length, is_nullable
+FROM information_schema.columns
+WHERE table_name = 'movimientos_nro'
+ORDER BY ordinal_position;
+
+-- 7.6  Indices existentes, con su definicion completa
+SELECT tablename, indexname, indexdef
+FROM pg_indexes
+WHERE schemaname = 'public'
+ORDER BY tablename, indexname;
+
+-- 7.7  Tamanio de tablas e indices
+SELECT relname AS tabla,
+       n_live_tup AS filas_estimadas,
+       pg_size_pretty(pg_relation_size(relid))       AS solo_tabla,
+       pg_size_pretty(pg_total_relation_size(relid)) AS con_indices
+FROM pg_stat_user_tables
+ORDER BY pg_total_relation_size(relid) DESC;
+
+SELECT indexname,
+       pg_size_pretty(pg_relation_size(quote_ident(indexname)::regclass)) AS tam
+FROM pg_indexes
+WHERE schemaname = 'public'
+ORDER BY pg_relation_size(quote_ident(indexname)::regclass) DESC;
+
+-- 7.8  Claves foraneas declaradas
+SELECT conrelid::regclass AS tabla,
+       conname,
+       pg_get_constraintdef(oid) AS definicion
+FROM pg_constraint
+WHERE contype = 'f'
+ORDER BY 1;
+
+-- 7.9  Uso real de cada indice: detecta indices que nadie aprovecha
+SELECT indexrelname, idx_scan, idx_tup_read
+FROM pg_stat_user_indexes
+WHERE schemaname = 'public'
+ORDER BY idx_scan DESC;
+
+-- 7.10 Roles, atributos y membresias
+SELECT rolname, rolsuper, rolcanlogin
+FROM pg_roles
+WHERE rolname NOT LIKE 'pg\_%'
+ORDER BY 1;
+
+SELECT r.rolname AS miembro, g.rolname AS grupo
+FROM pg_auth_members m
+JOIN pg_roles r ON r.oid = m.member
+JOIN pg_roles g ON g.oid = m.roleid
+ORDER BY 2, 1;
+
+-- 7.11 Privilegios sobre las tablas
+SELECT grantee, table_name, privilege_type
+FROM information_schema.role_table_grants
+WHERE table_schema = 'public'
+ORDER BY table_name, grantee;
+
+-- 7.12 Conexiones activas
+SELECT pid, usename, datname, client_addr, state
+FROM pg_stat_activity
+WHERE backend_type = 'client backend';
+
+-- 7.13 Equivalentes en psql (metacomandos del cliente, no SQL)
+--   \l                   listar bases
+--   \dt                  listar tablas
+--   \d movimientos_nro   estructura + indices + constraints
+--   \di                  listar indices
+--   \du                  listar roles
+--   \dp                  listar privilegios
+--   \conninfo            datos de la conexion actual
+
+
+-- =====================================================================
+--  8. COMANDOS PARA OBTENER EL PLAN DE EJECUCION
+-- =====================================================================
+--
+--  EXPLAIN            muestra el plan estimado, sin ejecutar.
+--  EXPLAIN ANALYZE    ejecuta y muestra tiempos y filas reales.
+--  BUFFERS            agrega paginas leidas: shared hit = memoria,
+--                     read = disco. Es lo que explica el "por que".
+--
+--  Metodo: en lugar de borrar y recrear el indice, se desactiva la
+--  posibilidad de usarlo. El efecto es el mismo y es reversible al
+--  instante, sin dejar al resto del equipo sin indice mientras se mide.
+--
+--  Cada bloque se corre 2 o 3 veces: la primera pasada paga el costo
+--  del cache frio y no es representativa.
+-- =====================================================================
+
+-- ---------------------------------------------------------------
+-- 8.1  Plan estimado, sin ejecutar
+-- ---------------------------------------------------------------
+EXPLAIN
+SELECT * FROM movimientos_nro WHERE nro_cuenta = 'CTA-000000000042';
+
+-- ---------------------------------------------------------------
+-- 8.2  Busqueda por igualdad: SIN indice
+-- ---------------------------------------------------------------
+SET enable_indexscan  = off;
+SET enable_bitmapscan = off;
+
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT * FROM movimientos_nro WHERE nro_cuenta = 'CTA-000000000042';
+
+-- ---------------------------------------------------------------
+-- 8.3  Busqueda por igualdad: CON indice
+--      Los SET valen para toda la sesion: sin estos RESET, la
+--      medicion "con indice" devuelve los tiempos de la anterior.
+-- ---------------------------------------------------------------
+RESET enable_indexscan;
+RESET enable_bitmapscan;
+
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT * FROM movimientos_nro WHERE nro_cuenta = 'CTA-000000000042';
+
+-- ---------------------------------------------------------------
+-- 8.4  Reunion con agregacion: SIN indice y CON indice
+-- ---------------------------------------------------------------
+SET enable_indexscan  = off;
+SET enable_bitmapscan = off;
+
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT c.nro_cuenta, c.titular, count(*) AS movs, sum(m.importe) AS total
+FROM cuentas c
+JOIN movimientos_nro m ON m.nro_cuenta = c.nro_cuenta
+WHERE c.nro_cuenta IN ('CTA-000000000042',
+                       'CTA-000000000043',
+                       'CTA-000000000044')
+GROUP BY 1, 2;
+
+RESET enable_indexscan;
+RESET enable_bitmapscan;
+
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT c.nro_cuenta, c.titular, count(*) AS movs, sum(m.importe) AS total
+FROM cuentas c
+JOIN movimientos_nro m ON m.nro_cuenta = c.nro_cuenta
+WHERE c.nro_cuenta IN ('CTA-000000000042',
+                       'CTA-000000000043',
+                       'CTA-000000000044')
+GROUP BY 1, 2;
+
+-- ---------------------------------------------------------------
+-- 8.5  Busqueda por prefijo: SIN indice y CON indice
+-- ---------------------------------------------------------------
+SET enable_indexscan  = off;
+SET enable_bitmapscan = off;
+
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT * FROM movimientos_nro WHERE nro_cuenta LIKE 'CTA-00000000004%';
+
+RESET enable_indexscan;
+RESET enable_bitmapscan;
+
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT * FROM movimientos_nro WHERE nro_cuenta LIKE 'CTA-00000000004%';
+
+-- ---------------------------------------------------------------
+-- 8.6  Medicion alternativa, eliminando el indice de verdad
+-- ---------------------------------------------------------------
+DROP INDEX idx_movnro_nro_cuenta;
+
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT * FROM movimientos_nro WHERE nro_cuenta = 'CTA-000000000042';
+
+CREATE INDEX idx_movnro_nro_cuenta ON movimientos_nro (nro_cuenta);
+ANALYZE movimientos_nro;
+
+
+-- =====================================================================
+--  9. RESULTADOS OBTENIDOS
+-- =====================================================================
+--
+--  Volumen: cuentas 2.200.026 filas / movimientos_nro 9.999.996 filas
+--           (793 MB de datos)
+--
+--  9.1  Tiempos de ejecucion
+--
+--  Consulta                      Filas   Sin indice      Con indice    Factor
+--  ----------------------------  ------  --------------  ------------  ------
+--  6.1 Igualdad                       2  396 - 498 ms    0,14-0,34 ms  ~1500x
+--  6.2 JOIN + agregacion             15  1202 - 1402 ms  0,14-0,56 ms  ~4000x
+--  6.3 Prefijo LIKE 'CTA-...%'       48  601 - 719 ms    0,11-0,41 ms  ~2000x
+--
+--  9.2  Planes de ejecucion
+--
+--  Consulta   Sin indice                    Con indice
+--  ---------  ----------------------------  --------------------------
+--  6.1        Parallel Seq Scan             Index Scan
+--  6.2        Hash Join + 2 Seq Scans       Nested Loop + 2 Index Scan
+--  6.3        Parallel Seq Scan             Index Scan (pattern_ops)
+--
+--  9.3  Indices intervinientes
+--
+--  Indice                    Tam.    Origen              Funcion
+--  ------------------------  ------  ------------------  -----------------
+--  idx_movnro_nro_cuenta     153 MB  creado a mano       igualdad y JOIN
+--  idx_movnro_nro_pattern    153 MB  creado a mano       prefijo LIKE
+--  cuentas_nro_cuenta_key     86 MB  UNIQUE automatico   lado cuentas
+--  movimientos_nro_pkey      214 MB  PRIMARY KEY autom.  no interviene
+--
+--  9.4  Conclusiones
+--
+--  a) Un indice no acelera el escaneo: cambia el algoritmo. En la
+--     consulta 6.2 el salto de ~1300 ms a ~0,2 ms viene de reemplazar
+--     un Hash Join, que construye una tabla hash con los 10.000.000
+--     de movimientos, por un Nested Loop que solo visita las filas
+--     de las tres cuentas buscadas.
+--
+--  b) La ganancia depende de la selectividad. Las tres consultas
+--     medidas devuelven menos del 0,001 % de la tabla, y por eso el
+--     indice rinde entre 1500 y 4000 veces. Si la consulta devolviera
+--     un porcentaje alto de las filas, el Seq Scan secuencial seria
+--     mas rapido y el planificador descartaria el indice.
+--
+--  c) Un indice B-tree comun no resuelve LIKE, ni siquiera con el
+--     comodin al final, cuando el locale de la base no es C. Hace
+--     falta declararlo con varchar_pattern_ops (seccion 5.2).
+--
+--  d) No todo indice se usa. movimientos_nro_pkey es el mas grande
+--     de la tabla (214 MB) y no interviene en ninguna de las tres
+--     consultas: ninguna filtra ni ordena por id.
+--
+--  e) Los indices que si se usan tampoco son gratis: 306 MB sobre una
+--     tabla de 793 MB, mas la penalizacion en cada INSERT, UPDATE y
+--     DELETE, que deben actualizar cada indice ademas de la tabla.
+--
+--  f) El indice del lado referenciado no hay que crearlo: la
+--     restriccion UNIQUE de cuentas.nro_cuenta ya lo genera, y es lo
+--     que permite que la clave foranea de la seccion 4.1 valide
+--     10.000.000 de filas en unos 2 segundos.
+
+
+-- =====================================================================
+--  10. LIMPIEZA (opcional - deja la base como estaba)
+-- =====================================================================
+-- DROP TABLE movimientos_nro;
+-- DELETE FROM cuentas WHERE nro_cuenta LIKE 'CTA-%';
+-- VACUUM FULL cuentas;

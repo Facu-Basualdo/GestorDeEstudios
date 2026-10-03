@@ -1,0 +1,146 @@
+====================================================================
+FASE 1: EL USUARIO INFILTRADO - SCRIPT DE COMANDOS Y SQL
+====================================================================
+
+--------------------------------------------------------------------
+1. TRANSFERENCIA Y EJECUCIÓN DEL SCRIPT BASE
+--------------------------------------------------------------------
+# Transferir el script base provisto por la cátedra a la máquina virtual
+multipass transfer "C:\Users\maria\Downloads\postgresql_u6_operacion_rescate_base.sql" mv-sgbd:/home/ubuntu/
+
+# Ejecutar el script como superadministrador para crear la base, tablas y roles iniciales
+sudo -u postgres psql -f /tmp/postgresql_u6_operacion_rescate_base.sql
+
+
+--------------------------------------------------------------------
+2. PRUEBAS DE ACCESOS INDEVIDOS (SITUACIÓN VULNERABLE INICIAL)
+--------------------------------------------------------------------
+# Entrar a la consola de PostgreSQL como administrador
+sudo -u postgres psql -d u6_rescate
+
+# Conectarse como usuario de aplicación (u6_app) desde la terminal
+psql -U u6_app -d u6_rescate -h localhost
+# (Contraseña: Cambiar_2026!)
+
+-- Acceso Indebido N° 1: Intento de borrado en cliente (bloqueado por FK)
+DELETE FROM cliente WHERE cliente_id = 4;
+
+-- Acceso Indebido N° 2: Borrado exitoso en transaccional (tabla movimiento)
+DELETE FROM movimiento WHERE movimiento_id = 1005;
+
+-- Acceso Indebido N° 3: Modificación masiva no controlada
+UPDATE cuenta SET saldo = 0;
+
+# Salir de la sesión del usuario de prueba
+\q
+
+
+--------------------------------------------------------------------
+3. APLICACIÓN DEL PRINCIPIO DE MÍNIMO PRIVILEGIO (ADMINISTRADOR)
+--------------------------------------------------------------------
+# Volver a entrar como superadministrador
+sudo -u postgres psql -d u6_rescate
+
+# Ejecución de los comandos SQL para rediseñar permisos
+-- 1. Revocar los permisos excesivos iniciales en el esquema public
+REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM rol_app, rol_analista;
+
+-- 2. Asignar los permisos estrictos para la aplicación (rol_app)
+GRANT SELECT, INSERT, UPDATE ON cliente, cuenta, movimiento TO rol_app;
+GRANT SELECT ON auditoria_evento TO rol_app;
+
+-- 3. Asignar los permisos estrictos para el analista (rol_analista)
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO rol_analista;
+
+# Salir de administrador
+\q
+
+
+====================================================================
+FASE 2: EL DBA BORRÓ PRODUCCIÓN - SCRIPT DE COMANDOS Y SQL
+====================================================================
+
+# 1. Registrar el estado inicial de la base de datos
+# Ejecuta conteos y suma de importes para establecer una línea base verificable antes de hacer copias
+sudo -u postgres psql -d u6_rescate -c "SELECT COUNT(*) AS clientes FROM cliente; SELECT COUNT(*) AS cuentas FROM cuenta; SELECT COUNT(*) AS movimientos FROM movimiento; SELECT COALESCE(SUM(importe), 0) AS importe_movimientos FROM movimiento;"
+
+# 2. Configuración del archivo WAL antes del Backup
+# Crea el directorio temporal donde se guardará una copia de cada log de transacciones
+sudo mkdir -p /tmp/wal_archive
+
+# Asigna los permisos del directorio temporal al usuario de la base de datos
+sudo chown postgres:postgres /tmp/wal_archive
+
+# Abre el archivo de configuración para definir las variables (
+#	wal_level = replica, 
+#	archive_mode = on, 
+#	archive_command = 'cp %p /tmp/wal_archive/%f'
+#)
+sudo nano /etc/postgresql/16/main/postgresql.conf
+
+# Reinicia el servicio para aplicar los cambios de configuración del archivado continuo
+sudo systemctl restart postgresql
+
+# 3. Realizar el respaldo base
+# Crea una nueva carpeta temporal para almacenar el backup físico
+sudo mkdir -p /tmp/backup_base
+
+# Le otorga la propiedad de la carpeta de backup al usuario postgres
+sudo chown postgres:postgres /tmp/backup_base
+
+# Ejecuta pg_basebackup para realizar una copia física exacta de los archivos de la base de datos
+sudo -u postgres pg_basebackup -D /tmp/backup_base -Fp -Xs -P
+
+# 4. Ejecutar las operaciones válidas posteriores al backup
+# Simula la operatoria normal insertando los movimientos válidos 1006 y 1007 que ocurrieron después del backup
+sudo -u postgres psql -d u6_rescate -c "INSERT INTO movimiento VALUES (1006,101,'2026-09-22 10:05:00', 'CREDITO', 15000.00, 'Operacion valida posterior al backup'); INSERT INTO movimiento VALUES (1007, 102, '2026-09-22 10:12:00', 'DEΒΙΤΟ',-7000.00, 'Operacion valida posterior al backup'); INSERT INTO auditoria_evento(evento, detalle) VALUES ('OPERACIONES_VALIDAS', 'Se ejecutaron movimientos 1006 y 1007');"
+
+# 5. Simular el incidente de borrado accidental
+# Ejecuta el incidente destructivo borrando los registros de la cuenta 101 y guarda el evento en la auditoría
+sudo -u postgres psql -d u6_rescate -c "DELETE FROM movimiento WHERE cuenta_id = 101; INSERT INTO auditoria_evento (evento, detalle) VALUES ('INCIDENTE', 'Borrado accidental de movimientos de cuenta 101');"
+
+# Verificación de que los registros de la cuenta 101 se eliminaron de la tabla
+sudo -u postgres psql -d u6_rescate -c "select * from movimiento where cuenta_id = 101;"
+
+# 6. Preparar la recuperación
+# Consulta la tabla de auditoría para buscar el registro que define al incidente y obtener su hora exacta
+sudo -u postgres psql -d u6_rescate -c "select * from auditoria_evento;"
+
+# Detiene momentáneamente el motor de bases de datos para iniciar el proceso de recuperación
+sudo systemctl stop postgresql
+
+# Vacía por completo el directorio de datos que se encuentra corrupto
+sudo rm -rf /var/lib/postgresql/16/main/
+
+# 7. Restaurar el Backup Base
+# Trae los archivos limpios guardados previamente con el pg_basebackup hacia el directorio principal
+sudo cp -R /tmp/backup_base/* /var/lib/postgresql/16/main/
+
+# Devuelve la propiedad de los archivos restaurados al usuario postgres
+sudo chown -R postgres:postgres /var/lib/postgresql/16/main/
+
+# Lista el directorio para verificar que se listan múltiples carpetas (base, pg_wal, global) y archivos propios del motor
+sudo ls -lh /var/lib/postgresql/16/main/
+
+# Crea el archivo de señal que le avisa al motor que debe entrar en modo de recuperación al iniciar
+sudo -u postgres touch /var/lib/postgresql/16/main/recovery.signal
+
+# Abre el archivo de configuración para configurar las variables de PITR (
+#	restore_command, 
+#	recovery_target_time, 
+#	recovery_target_inclusive = off, 
+#	recovery_target_action = 'promote'
+#)
+
+--------------------------------------------------------------------
+4. VALIDACIÓN DE BLOQUEOS POSTERIORES (PRUEBAS DE SEGURIDAD)
+--------------------------------------------------------------------
+# Conectarse como el usuario analista (u6_analista)
+psql -U u6_analista -d u6_rescate -h localhost
+# (Contraseña: Cambiar_2026!)
+
+-- Intento prohibido (debe arrojar error de permisos denegados)
+DELETE FROM cliente WHERE cliente_id = 1;
+
+# Salir de la sesión
+\q
