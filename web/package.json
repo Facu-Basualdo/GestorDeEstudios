@@ -5,7 +5,7 @@
   "scripts": {
     "datos": "node ../scripts/generar-web.mjs",
     "predev": "npm run datos",
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "prebuild": "npm run datos",
     "build": "next build",
     "start": "npx serve@14 out"
