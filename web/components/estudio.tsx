@@ -6,7 +6,6 @@ import type { Datos, Lectura, Nota, Vista } from '@/lib/tipos';
 import { cuentaRegresiva, guardado } from '@/lib/util';
 import { Cuestionario } from './cuestionario';
 import { Flashcards } from './flashcards';
-import { InterruptorTema } from './piezas';
 import { Teoria } from './teoria';
 
 const VISTAS: Vista[] = ['flashcards', 'cuestionario', 'teoria'];
@@ -104,15 +103,22 @@ export function Estudio({ datos }: { datos: Datos }) {
       >
         <div className="mx-auto flex max-w-[1680px] flex-wrap items-center gap-x-5 gap-y-3 px-4 py-3 sm:px-8 xl:px-10">
           <div className="flex items-center gap-2.5 font-titulo text-xl font-semibold tracking-tight">
-            <svg viewBox="0 0 34 20" className="h-5 w-[34px] text-accent" aria-hidden="true">
-              <path d="M1 16H8V4H17V16H26V4H33" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinejoin="round" />
-            </svg>
-            Flip-Flop
+            <span className="grid size-8 place-items-center rounded-lg bg-accent text-accent-foreground shadow-[0_4px_14px_-4px_var(--accent)]">
+              <svg viewBox="0 0 24 24" className="size-[18px]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M12 6.5C10.3 5.2 7.9 4.6 4 4.6v13.2c3.9 0 6.3.6 8 1.9 1.7-1.3 4.1-1.9 8-1.9V4.6c-3.9 0-6.3.6-8 1.9Z" />
+                <path d="M12 6.5v13.2" />
+              </svg>
+            </span>
+            Gestor de estudios
           </div>
 
           <div className="flex min-w-0 flex-1 flex-col gap-0.5 md:flex-none">
             {datos.materias.length > 1 ? (
-              <Select aria-label="Materia" value={materia.id} onChange={(v) => v != null && setMateriaId(String(v))} className="w-full max-w-60">
+              <Select aria-label="Materia" value={materia.id} onChange={(v) => {
+                  if (v == null) return;
+                  setMateriaId(String(v));
+                  guardado.escribir('materia', String(v));
+                }} className="w-full max-w-60">
                 <Select.Trigger>
                   <Select.Value className="truncate" />
                   <Select.Indicator />
@@ -156,7 +162,6 @@ export function Estudio({ datos }: { datos: Datos }) {
             </Tabs>
           </div>
 
-          <InterruptorTema />
         </div>
       </header>
 

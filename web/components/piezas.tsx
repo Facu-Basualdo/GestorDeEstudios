@@ -1,8 +1,6 @@
 'use client';
 
 import { Button, Card, Header, Kbd, ListBox, ScrollShadow, Select, Separator, Typography } from '@heroui/react';
-import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
 import type { Materia, Tema } from '@/lib/tipos';
 import { nombreUnidad, unidadesDe, type Filtro } from '@/lib/util';
 
@@ -119,33 +117,6 @@ export function FiltroTemas({ materia, valor, onCambio, contar, etiqueta }: {
         </ListBox>
       </Select.Popover>
     </Select>
-  );
-}
-
-export function InterruptorTema() {
-  const { resolvedTheme, setTheme } = useTheme();
-  const [montado, setMontado] = useState(false);
-  useEffect(() => setMontado(true), []);
-  const oscuro = montado && resolvedTheme === 'dark';
-  return (
-    <Button
-      isIconOnly
-      variant="ghost"
-      size="sm"
-      aria-label={oscuro ? 'Usar tema claro' : 'Usar tema oscuro'}
-      onPress={() => setTheme(oscuro ? 'light' : 'dark')}
-    >
-      <svg viewBox="0 0 24 24" className="size-[18px]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
-        {oscuro ? (
-          <>
-            <circle cx="12" cy="12" r="4.2" />
-            <path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6" />
-          </>
-        ) : (
-          <path d="M20.2 14.6A8.3 8.3 0 0 1 9.4 3.8a8.3 8.3 0 1 0 10.8 10.8Z" />
-        )}
-      </svg>
-    </Button>
   );
 }
 

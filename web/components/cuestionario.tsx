@@ -40,10 +40,10 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
     [materia],
   );
   const [filtro, setFiltro] = useState<Filtro>('todos');
-  const [cantidad, setCantidad] = useState(10);
+  const [cantidad, setCantidad] = useState(0); // 0 = todas
   // Primer render sin mezclar (igual en servidor y navegador); se mezcla al montar.
   const [sesion, setSesion] = useState<Sesion>(() => ({
-    items: todas.slice(0, 10).map((p) => ({ p, orden: p.opciones.map((_, k) => k) })),
+    items: todas.map((p) => ({ p, orden: p.opciones.map((_, k) => k) })),
     i: 0,
     elegidas: [],
   }));
@@ -61,7 +61,7 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
   useEffect(() => {
     const f = guardado.leer<Filtro>('filtro-cu', 'todos');
     const valido = f === 'todos' || f === 'p3' || materia.temas.some((t) => t.id === f);
-    const cant = guardado.leer('cantidad', 10);
+    const cant = guardado.leer('cantidad-cu', 0);
     setFiltro(valido ? f : 'todos');
     setCantidad(cant);
     armar(valido ? f : 'todos', cant);
@@ -155,7 +155,7 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
           onChange={(v) => {
             const c = Number(v);
             setCantidad(c);
-            guardado.escribir('cantidad', c);
+            guardado.escribir('cantidad-cu', c);
             armar(filtro, c);
           }}
         >
@@ -165,7 +165,7 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
           </Select.Trigger>
           <Select.Popover>
             <ListBox>
-              {[['10', '10 preguntas'], ['20', '20 preguntas'], ['0', 'Todas']].map(([id, texto]) => (
+              {[['0', 'Todas'], ['10', '10 preguntas'], ['20', '20 preguntas']].map(([id, texto]) => (
                 <ListBox.Item key={id} id={id} textValue={texto}>
                   <Label>{texto}</Label>
                   <ListBox.ItemIndicator />

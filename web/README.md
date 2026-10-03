@@ -1,8 +1,8 @@
-# Flip-Flop — web de estudio
+# Gestor de estudios — web de estudio
 
 Flashcards, cuestionario de opción múltiple y lectura de la teoría, generados desde las
 notas del vault. Next.js 16 + HeroUI 3 + Tailwind 4. Anda en celular y en compu, con
-tema claro y oscuro.
+tema oscuro.
 
 ## Usarla
 
