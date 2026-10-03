@@ -10,6 +10,8 @@ type Tarjeta = Flashcard & { tema: Tema; clave: string };
 /** `vista`: ya se mostró la respuesta de la tarjeta actual (se puede volver a la pregunta y calificar igual). */
 type Sesion = { mazo: Tarjeta[]; i: number; girada: boolean; vista: boolean; notas: (Nota | undefined)[] };
 type Opciones = { filtro: Filtro; mezclado: boolean; soloFalladas: boolean };
+/** Lo que se guarda de la sesión para retomarla al recargar: las tarjetas por su clave. */
+type SesionGuardada = { opciones: Opciones; claves: string[]; i: number; notas: (Nota | null)[] };
 
 const fallada = (n: Nota | undefined) => n === 0 || n === 1;
 
@@ -35,6 +37,8 @@ export function Flashcards({ materia, activo, historial, onCalificar, irATeoria,
   );
   const [opciones, setOpciones] = useState<Opciones>({ filtro: 'todos', mezclado: false, soloFalladas: false });
   const [sesion, setSesion] = useState<Sesion>({ mazo: todas, i: 0, girada: false, vista: false, notas: [] });
+  // Hasta recuperar la sesión guardada no se guarda nada, para no pisarla con la inicial.
+  const [cargada, setCargada] = useState(false);
 
   const armar = useCallback(
     (o: Opciones, lista?: Tarjeta[]) => {
@@ -54,13 +58,36 @@ export function Flashcards({ materia, activo, historial, onCalificar, irATeoria,
     armar(o);
   };
 
-  // Al abrir (o cambiar de materia) se recuperan los filtros de la última vez.
+  // Al abrir (o cambiar de materia) se retoma la sesión que quedó a medias; si no hay, se arma
+  // una con los filtros de la última vez.
   useEffect(() => {
-    const filtro = guardado.leer<Filtro>('filtro-fc', 'todos');
-    const valido = filtro === 'todos' || filtro === 'p3' || materia.temas.some((t) => t.id === filtro);
-    armar({ filtro: valido ? filtro : 'todos', mezclado: guardado.leer('mezclar', false), soloFalladas: false });
+    const previa = guardado.leer<SesionGuardada | null>(`sesion-fc:${materia.id}`, null);
+    const porClave = new Map(todas.map((c) => [c.clave, c]));
+    const mazo = previa?.claves.map((k) => porClave.get(k)).filter((c): c is Tarjeta => !!c) ?? [];
+    // Si las notas cambiaron y faltan tarjetas, la sesión vieja ya no calza: se arma una nueva.
+    if (previa && mazo.length && mazo.length === previa.claves.length) {
+      setOpciones(previa.opciones);
+      const notas = previa.notas.map((n) => n ?? undefined);
+      setSesion({ mazo, i: Math.min(previa.i, mazo.length), girada: false, vista: false, notas });
+    } else {
+      const filtro = guardado.leer<Filtro>('filtro-fc', 'todos');
+      const valido = filtro === 'todos' || filtro === 'p3' || materia.temas.some((t) => t.id === filtro);
+      armar({ filtro: valido ? filtro : 'todos', mezclado: guardado.leer('mezclar', false), soloFalladas: false });
+    }
+    setCargada(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [materia.id]);
+
+  useEffect(() => {
+    if (!cargada) return;
+    const datos: SesionGuardada = {
+      opciones,
+      claves: sesion.mazo.map((c) => c.clave),
+      i: sesion.i,
+      notas: Array.from({ length: sesion.mazo.length }, (_, k) => sesion.notas[k] ?? null),
+    };
+    guardado.escribir(`sesion-fc:${materia.id}`, datos);
+  }, [cargada, opciones, sesion.mazo, sesion.i, sesion.notas, materia.id]);
 
   useEffect(() => {
     if (pedido) armar({ ...opciones, filtro: pedido.tema, soloFalladas: false });

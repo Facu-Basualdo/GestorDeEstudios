@@ -13,6 +13,14 @@ type Item = Pregunta & { tema: Tema; clave: string };
  * `elegidas`: por pregunta, las opciones originales que respondió (undefined = sin responder).
  */
 type Sesion = { items: { p: Item; orden: number[] }[]; i: number; elegidas: (number[] | undefined)[] };
+/** Lo que se guarda de la sesión para retomarla al recargar: las preguntas por su clave. */
+type SesionGuardada = {
+  filtro: Filtro;
+  cantidad: number;
+  items: { clave: string; orden: number[] }[];
+  i: number;
+  elegidas: (number[] | null)[];
+};
 
 const LETRAS = 'ABCDEF';
 
@@ -47,6 +55,8 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
     i: 0,
     elegidas: [],
   }));
+  // Hasta recuperar la sesión guardada no se guarda nada, para no pisarla con la inicial.
+  const [cargada, setCargada] = useState(false);
   const siguienteRef = useRef<HTMLButtonElement>(null);
 
   const armar = useCallback(
@@ -58,15 +68,44 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
     [todas],
   );
 
+  // Al abrir (o cambiar de materia) se retoma el cuestionario que quedó a medias; si no hay,
+  // se arma uno con los filtros de la última vez.
   useEffect(() => {
-    const f = guardado.leer<Filtro>('filtro-cu', 'todos');
-    const valido = f === 'todos' || f === 'p3' || materia.temas.some((t) => t.id === f);
-    const cant = guardado.leer('cantidad-cu', 0);
-    setFiltro(valido ? f : 'todos');
-    setCantidad(cant);
-    armar(valido ? f : 'todos', cant);
+    const previa = guardado.leer<SesionGuardada | null>(`sesion-cu:${materia.id}`, null);
+    const porClave = new Map(todas.map((p) => [p.clave, p]));
+    const items = (previa?.items ?? []).flatMap(({ clave, orden }) => {
+      const p = porClave.get(clave);
+      return p && orden.length === p.opciones.length ? [{ p, orden }] : [];
+    });
+    // Si las notas cambiaron y faltan preguntas, la sesión vieja ya no calza: se arma una nueva.
+    if (previa && items.length && items.length === previa.items.length) {
+      setFiltro(previa.filtro);
+      setCantidad(previa.cantidad);
+      const elegidas = previa.elegidas.map((e) => e ?? undefined);
+      setSesion({ items, i: Math.min(previa.i, items.length), elegidas });
+    } else {
+      const f = guardado.leer<Filtro>('filtro-cu', 'todos');
+      const valido = f === 'todos' || f === 'p3' || materia.temas.some((t) => t.id === f);
+      const cant = guardado.leer('cantidad-cu', 0);
+      setFiltro(valido ? f : 'todos');
+      setCantidad(cant);
+      armar(valido ? f : 'todos', cant);
+    }
+    setCargada(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [materia.id]);
+
+  useEffect(() => {
+    if (!cargada) return;
+    const datos: SesionGuardada = {
+      filtro,
+      cantidad,
+      items: sesion.items.map(({ p, orden }) => ({ clave: p.clave, orden })),
+      i: sesion.i,
+      elegidas: Array.from({ length: sesion.items.length }, (_, k) => sesion.elegidas[k] ?? null),
+    };
+    guardado.escribir(`sesion-cu:${materia.id}`, datos);
+  }, [cargada, filtro, cantidad, sesion, materia.id]);
 
   useEffect(() => {
     if (!pedido) return;
