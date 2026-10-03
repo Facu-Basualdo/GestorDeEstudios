@@ -1,0 +1,10 @@
+# Sistemas de Gestión de Bases de Datos
+
+- Notebook: no hay; las notas salen de `material/` (clases 2026 y bitácoras del grupo). Ver [fuentes](fuentes.md)
+- Próxima fecha: Parcial BT1 (temas 1 a 6), **sin fecha cargada**. Ver [calendario](../../calendario.md)
+- Los parciales 2019–2025 no sirven: en 2026 la cátedra evalúa decisiones justificadas con evidencia (cambio por la IA).
+- El grupo trabaja con PostgreSQL en una VM; la cátedra compara MySQL y PostgreSQL.
+- Índice: [INDICE.md](INDICE.md)
+- Hub: [CLAUDE.md](../../CLAUDE.md)
+
+No agregues contenido a este archivo: cada tema va como una nota en notas/.

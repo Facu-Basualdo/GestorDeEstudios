@@ -1,11 +1,10 @@
 # Prompt para Gemini — análisis del material de SGBD
 
-Copiar desde la línea de abajo. Adjuntar los archivos de
-`materias/sistema-de-gestion-de-base-de-datos/` (`material/` y `examenes/`).
+Copiar desde la línea de abajo y pegarlo en Gemini dentro de Antigravity (tiene acceso al repo).
 
 ---
 
-Sos un analista de material de estudio. Te paso todo el material de la materia **Sistemas de Gestión de Bases de Datos** (Ingeniería en Sistemas, UTN FRRE): clases (Clase 0 a 6), `planificacion+.txt`, `cronograma.png`, resúmenes y resoluciones del 1er parcial, modelos de parcial 2019–2022 (con soluciones), el parcial BT1 que rendí (`examenes/`), bitácoras y scripts SQL de las actividades, y libros de referencia (Elmasri-Navathe, Ramakrishnan, Coronel). Respondé en español rioplatense.
+Sos un analista de material de estudio. Antes de empezar, leé `CLAUDE.md` y `metodo/recuperacion-activa.md` (convenciones del vault), y como ejemplo de formato `materias/arquitectura-de-computadoras/INDICE.md` y una nota de su carpeta `notas/`. En `materias/sistema-de-gestion-de-base-de-datos/` (`material/` y `examenes/`) está todo el material de la materia **Sistemas de Gestión de Bases de Datos** (Ingeniería en Sistemas, UTN FRRE): clases (Clase 0 a 6), `planificacion+.txt`, `cronograma.png`, resúmenes y resoluciones del 1er parcial, modelos de parcial 2019–2022 (con soluciones), el parcial BT1 que rendí (`examenes/`), bitácoras y scripts SQL de las actividades, y libros de referencia (Elmasri-Navathe, Ramakrishnan, Coronel). Respondé en español rioplatense.
 
 **Reglas**
 - Usá sólo lo que está en los archivos. Si algo no aparece, escribí "no figura en el material". Si agregás algo tuyo, marcalo con *(agregado)*.
@@ -13,7 +12,9 @@ Sos un analista de material de estudio. Te paso todo el material de la materia *
 - Los libros son referencia: priorizá clases, modelos de parcial y lo que pide la cátedra.
 - Fechas en formato `AAAA-MM-DD`. Hoy es 2026-10-03.
 
-**Qué quiero que extraigas** (cada parte en su propio bloque de código markdown, con la ruta del archivo como título):
+- Los libros completos (Coronel, Elmasri-Navathe, Data Protection) consultalos sólo si a un tema le falta teoría.
+
+**Qué quiero que extraigas**: escribí cada archivo directamente en `materias/sistema-de-gestion-de-base-de-datos/`. Si no entra todo de una vez, hacelo por partes, en este orden:
 
 1. **`programa.md`** — Unidades y temas según la planificación y las clases, en orden. Objetivos, bibliografía y régimen de aprobación (parciales, recuperatorios, promoción, actividades/bitácoras y cuánto valen).
 
@@ -59,4 +60,6 @@ Sos un analista de material de estudio. Te paso todo el material de la materia *
 
 6. **`temas.md`** — Tabla `Tema | Unidad | Peso | Dominio | Último repaso | Próximo repaso`, con Dominio en 0 y las fechas vacías.
 
-7. **Resumen final** (fuera de los archivos): los 5 temas que más conviene estudiar primero para la próxima evaluación y por qué, y qué material falta o está incompleto.
+7. **Verificación**: corré `node scripts/verificar-docs.mjs` y `cd web && npm run datos`, y corregí hasta que los dos den OK. No hagas commit.
+
+8. **Resumen final** (en el chat, no en un archivo): los 5 temas que más conviene estudiar primero para la próxima evaluación y por qué, y qué material falta o está incompleto.
