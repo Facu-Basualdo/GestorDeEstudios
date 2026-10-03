@@ -2,7 +2,7 @@
 [← Índice Sistemas de Gestión de Bases de Datos](../INDICE.md)
 
 > Tema 6 · Peso: 2/3 (estimado) · Fuente: *Clase 6 - Seguridad - Backup - Replica - HA 2026* (diap. 20–29) y la
-> bitácora U6 Act. 1 del grupo, Fase 3 "Diseñar para sobrevivir".
+> bitácora U6 Act. 1 del grupo, Fase 3 "Diseñar para sobrevivir". Ampliada con el *Resumen parcial* del estudiante (pp. 27–28 y 33).
 
 ## Preguntas de recuperación
 
@@ -19,6 +19,8 @@
 - ¿Cómo se sabe en PostgreSQL si un nodo es réplica y cómo va la replicación? :: SELECT pg_is_in_recovery() (true en la réplica). En el primario, pg_stat_replication (state, sync_state, sent_lsn, replay_lsn); en la réplica, pg_last_wal_replay_lsn(). [→ Observar la réplica](#Observar%20la%20réplica)
 - ¿Qué herramienta corresponde a cada incidente: permiso incorrecto, pérdida completa, DELETE accidental, caída del primario? :: GRANT/REVOKE (probando permitido y rechazado); backup + restore; backup + logs + PITR; réplica + failover. [→ Problema y herramienta](#Problema%20y%20herramienta)
 - En la Fase 3, ¿por qué el grupo eligió failover manual? :: Porque con dos nodos y sin un tercer árbitro, una conmutación automática ante un corte de red puede producir split brain. La promoción la valida y ejecuta un DBA. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
+- ¿Qué envía la replicación física en PostgreSQL y qué en MySQL? :: PostgreSQL envía el WAL (streaming replication); MySQL, el binlog. [→ Replicación](#Replicación)
+- En la réplica sincrónica, ¿qué espera el COMMIT y qué costo tiene? :: Espera que la réplica confirme que recibió el cambio: RPO ≈ 0, pero cada escritura es más lenta y, si la réplica falla, puede frenar al primario. [→ Replicación](#Replicación)
 
 ## Cuestionario
 
@@ -70,6 +72,12 @@
    - [ ] Si la falla es real o una red parcial
    - [ ] Cómo llegan las aplicaciones al nuevo nodo
    > Detectar, promover, reconectar y reintegrar. [→ Failover](#Failover)
+9. Con replicación **sincrónica**, la réplica se cae. ¿Qué riesgo hay?
+   - [ ] Ninguno: el primario sigue igual
+   - [x] El primario puede frenarse esperando la confirmación de la réplica
+   - [ ] Se pierden las transacciones que estaban en el lag
+   - [ ] Se produce un split brain
+   > El COMMIT sincrónico depende de la réplica. Perder lo del lag es el riesgo de la asincrónica. [→ Replicación](#Replicación)
 
 ## HA no es backup
 
@@ -82,16 +90,22 @@
 
 **Replicar un error no crea un backup.**
 
+Ante un incidente hay tres respuestas que se complementan (*Resumen parcial*, p. 22): **proteger** (que no pase: permisos, auditoría), **recuperar** (volver a un estado correcto: backup + logs) y **continuar** (seguir dando servicio: réplica, failover). Primero se diagnostica qué pasó y después se elige la herramienta.
+
 ## Replicación
 
-- **Primario**: recibe escrituras y publica cambios.
-- **Réplica**: recibe cambios; sirve lecturas o espera el failover.
-- **Lag**: distancia temporal entre primario y réplica.
+**Alta disponibilidad** = que el servicio siga funcionando aunque falle un componente. Se logra con **replicación**: copias vivas de la base en otros servidores.
 
-| Tipo | Ventaja | Costo |
-|---|---|---|
-| Sincrónica | Menor pérdida potencial | Mayor acoplamiento |
-| Asincrónica | Menor impacto en el primario | Posible pérdida si hay lag |
+- **Primario** (*primary / source*): recibe escrituras y publica cambios.
+- **Réplica** (*standby / replica*): recibe cambios y los aplica; sirve lecturas (por ejemplo, reportes) o espera el failover.
+- **Lag**: distancia temporal entre primario y réplica (por ejemplo, 3 segundos).
+
+| Tipo | Cómo funciona (*Resumen parcial*, p. 27) | Ventaja | Costo |
+|---|---|---|---|
+| Sincrónica | El COMMIT **espera** a que la réplica confirme que recibió el cambio | Pérdida casi nula (RPO ≈ 0) | Cada escritura es más lenta; si la réplica falla, puede frenar al primario |
+| Asincrónica | El primario confirma y **envía después** | No afecta el rendimiento | Si el primario muere, se pierde lo que estaba en el lag |
+
+En PostgreSQL la replicación física envía el **WAL** a la réplica (*streaming replication*); en MySQL se envía el **binlog**.
 
 ## Failover
 
@@ -99,9 +113,11 @@ Volver a dar servicio no alcanza:
 1. **Detectar**: ¿falla real o red parcial?
 2. **Promover**: ¿qué réplica asume las escrituras?
 3. **Reconectar**: ¿cómo llegan las aplicaciones al nuevo nodo?
-4. **Reintegrar**: ¿qué pasa con el nodo anterior?
+4. **Reintegrar**: ¿qué pasa con el nodo anterior? Vuelve **como réplica**, no como primario.
 
-Riesgos: **split brain**, pérdida por lag y un failover que funciona técnicamente pero no operacionalmente.
+Detectar, promover (convertir una réplica en el nuevo primario) y reconectar (IP virtual, DNS o proxy) son los pasos del *Resumen parcial* (p. 27).
+
+Riesgos: **split brain** (por un problema de red los dos nodos creen ser el primario, los dos aceptan escrituras y los datos divergen), pérdida por lag y un failover que funciona técnicamente pero no operacionalmente.
 
 ## Diseño por criticidad
 
@@ -119,7 +135,7 @@ La complejidad técnica se justifica por la criticidad, el costo de la caída y 
 ```sql
 -- MySQL
 SHOW REPLICA STATUS\G
--- Replica_IO_Running, Replica_SQL_Running, Seconds_Behind_Source, Source_Host
+-- Replica_IO_Running, Replica_SQL_Running, Seconds_Behind_Source (el lag), Source_Host
 SHOW BINARY LOGS;
 
 -- PostgreSQL

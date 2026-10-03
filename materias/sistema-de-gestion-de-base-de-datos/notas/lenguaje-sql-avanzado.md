@@ -2,7 +2,7 @@
 [← Índice Sistemas de Gestión de Bases de Datos](../INDICE.md)
 
 > Tema 3 · Peso: 3/3 (estimado: es práctica directa y la Actividad 1 de U3 lo pide entero) · Fuente:
-> *Clase 3y4 - SQL avanzado y programabilidad 2026* (parte 1, diap. 6–27) y la bitácora U3 Act. 3 del grupo.
+> *Clase 3y4 - SQL avanzado y programabilidad 2026* (parte 1, diap. 6–27) y la bitácora U3 Act. 3 del grupo. Ampliada con el *Resumen parcial* del estudiante (pp. 11–14 y 31).
 
 ## Preguntas de recuperación
 
@@ -25,6 +25,13 @@
 - ¿Por qué cargar 20.000 filas con LOAD DATA o COPY y no con INSERT? :: Porque 20.000 INSERT son 20.000 interacciones con overhead por fila; la carga por lote minimiza ese costo repetido. [→ Carga masiva](#Carga%20masiva)
 - ¿Qué comando de carga masiva usa cada motor? :: MySQL: LOAD DATA LOCAL INFILE 'ventas.csv' INTO TABLE venta FIELDS TERMINATED BY ',' IGNORE 1 LINES. PostgreSQL: COPY venta FROM '/ruta/ventas.csv' WITH (FORMAT csv, HEADER true). [→ Carga masiva](#Carga%20masiva)
 - ¿Por qué el total por cliente del laboratorio dejaba afuera al cliente 3 y cómo se arregló? :: Porque agrupaba sobre pedido y el cliente 3 no tenía pedidos. Se arregló con cliente LEFT JOIN pedido y COALESCE(SUM(p.total), 0), que devuelve 0. [→ JOIN subconsulta y EXISTS](#JOIN%20subconsulta%20y%20EXISTS)
+- Con ORDER BY y sin marco en OVER(), ¿qué marco usa el motor y qué problema trae? :: RANGE, que trata como una sola a las filas empatadas en el orden: dos ventas del mismo día muestran el mismo acumulado. Se arregla con ROWS y un desempate. [→ Funciones de ventana](#Funciones%20de%20ventana)
+- ¿Qué devuelven LAG y LEAD? :: El valor de la fila anterior y el de la siguiente dentro de la ventana (por ejemplo, para comparar con la venta previa). [→ Funciones de ventana](#Funciones%20de%20ventana)
+- ¿Por qué no alcanza `MAX(fecha)` para la última venta de cada cliente? :: Porque da sólo la fecha y no la fila completa, y si hay dos ventas en esa fecha devuelve las dos. [→ Ranking](#Ranking)
+- ¿Cómo se evita un ciclo infinito en una CTE recursiva? :: Guardando el camino recorrido en un arreglo y cortando si el id ya está: `WHERE NOT c.cliente_id = ANY(j.camino)`. La FK autorreferenciada no impide los ciclos. [→ CTE recursiva](#CTE%20recursiva)
+- ¿Qué diferencia hay entre `COPY` y `\copy` en PostgreSQL? :: `COPY` lee el archivo en el servidor; `\copy` (de psql) lo lee desde tu máquina. [→ Carga masiva](#Carga%20masiva)
+- ¿Por qué la subconsulta de EXISTS usa `SELECT 1`? :: Porque a EXISTS sólo le importa si hay alguna fila, no qué columnas devuelve. Es correlacionada: usa columnas de la consulta de afuera. [→ JOIN subconsulta y EXISTS](#JOIN%20subconsulta%20y%20EXISTS)
+- En U3A1, ¿cómo se validó que el acumulado por ventana estaba bien? :: Con un bloque `DO … RAISE EXCEPTION` que lo compara con un `GROUP BY`: dos caminos distintos al mismo número. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
 
 ## Cuestionario
 
@@ -94,6 +101,24 @@
     - [ ] LOAD DATA LOCAL INFILE
     - [ ] Un trigger AFTER INSERT
     > LOAD DATA es el equivalente de MySQL. El principio es minimizar el costo por fila. [→ Carga masiva](#Carga%20masiva)
+12. Un cliente tiene una venta de 200 y después dos el mismo día, de 100 y 50. ¿Qué acumulado muestran esas dos con `SUM(total) OVER (PARTITION BY cliente_id ORDER BY fecha)`?
+   - [ ] 300 y 350
+   - [x] Las dos muestran 350
+   - [ ] 250 y 350
+   - [ ] Error: falta el marco
+   > Sin marco, el default es RANGE: las filas empatadas en fecha se suman juntas. Con ROWS y `venta_id` darían 300 y 350. [→ Funciones de ventana](#Funciones%20de%20ventana)
+13. ¿Qué pasa con los clientes de segmento NULL en `PARTITION BY segmento`?
+   - [ ] Se descartan
+   - [x] Quedan juntos en un grupo propio
+   - [ ] Cada uno queda en su propio grupo
+   - [ ] La consulta falla
+   > PARTITION BY junta los NULL; un `WHERE segmento = 'X'` nunca los encuentra. Se tratan con COALESCE. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
+14. Hay que comparar cada venta con la venta anterior del mismo cliente. ¿Qué se usa?
+   - [ ] `LEAD(total) OVER (PARTITION BY cliente_id ORDER BY fecha, venta_id)`
+   - [x] `LAG(total) OVER (PARTITION BY cliente_id ORDER BY fecha, venta_id)`
+   - [ ] `SUM(total) OVER (PARTITION BY cliente_id)`
+   - [ ] `RANK() OVER (ORDER BY total)`
+   > LAG trae la fila anterior; LEAD, la siguiente. [→ Funciones de ventana](#Funciones%20de%20ventana)
 
 ## Definir el resultado primero
 
@@ -116,7 +141,8 @@ SELECT COALESCE(segmento, 'SIN_SEGMENTO') AS segmento,
 FROM cliente;
 ```
 
-- **NULL**: cualquier comparación con NULL da **UNKNOWN**. Se usa `IS NULL` / `IS NOT NULL`.
+- **NULL** significa "valor desconocido", no cero ni vacío. Cualquier comparación con NULL da **UNKNOWN** (ni verdadero ni falso): `segmento = NULL` no devuelve ninguna fila. Se usa `IS NULL` / `IS NOT NULL`.
+- **Portable** = SQL estándar que funciona igual en varios motores (*Resumen parcial*, p. 11).
 - **COALESCE** devuelve el primer valor no nulo.
 
 ## JOIN subconsulta y EXISTS
@@ -135,6 +161,8 @@ FROM cliente c
 WHERE EXISTS (SELECT 1 FROM venta v
               WHERE v.cliente_id = c.cliente_id AND v.total > 100000);
 ```
+
+El `SELECT 1` es a propósito: a EXISTS no le importa qué columnas devuelve, sólo si hay alguna fila. Es una **subconsulta correlacionada** porque usa `c.cliente_id` de la consulta de afuera (*Resumen parcial*, p. 12).
 
 Formas lógicamente equivalentes no son idénticas: se comparan por intención, legibilidad y plan.
 
@@ -155,6 +183,9 @@ SUM(v.total) OVER (
 - Para un acumulado **mensual**: `PARTITION BY cliente_id, EXTRACT(YEAR FROM fecha), EXTRACT(MONTH FROM fecha)`.
 - El marco importa en acumulados y promedios móviles.
 - ROWS + un segundo criterio de orden evita la ambigüedad de los empates.
+- El marco "desde el principio hasta la fila actual" da un **acumulado** (running total): 100, 180, 260…
+- **Trampa ROWS frente a RANGE** (*Resumen parcial*, p. 12): con `ORDER BY` y **sin marco**, el default es `RANGE`, que trata como una sola a las filas empatadas en el orden. Dos ventas del mismo día muestran el mismo acumulado (ya sumadas las dos). Con `ROWS` y un desempate (`venta_id`) cada fila suma de a una.
+- **LAG(total)** trae el valor de la fila anterior (para comparar con la venta previa); **LEAD**, el de la siguiente (*Resumen parcial*, p. 13).
 
 ## Ranking
 
@@ -182,6 +213,10 @@ WITH ventas_ordenadas AS (
 )
 SELECT * FROM ventas_ordenadas WHERE rn = 1;
 ```
+
+Cada cliente numera sus ventas de la más nueva a la más vieja; `venta_id DESC` desempata dos ventas del mismo día; queda la número 1. Si también van los clientes sin ventas, se parte de `cliente LEFT JOIN venta`.
+
+**¿Por qué no `MAX(fecha)`?** Porque da sólo la fecha, no la fila completa, y si hay dos ventas en esa fecha devuelve las dos (*Resumen parcial*, p. 13).
 
 ## CTE
 
@@ -218,6 +253,10 @@ SELECT * FROM jerarquia;
 - **MySQL**: `CAST(nombre AS CHAR(200))` en el ancla y `CONCAT(j.ruta, ' > ', c.nombre)`.
 - **PostgreSQL**: castear el nombre a `text` y concatenar con `||`.
 
+Vuelta 0: la raíz (Casa Central). Vuelta 1: sus hijos (Norte, Sur). Vuelta 2: los clientes de Norte y Sur… Resultado ejemplo: `Casa Central > Norte > Cliente A`, nivel 2.
+
+**Cuidado con los ciclos** (*Resumen parcial*, p. 14): si alguien carga A → B → A, la recursión no termina. Se corta guardando el camino recorrido en un arreglo y evitando repetir: `WHERE NOT c.cliente_id = ANY(j.camino)`. Una FK autorreferenciada (`responsable_id` → misma tabla) **no impide** cargar un ciclo.
+
 Sí: organigramas, categorías, BOM, dependencias, árboles de permisos. No necesariamente: profundidad conocida y chica, datos que conviene precalcular.
 
 ## Carga masiva
@@ -233,4 +272,21 @@ FIELDS TERMINATED BY ',' IGNORE 1 LINES;
 COPY venta FROM '/ruta/ventas.csv' WITH (FORMAT csv, HEADER true);
 ```
 
+`COPY` lee el archivo **en el servidor**; desde psql, `\copy` lo lee **desde tu máquina** (*Resumen parcial*, p. 14).
+
 Antes de cargar: formato, tipos, manejo de errores, transacción y validación posterior.
+
+## Lo que hicimos en el laboratorio
+
+U3 Act. 1, "El reporte que nadie puede resolver": última venta por cliente, acumulado mensual, ranking por segmento y recorrido jerárquico, sobre un dataset con trampas puestas a propósito (*Resumen parcial*, p. 31).
+
+| Trampa | Qué rompía | Solución |
+|---|---|---|
+| Cliente con dos ventas en su última fecha | `MAX(fecha)` devolvía dos filas | `ROW_NUMBER()` con `ORDER BY fecha DESC, venta_id DESC` |
+| Clientes sin ventas | Desaparecían con INNER JOIN | LEFT JOIN (columnas de venta en NULL) |
+| Dos ventas el mismo día | El marco por defecto (RANGE) les daba el mismo acumulado | `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` + desempate |
+| Dos clientes con igual facturación | Había que decidir qué significa empate | `RANK()`: mismo puesto y el siguiente salta |
+| Segmento NULL | `PARTITION BY` junta los NULL en un grupo; `= 'X'` nunca los encuentra | Tratarlos explícitamente con COALESCE |
+
+- **Jerarquía**: CTE recursiva con un arreglo `camino` de ids recorridos, que sirve para ordenar el árbol y para cortar ciclos.
+- **Validaciones**: bloques `DO … RAISE EXCEPTION` que hacen fallar el script si algo no cierra. Ejemplo: el acumulado por ventana tiene que dar lo mismo que un `GROUP BY` (dos caminos distintos al mismo número).

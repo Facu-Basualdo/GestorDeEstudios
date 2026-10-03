@@ -2,7 +2,8 @@
 [← Índice Sistemas de Gestión de Bases de Datos](../INDICE.md)
 
 > Tema 6 · Peso: 2/3 (estimado) · Fuente: *Clase 6 - Seguridad - Backup - Replica - HA 2026* (diap. 5–10) y la
-> bitácora U6 Act. 1 del grupo, Fase 1 "El usuario infiltrado" (PostgreSQL).
+> bitácora U6 Act. 1 del grupo, Fase 1 "El usuario infiltrado" (PostgreSQL). Ampliada con el *Resumen parcial* del
+> estudiante (pp. 22–24 y 33).
 
 ## Preguntas de recuperación
 
@@ -24,6 +25,13 @@
 - ¿Qué significa auditar bien? :: Registrar eventos relevantes, consultables y protegidos contra alteraciones; no guardar todo. [→ Auditoría](#Auditoría)
 - En la Fase 1 del laboratorio, ¿qué tres accesos indebidos tenía u6_app? :: Intentar borrar un cliente (lo frenó la FK, no el permiso), borrar un movimiento histórico (DELETE 1) y poner en cero el saldo de todas las cuentas (4 filas). [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
 - Si un DELETE falla por una FK, ¿demuestra que el usuario no tenía permiso? :: No. El motor lo dejó intentar (tenía el privilegio) y lo frenó la integridad referencial. Para probar el permiso hay que buscar una operación que no choque con restricciones. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
+- ¿Qué trampa tiene el pseudo-rol PUBLIC en PostgreSQL? :: Tiene CONNECT y TEMP sobre cada base nueva: hay que hacer `REVOKE CONNECT ON DATABASE banco FROM PUBLIC;` para restringir de verdad. [→ Comandos por motor](#Comandos%20por%20motor)
+- ¿Cómo se prueba un permiso con un rol en PostgreSQL? :: `SET ROLE rol;`, ejecutar lo permitido (OK) y lo prohibido (error esperado), y `RESET ROLE;`. Se guarda la evidencia de las dos. [→ Mínimo privilegio](#Mínimo%20privilegio)
+- ¿Qué es un usuario en PostgreSQL? :: Un rol que puede iniciar sesión. [→ Comandos por motor](#Comandos%20por%20motor)
+- En MySQL, ¿por qué `'juan'@'%'` y `'juan'@'localhost'` son usuarios distintos? :: Porque el usuario incluye desde dónde se conecta: `%` es cualquier host. [→ Comandos por motor](#Comandos%20por%20motor)
+- ¿Qué guarda una buena auditoría? :: Quién (`session_user`), qué, cuándo y el valor anterior y el nuevo. [→ Auditoría](#Auditoría)
+- En la Fase 1, ¿cómo se evitó que la app falsificara el usuario de la auditoría? :: Con un permiso por columna: `GRANT INSERT (evento, detalle) ON auditoria_evento TO app;`, así no puede mandar `usuario`. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
+- ¿Por qué los ids tienen saltos después de un ROLLBACK? :: Porque el ROLLBACK no devuelve los números de secuencia ya usados. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
 
 ## Cuestionario
 
@@ -75,6 +83,18 @@
    - [ ] Sólo se hace con triggers
    - [ ] Reemplaza al backup
    > Las fuentes son eventos, logs del motor y tablas propias por trigger. [→ Auditoría](#Auditoría)
+9. Se dio CONNECT sobre la base `banco` sólo a `rol_analista`, pero cualquier usuario se sigue conectando. ¿Qué falta?
+   - [ ] `GRANT USAGE ON SCHEMA public TO rol_analista;`
+   - [x] `REVOKE CONNECT ON DATABASE banco FROM PUBLIC;`
+   - [ ] Reiniciar el servicio
+   - [ ] `REVOKE ALL ON DATABASE banco FROM rol_analista;`
+   > PUBLIC tiene CONNECT por defecto sobre toda base nueva. [→ Comandos por motor](#Comandos%20por%20motor)
+10. La tabla de auditoría tiene `usuario DEFAULT CURRENT_USER` y la app tiene INSERT sobre toda la tabla. ¿Qué riesgo hay?
+   - [x] La app puede mandar otro valor en `usuario` y falsificar quién hizo el cambio
+   - [ ] Ninguno: el DEFAULT siempre se aplica
+   - [ ] El INSERT falla si no se manda `usuario`
+   - [ ] CURRENT_USER siempre devuelve postgres
+   > El DEFAULT sólo aplica si no se manda la columna. Se cierra con un permiso por columna. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
 
 ## Pilares de la seguridad
 
@@ -88,11 +108,15 @@ El DBA responde a los incidentes en tres tiempos complementarios:
 | Autenticación | ¿Quién es? | Usuario y credencial, plugin, LDAP/AD, certificado |
 | Autorización | ¿Qué puede hacer? | Roles, privilegios, objetos |
 | Auditoría | ¿Qué hizo? | Eventos, consultas, cambios, trazabilidad |
-| Cifrado u ofuscación | ¿Cómo se protege? | Tránsito, reposo, copias; enmascaramiento estático y dinámico |
+| Cifrado u ofuscación | ¿Cómo se protege? | Tránsito (SSL/TLS), reposo (archivos del disco), copias; enmascaramiento estático y dinámico (mostrar `****-1234` en vez de la tarjeta completa) |
 
 ## Mínimo privilegio
 
 **Diseñar los permisos antes de ejecutar comandos.** Se otorga lo necesario para la función y se prueba explícitamente lo que tiene que quedar bloqueado.
+
+- **Privilegio**: permiso para una acción sobre un objeto (SELECT sobre `cliente`, INSERT sobre `movimiento`, CREATE en un esquema).
+- **Rol**: conjunto de privilegios con nombre. Se asigna el rol a las personas en vez de dar permisos uno por uno: 20 analistas reciben `rol_analista`, y si cambia lo que puede hacer un analista se cambia el rol una sola vez.
+- **Mínimo privilegio**: cada usuario tiene **sólo** lo que necesita. La cuenta de la app no debe poder hacer DROP; el analista no debe poder modificar datos (*Resumen parcial*, p. 23).
 
 | Rol | Lectura | Escritura | DDL | Usuarios | Auditoría |
 |---|---|---|---|---|---|
@@ -108,7 +132,16 @@ Pasos:
 3. **Revocar** permisos heredados, globales o temporales no justificados.
 4. **Probar**: un OK y un error esperado.
 
-Las **vistas** también son seguridad: exponen sólo columnas o filas permitidas.
+Las **vistas** también son seguridad: exponen sólo columnas o filas permitidas (permiso sobre una vista sin DNI ni sueldo, y no sobre la tabla).
+
+**Probar los permisos** (*Resumen parcial*, p. 24): no alcanza con decir "no tiene permiso". Se ejecuta la prueba y se guarda la evidencia de lo que funciona **y** de lo que falla por la razón correcta:
+
+```sql
+SET ROLE rol_analista;
+SELECT * FROM cliente;   -- OK
+DELETE FROM cliente;     -- ERROR: permission denied for table cliente (error esperado)
+RESET ROLE;
+```
 
 ## Comandos por motor
 
@@ -135,7 +168,11 @@ REVOKE USAGE ON SCHEMA public FROM rol_analista;
 
 > *(agregado)* La diapositiva escribe `REVOKE … TO`; la sintaxis correcta es `REVOKE … FROM`.
 
-En PostgreSQL los permisos van en tres niveles: **base (CONNECT) → esquema (USAGE) → objeto (SELECT…)**. En `pg_class.relacl`, `arwd` = INSERT (a), SELECT (r), UPDATE (w), DELETE (d).
+En PostgreSQL los permisos van en tres niveles: **base (CONNECT) → esquema (USAGE) → objeto (SELECT…)**. Un **usuario es un rol que puede iniciar sesión**. En MySQL, en cambio, el usuario incluye desde dónde se conecta: `'juan'@'%'` (cualquier host) no es `'juan'@'localhost'`.
+
+**Trampa de PostgreSQL** (*Resumen parcial*, pp. 24 y 33): el pseudo-rol **PUBLIC** (todos los usuarios) tiene `CONNECT` y `TEMP` sobre cada base nueva. Dar CONNECT a los roles no restringe nada si antes no se hace `REVOKE CONNECT ON DATABASE banco FROM PUBLIC;`.
+
+ En `pg_class.relacl`, `arwd` = INSERT (a), SELECT (r), UPDATE (w), DELETE (d).
 
 ## Auditoría
 
@@ -145,7 +182,7 @@ El DBA tiene que poder reconstruir qué pasó sin depender de la memoria de nadi
 - **Tablas propias** por trigger, cuando aplica al negocio.
 - **Revisión**: qué evidencia alcanza para sostener una conclusión.
 
-Auditar no es guardar todo: es registrar lo relevante, consultable y protegido contra alteraciones.
+Auditar no es guardar todo: es registrar lo relevante, consultable y protegido contra alteraciones. Una buena auditoría guarda **quién** (`session_user`), **qué**, **cuándo** y el **valor anterior y nuevo** (*Resumen parcial*, p. 24).
 
 ## Lo que hicimos en el laboratorio
 
@@ -158,3 +195,5 @@ U6 Act. 1, Fase 1 "El usuario infiltrado", base `u6_rescate` en PostgreSQL (4 cl
   3. Puso en cero el saldo de las 4 cuentas con un UPDATE masivo.
 - **Corrección**: REVOKE de DELETE y TRUNCATE. `rol_app` queda con SELECT, INSERT y UPDATE en cliente, cuenta y movimiento, y SELECT en `auditoria_evento`. `rol_analista`, sólo SELECT.
 - **Prueba**: con `u6_analista`, DELETE e INSERT dan error de permisos.
+- **Auditoría falsificable** (*Resumen parcial*, p. 33): la columna `usuario` era un `DEFAULT CURRENT_USER`, y la app podía mandar otro valor en el INSERT. Se cerró con un **permiso por columna**: `GRANT INSERT (evento, detalle) ON auditoria_evento TO app;`.
+- Un ROLLBACK **no devuelve los números de secuencia**: por eso los ids tienen saltos.

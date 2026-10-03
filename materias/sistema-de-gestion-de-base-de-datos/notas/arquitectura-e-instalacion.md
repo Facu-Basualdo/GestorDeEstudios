@@ -3,7 +3,7 @@
 
 > Tema 1 · Peso: 2/3 (estimado: los parciales 2026 cambiaron de formato y todavía no hay modelo) · Fuente:
 > *Clase 1 - Arquitectura DB 2026 multiplataforma* (diap. 9–34) y la bitácora U1 Act. 3 del grupo
-> (instalación de PostgreSQL 18.4 en Ubuntu Server).
+> (instalación de PostgreSQL 18.4 en Ubuntu Server). Ampliada con el *Resumen parcial* del estudiante (pp. 1–5).
 
 ## Preguntas de recuperación
 
@@ -26,6 +26,13 @@
 - ¿Qué es la instancia? :: El proceso o servicio que administra memoria, recursos y conexiones (en MySQL, mysqld). No siempre equivale a una base: una instancia puede tener varias. [→ Instancia base y esquema](#Instancia%20base%20y%20esquema)
 - En DBaaS (RDS, Azure SQL, Cloud SQL), ¿qué sigue siendo responsabilidad del equipo? :: Modelo, consultas, índices, seguridad, costos y continuidad. El proveedor administra parte del backup, el patching, la disponibilidad y el monitoreo. [→ Nube y rol del DBA](#Nube%20y%20rol%20del%20DBA)
 - ¿Qué viste en el laboratorio de instalación que confirma la independencia física? :: Que los nombres lógicos (sgbd_lab, cuentas) no existen en el disco: hay directorios y archivos identificados por OID, páginas de 8 kB y segmentos de WAL. [→ Lo que vimos en el laboratorio](#Lo%20que%20vimos%20en%20el%20laboratorio)
+- ¿Qué cuatro problemas aparecen al manejar los datos con archivos sueltos? Un ejemplo de cada uno. :: Concurrencia (dos cajeros pisan el mismo saldo), atomicidad (corte a mitad de una transferencia), redundancia e inconsistencia (la dirección copiada en tres archivos y una vieja) e integridad (nada impide un saldo negativo). [→ Conceptos base](#Conceptos%20base)
+- Cuando el motor necesita una fila, ¿qué lee? :: La página entera donde está (8 KB en PostgreSQL). Nunca lee "una fila". [→ Recorrido de una consulta](#Recorrido%20de%20una%20consulta)
+- Tras una caída, ¿qué hace el recovery con el log? :: Rehace (redo) los cambios confirmados y deshace (undo) los que no llegaron al COMMIT. [→ Recorrido de una consulta](#Recorrido%20de%20una%20consulta)
+- ¿Por qué el motor escribe primero el log y no la página modificada? :: Porque escribir el log es secuencial y rápido, y escribir páginas sueltas es lento. Con el log en disco el cambio ya es durable; la página baja después con el checkpoint. [→ Recorrido de una consulta](#Recorrido%20de%20una%20consulta)
+- ¿Cómo se llaman en PostgreSQL el buffer de datos, la memoria de trabajo y el log buffer? :: `shared_buffers`, `work_mem` (por operación: si no alcanza, va a disco) y `wal_buffers`. [→ Memoria y almacenamiento](#Memoria%20y%20almacenamiento)
+- ¿Qué mecanismo sostiene cada propiedad ACID? :: Atomicidad: log de undo y ROLLBACK. Consistencia: constraints (CHECK, FK). Aislamiento: locks y MVCC. Durabilidad: el WAL en disco. [→ Memoria y almacenamiento](#Memoria%20y%20almacenamiento)
+- ¿Qué hace `SET search_path TO sgbd_u5;`? :: Le dice al motor en qué esquema buscar las tablas sin calificarlas. [→ Instancia base y esquema](#Instancia%20base%20y%20esquema)
 
 ## Cuestionario
 
@@ -89,6 +96,24 @@
     - [ ] El hardware del servidor
     - [ ] Nada: el proveedor resuelve todo
     > DBaaS cambia la operación, no elimina la arquitectura ni las decisiones técnicas. [→ Nube y rol del DBA](#Nube%20y%20rol%20del%20DBA)
+11. Con archivos sueltos, se corta la luz a mitad de una transferencia y la plata queda debitada de una cuenta pero no acreditada en la otra. ¿Qué garantía faltó?
+   - [x] Atomicidad
+   - [ ] Consistencia
+   - [ ] Aislamiento
+   - [ ] Durabilidad
+   > Atomicidad = todo o nada: o se debita y se acredita, o no pasa nada. [→ Conceptos base](#Conceptos%20base)
+12. ¿Qué mecanismo sostiene el **aislamiento** de las transacciones?
+   - [ ] Constraints CHECK y FK
+   - [x] Locks y MVCC
+   - [ ] El WAL forzado a disco en el COMMIT
+   - [ ] El log de undo
+   > Los constraints sostienen la consistencia; el WAL, la durabilidad; el undo, la atomicidad. [→ Memoria y almacenamiento](#Memoria%20y%20almacenamiento)
+13. En PostgreSQL, un ORDER BY grande no entra en `work_mem`. ¿Qué pasa?
+   - [ ] Falla con un error de memoria
+   - [ ] Toma la memoria que le falta de `shared_buffers`
+   - [x] Usa archivos temporales en disco y la consulta se vuelve lenta
+   - [ ] Ordena sólo las filas que entran y devuelve el resto sin ordenar
+   > `work_mem` es por operación; si no alcanza, el ordenamiento sigue en disco. [→ Memoria y almacenamiento](#Memoria%20y%20almacenamiento)
 
 ## Conceptos base
 
@@ -97,6 +122,17 @@
 - **DBMS / SGBD**: el software que gestiona definición, manipulación, seguridad, concurrencia, transacciones, recuperación y acceso eficiente. No es sólo "guardar datos".
 
 DBMS frente a archivos: con archivos, el programa conoce la estructura exacta y la integridad, la seguridad y la recuperación quedan del lado de la aplicación. El DBMS lo centraliza todo.
+
+Qué sale mal con archivos sueltos (un CSV por tabla), con el ejemplo de un banco (*Resumen parcial*, p. 1):
+
+| Problema | Ejemplo |
+|---|---|
+| Concurrencia | Dos cajeros actualizan el mismo saldo y uno pisa el cambio del otro |
+| Atomicidad | Se corta la luz a mitad de una transferencia: debitada en una cuenta, no acreditada en la otra |
+| Redundancia e inconsistencia | La dirección del cliente copiada en tres archivos, y en uno quedó vieja |
+| Integridad | Nada impide un saldo negativo o un movimiento de una cuenta que no existe |
+
+Además el DBMS da **independencia datos–aplicación**: la app pide datos con SQL sin saber cómo están guardados.
 
 Roles: el **DA** define políticas y gobierno de datos. El **DBA** administra operación, seguridad, rendimiento, backups y disponibilidad. El **desarrollador** hace aplicaciones, consultas y migraciones. El **analista** consume la información. La cátedra mira desde el DBA.
 
@@ -120,6 +156,8 @@ Modelos de datos: relacional, documental (JSON/BSON), clave-valor, columnar, gra
 - **Independencia lógica**: cambiar el conceptual sin afectar las vistas (agregar atributos, dividir una entidad).
 - **Independencia física**: cambiar el interno sin cambiar la visión lógica (índices, tablespaces, particiones). Ejemplo de la clase: migrar de row-store en disco a column-store en SSD sin que los usuarios lo noten.
 
+Ejemplos concretos (*Resumen parcial*, p. 2): agregar la columna `email` a `cliente` y que la vista `v_clientes_publica` (nombre y ciudad, sin DNI) siga andando es independencia **lógica**; crear un índice o pasar la tabla a un SSD sin reescribir ninguna consulta es independencia **física**.
+
 El ideal: que una decisión física de rendimiento no obligue a reprogramar el sistema.
 
 ## Recorrido de una consulta
@@ -127,16 +165,19 @@ El ideal: que una decisión física de rendimiento no obligue a reprogramar el s
 `SELECT saldo FROM cuentas WHERE nro_cuenta = 12345;`
 
 1. **Parser**: análisis léxico, sintáctico y semántico. Consulta el **catálogo** (¿existe la tabla? ¿las columnas? ¿hay permisos?) y produce un árbol de consulta.
-2. **Optimizador**: con las **estadísticas**, estima costos y elige el plan de menor costo (índice o scan, joins, orden, paralelismo).
+2. **Optimizador**: con las **estadísticas**, estima costos y elige el plan de menor costo (índice o scan, joins, orden, paralelismo). Ejemplo: con un índice sobre `nro_cuenta`, leer 3 páginas en vez de 50.000 (*Resumen parcial*, p. 3).
 3. **Ejecutor**: corre el plan **sobre páginas en memoria**. Si la página está en el buffer, es *hit*; si no, *miss* y la pide al almacenamiento.
 4. Devuelve el resultado respetando aislamiento y permisos.
+
+El **storage manager** es el componente que lee y escribe los archivos de datos y de logs en el disco. La **página** (o bloque) es la unidad mínima de lectura y escritura: 8 KB en PostgreSQL, con varias filas adentro. **El motor nunca lee "una fila": lee la página entera donde está** (*Resumen parcial*, p. 3).
 
 **Escritura (UPDATE + COMMIT)**:
 - El cambio se anota en el **buffer de log** y la página queda **sucia** en RAM.
 - **Escritura anticipada**: el log se escribe antes que el dato.
 - El **COMMIT fuerza el log a disco** → durabilidad. No baja la página.
 - El **checkpoint** (asíncrono, en segundo plano) baja las páginas sucias a los archivos de datos.
-- Si el servidor cae, la recuperación **rehace** los cambios desde el log.
+- Si el servidor cae, la recuperación lee el log, **rehace (redo)** los cambios confirmados y **deshace (undo)** los que no llegaron al COMMIT.
+- ¿Por qué así? Escribir el log es **secuencial y rápido**; escribir páginas sueltas es lento (*Resumen parcial*, p. 3).
 
 ## Memoria y almacenamiento
 
@@ -145,6 +186,8 @@ Memoria:
 - **Plan cache**: reutiliza planes de consultas frecuentes.
 - **Sort / work memory**: ordenamientos, joins, hash.
 - **Log buffer**: agrupa cambios antes de escribirlos al log.
+
+En PostgreSQL (*Resumen parcial*, pp. 3–4): el buffer es `shared_buffers`, la memoria de trabajo es `work_mem` (**por operación**: si un ordenamiento no entra, va a archivos temporales en disco), el log buffer es `wal_buffers` y el plan cache se aprovecha con **sentencias preparadas**.
 
 | Motor | Buffer de datos | Log transaccional |
 |---|---|---|
@@ -156,6 +199,15 @@ Memoria:
 Almacenamiento: **datos** (páginas, bloques, segmentos, tablespaces, datafiles), **índices** (B-Tree, hash, columnstore, full-text, espacial), **logs** y **temporales** (sort, hash, objetos temporales).
 
 **ACID**: atomicidad (todo o nada), consistencia (respeta reglas), aislamiento (controla concurrencia), durabilidad (lo confirmado sobrevive). Se sostiene con logs, bloqueos, control de concurrencia y checkpoints.
+
+Qué mecanismo sostiene cada propiedad, con una transferencia de $100 (dos UPDATE) (*Resumen parcial*, p. 4):
+
+| Propiedad | En el ejemplo | Mecanismo |
+|---|---|---|
+| Atomicidad | Se debita y se acredita, o no pasa nada | Log de undo, ROLLBACK |
+| Consistencia | Ningún saldo queda negativo | Constraints (CHECK, FK) |
+| Aislamiento | Otro cajero no ve la plata "en el aire" | Locks, MVCC |
+| Durabilidad | Tras el COMMIT, un corte de luz no borra la transferencia | Log (WAL) en disco |
 
 ## Diccionario de datos
 
@@ -184,6 +236,8 @@ INFORMATION_SCHEMA es el estándar ANSI; Oracle usa su propio diccionario.
 - **Oracle**: instancia + base, SGA/PGA, datafiles, control files, redo, undo.
 
 Hay que comparar términos antes de comparar comandos.
+
+En nuestra VM de PostgreSQL (*Resumen parcial*, p. 5): la **instancia** es el proceso que escucha en el puerto 5432; las **bases** son `pruebas`, `sgbd_lab` y `sgbd_u5`; los **esquemas** (`public`, `sgbd_u5`) son carpetas dentro de cada base, y `SET search_path TO sgbd_u5;` le dice al motor en qué esquema buscar las tablas.
 
 ## Nube y rol del DBA
 

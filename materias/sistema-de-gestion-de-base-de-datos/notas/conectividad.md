@@ -2,7 +2,7 @@
 [← Índice Sistemas de Gestión de Bases de Datos](../INDICE.md)
 
 > Tema 5 (primera mitad) · Peso: 2/3 (estimado) · Fuente: *Clase 5 - Conectividad - Transacciones - Concurrencia 2026*
-> (diap. 5–13) y el *Informe de guardia DBA* del grupo (U5 Act. 1, PostgreSQL por Tailscale y pgAdmin).
+> (diap. 5–13) y el *Informe de guardia DBA* del grupo (U5 Act. 1, PostgreSQL por Tailscale y pgAdmin). Ampliada con el *Resumen parcial* del estudiante (pp. 17–18 y 32).
 
 ## Preguntas de recuperación
 
@@ -25,6 +25,12 @@
 - En la guardia, ¿para qué sirvió el rol pg_monitor? :: Para que las cuentas alumnoXX vieran sesiones y estadísticas del servidor sin poder modificar nada: mínimo privilegio aplicado a la guardia ("quien está de turno mira, no toca"). [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
 - ¿Cómo se lee alumno01=arwd/postgres en los permisos de una tabla de PostgreSQL? :: El rol alumno01 tiene a = INSERT, r = SELECT, w = UPDATE y d = DELETE, otorgados por postgres. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
 - ¿Por qué el grupo usó Tailscale y no el adaptador puente? :: No depende de la subred del aula, funciona igual desde casa sin abrir puertos ni publicar el 5432 en internet, y el motor escucha en direcciones concretas en lugar de listen_addresses = '*'. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
+- ¿En qué IP escucha PostgreSQL por defecto y cómo se cambia? :: Sólo en localhost (127.0.0.1). Se cambia `listen_addresses` en `postgresql.conf` y se reinicia. [→ Ruta de una conexión remota](#Ruta%20de%20una%20conexión%20remota)
+- ¿Qué decide `pg_hba.conf`? :: Qué usuario, a qué base, desde qué IP y con qué método de autenticación (por ejemplo `scram-sha-256`) se puede conectar. [→ Ruta de una conexión remota](#Ruta%20de%20una%20conexión%20remota)
+- ¿Qué indican `connection refused`, `password authentication failed` y `no pg_hba.conf entry`? :: Red, firewall o listener; usuario o contraseña; la regla de acceso no te incluye. [→ Ruta de una conexión remota](#Ruta%20de%20una%20conexión%20remota)
+- En VirtualBox, ¿por qué no se ve una VM en NAT desde otra PC y qué se hace? :: En NAT la VM sale a internet pero nadie de afuera la ve: hace falta port forwarding. En puente tiene IP propia en la red. [→ Ruta de una conexión remota](#Ruta%20de%20una%20conexión%20remota)
+- ¿Qué fue la prueba negativa de la guardia DBA? :: Conectarse desde la red a otra base (`pruebas`) y comprobar que falla con `no pg_hba.conf entry`: abrir el acceso no expuso las demás bases. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
+- ¿Con qué comando se verificó en qué IPs escucha el puerto 5432? :: `ss -lntp | grep 5432`. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
 
 ## Cuestionario
 
@@ -70,6 +76,18 @@
    - [ ] Borrar la tabla o cambiar su estructura
    - [ ] Crear bases y roles nuevos
    > Permisos de trabajo (a, r, w, d), sin permisos de administración. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
+8. La conexión desde pgAdmin falla con `no pg_hba.conf entry for host`. ¿Dónde está el problema?
+   - [ ] En el firewall de la VM
+   - [ ] En la contraseña del usuario
+   - [x] En `pg_hba.conf`: ninguna regla incluye esa base, usuario o IP
+   - [ ] La base no existe
+   > El mensaje viene de la autenticación por host; red y contraseña dan otros errores. [→ Ruta de una conexión remota](#Ruta%20de%20una%20conexión%20remota)
+9. PostgreSQL corre en la VM, pero desde otra PC da `connection refused`, y en la VM `ss -lntp` muestra `127.0.0.1:5432`. ¿Qué se cambia?
+   - [ ] `pg_hba.conf`
+   - [x] `listen_addresses` en `postgresql.conf`
+   - [ ] La contraseña del usuario
+   - [ ] El puerto a 3306
+   > El motor sólo escucha en localhost: hay que agregar la IP por la que llegan los clientes. [→ Ruta de una conexión remota](#Ruta%20de%20una%20conexión%20remota)
 
 ## Ruta de una conexión remota
 
@@ -77,9 +95,31 @@ La VM del grupo pasa a ser un **servidor compartido**: equipos con pgAdmin, Work
 
 **Una conexión remota es una ruta completa**: cliente → red → puerto → motor → autenticación → base.
 
-- **VirtualBox**: NAT, puente o Host-Only cambian cómo se alcanza la VM. Puede hacer falta redirigir puertos.
+Cada paso, en PostgreSQL (*Resumen parcial*, p. 17):
+1. **Cliente**: pgAdmin, Workbench, DBeaver o una aplicación.
+2. **Red**: la PC tiene que llegar a la IP del servidor, y el **firewall** tiene que dejar pasar el puerto.
+3. **Puerto**: PostgreSQL **5432**, MySQL **3306**.
+4. **Listener**: por defecto PostgreSQL escucha **sólo en localhost** (127.0.0.1). Para recibir conexiones de afuera se cambia `listen_addresses` en `postgresql.conf`.
+5. **Autenticación**: la decide `pg_hba.conf` (*host-based authentication*): qué usuario, a qué base, desde qué IP y con qué método (`scram-sha-256` = contraseña cifrada).
+6. **Base**: que exista y que haya permiso.
+
+```
+# pg_hba.conf: conexiones TCP a sgbd_u5, de cualquier usuario, desde ese rango, con contraseña
+host  sgbd_u5  all  100.64.0.0/10  scram-sha-256
+```
+
+- **VirtualBox**: NAT, puente o Host-Only cambian cómo se alcanza la VM. En **NAT** la VM sale a internet pero nadie de afuera la ve: hace falta *port forwarding* (redirigir un puerto del host a la VM). En **puente** la VM tiene IP propia en la misma red que las PCs.
 - **Multipass**: la instancia tiene una IP administrada por la plataforma; hay que identificarla y verificar su alcance.
 - Verificación: `ip addr` en el servidor para comprobar que está en la misma red que el host.
+
+Qué error indica qué (*Resumen parcial*, p. 17):
+
+| Error | Dónde mirar |
+|---|---|
+| `connection refused` / timeout | Red, firewall o listener |
+| `password authentication failed` | Usuario o contraseña |
+| `no pg_hba.conf entry` | La regla de acceso no te incluye |
+| `database does not exist` | Nombre de base mal escrito |
 
 **Checklist**: VM encendida · servicio activo · IP correcta · puerto abierto · motor escucha externamente · usuario remoto habilitado · base existe · cliente apunta al destino correcto.
 
@@ -92,12 +132,12 @@ postgresql://usuario:clave@servidor:5432/base
 mysql://usuario:clave@servidor:3306/base
 ```
 
-Parámetros: host, port, database, user, password, ssl, timeout. Una cadena incorrecta puede simular un problema de red, de autenticación o de base inexistente. **No publicar credenciales.**
+Parámetros: host, port, database, user, password, ssl, timeout. Una cadena incorrecta puede simular un problema de red, de autenticación o de base inexistente. **No publicar credenciales**: van en variables de entorno o archivos de configuración, no en el código.
 
 **Connection pooling**:
 - Sin pool: una conexión por operación → latencia y demasiadas sesiones.
-- Con pool: se reutiliza un conjunto controlado; la app pide, usa y devuelve.
-- Riesgo: la conexión devuelta conserva contexto de sesión si la app no administra bien transacciones y estado.
+- Con pool: se reutiliza un conjunto controlado; la app pide, usa y devuelve. Abrir una conexión es caro (autenticación, memoria): por ejemplo, 500 usuarios web comparten 20 conexiones (*Resumen parcial*, p. 18).
+- Riesgo: la conexión devuelta conserva contexto de sesión si la app no administra bien transacciones y estado: si se devuelve con una transacción sin cerrar, el próximo que la use hereda ese estado.
 - **El pool no resuelve concurrencia ni locks.**
 
 ## Guardia DBA
@@ -107,7 +147,7 @@ pgAdmin y MySQL Workbench sirven para **observar**, no sólo para ejecutar SQL:
 - **Operación**: sesiones, actividad, usuarios y roles, mantenimiento, mensajes.
 - **Rendimiento**: planes, estadísticas, tamaño de tablas e índices, consultas activas.
 
-**Ingeniería inversa**: base existente → metadatos → modelo. Reconstruye la implementación, no la intención. Hay que contrastarla con PK, FK, constraints e índices reales.
+**Ingeniería inversa**: base existente → metadatos → modelo. Reconstruye la implementación, no la intención. Lo contrario, **forward engineering**, es pasar del modelo al DDL. Hay que contrastarla con PK, FK, constraints e índices reales.
 
 Qué revisar en la primera guardia: sesiones, actividad, consumo, espacio, plan y mantenimiento. Cada hallazgo responde **¿dónde está? → ¿qué muestra? → ¿para qué le sirve al DBA? → evidencia**. La interfaz es una herramienta de observación; la evidencia está en el SGBD.
 
@@ -119,3 +159,5 @@ Informe de guardia DBA del grupo (PostgreSQL en una VM, host 100.116.70.32:5432,
 - **Seguridad**: las seis cuentas `alumnoXX` pueden iniciar sesión, pero no son superusuario ni crean bases o roles. Pertenecen a **pg_monitor** (ven sesiones y estadísticas sin modificar nada). En las tablas tienen `arwd` (INSERT, SELECT, UPDATE, DELETE) otorgado por postgres.
 - **Metadatos**: `movimiento.importe` es `numeric(12,2)` y no float, porque float redondea los decimales. Hay un índice `ix_mov_cuenta_fecha (cuenta_id, fecha)` que pgAdmin no muestra en Properties.
 - **Ingeniería inversa**: ERD cuenta 1 → N movimiento. Sirve para entender una base sin documentación en minutos.
+- **Configuración** (*Resumen parcial*, p. 32): `listen_addresses = 'localhost,100.116.70.32'` en `postgresql.conf` (la IP de la VM en Tailscale); en `pg_hba.conf`, una regla que permite **sólo la base sgbd_u5**, desde el rango de Tailscale, con `scram-sha-256`; reinicio del servicio y verificación con `ss -lntp | grep 5432` (en qué IPs escucha el puerto).
+- **Prueba negativa**: conectarse desde la red a otra base (`pruebas`) y comprobar que falla con `no pg_hba.conf entry`. Demuestra que abrir el acceso no expuso las demás bases (mínimo privilegio a nivel de red).

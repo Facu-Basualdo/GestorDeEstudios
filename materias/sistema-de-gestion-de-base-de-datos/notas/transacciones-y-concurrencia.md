@@ -3,7 +3,7 @@
 
 > Tema 5 · Peso: 3/3 (estimado: el cronograma lo nombra "Transacciones y Bloqueos" y la Actividad 2 de U5 son tres
 > experimentos) · Fuente: *Clase 5 - Conectividad - Transacciones - Concurrencia 2026* (diap. 14–37) y la bitácora
-> U5 Act. 2 del grupo ("Dos usuarios, un mismo dato", PostgreSQL 18.6).
+> U5 Act. 2 del grupo ("Dos usuarios, un mismo dato", PostgreSQL 18.6). Ampliada con el *Resumen parcial* del estudiante (pp. 18–22 y 32–33).
 
 ## Preguntas de recuperación
 
@@ -29,6 +29,14 @@
 - En PostgreSQL, ¿qué transacción aborta el detector de deadlocks? :: La que encuentra el ciclo al vencer su deadlock_timeout (1 s): en la práctica, la que cerró el ciclo. No es la más barata ni la menos importante. [→ Lo que observamos en el laboratorio](#Lo%20que%20observamos%20en%20el%20laboratorio)
 - ¿Cómo se previenen y manejan los deadlocks? :: Acceder a los recursos siempre en el mismo orden, transacciones cortas, acceso selectivo (índices y predicados adecuados), reintento en la aplicación y diagnóstico con evidencia antes de rediseñar. [→ Deadlocks](#Deadlocks)
 - ¿Qué parámetros evitan que una transacción olvidada bloquee indefinidamente? :: lock_timeout y statement_timeout: el motor corta la espera o la sentencia en lugar de dejar el recurso tomado. [→ Lo que observamos en el laboratorio](#Lo%20que%20observamos%20en%20el%20laboratorio)
+- ¿Qué hace `ROLLBACK TO` un savepoint? :: Deshace sólo lo posterior al savepoint; la transacción sigue abierta y se puede confirmar el resto. [→ Transacciones](#Transacciones)
+- Dos transacciones leen saldo 100; una suma 50 y la otra resta 30. ¿Qué anomalía es y qué puede quedar? :: Lost update: queda 150 o 70 en vez de 120. [→ Schedules y anomalías](#Schedules%20y%20anomalías)
+- ¿Qué anomalías evita cada nivel de aislamiento? :: READ UNCOMMITTED: casi nada. READ COMMITTED: dirty read. REPEATABLE READ: dirty y non-repeatable read. SERIALIZABLE: todas. [→ Niveles de aislamiento](#Niveles%20de%20aislamiento)
+- ¿Qué guardan `xmin` y `xmax` en PostgreSQL? :: Qué transacción creó y cuál borró esa versión de la fila. Las versiones que ya nadie necesita son tuplas muertas que limpia VACUUM. [→ MVCC y locks](#MVCC%20y%20locks)
+- ¿Cuáles son las fases de 2PL y qué cambia la variante estricta? :: Crecimiento (sólo adquiere locks) y decrecimiento (sólo libera, sin pedir nuevos). La estricta libera todo al COMMIT. [→ MVCC y locks](#MVCC%20y%20locks)
+- ¿Qué diferencia hay entre `pg_cancel_backend(pid)` y `pg_terminate_backend(pid)`? :: El primero cancela la consulta en curso; el segundo cierra la conexión. [→ Diagnosticar esperas](#Diagnosticar%20esperas)
+- ¿Cada cuánto busca PostgreSQL deadlocks y cómo los resuelve? :: Cada `deadlock_timeout` (1 s por defecto) busca ciclos en el grafo de espera y aborta una transacción, la víctima. [→ Deadlocks](#Deadlocks)
+- ¿Por qué el diagnóstico del laboratorio se hizo con las cuentas alumnoXX? :: Porque tienen el rol `pg_monitor`; con las cuentas personales, `pg_stat_activity` mostraba `<insufficient privilege>` en las consultas ajenas. [→ Lo que observamos en el laboratorio](#Lo%20que%20observamos%20en%20el%20laboratorio)
 
 ## Cuestionario
 
@@ -110,6 +118,24 @@
     - [x] SHOW PROCESSLIST
     - [ ] pg_blocking_pids
     > pg_blocking_pids es de PostgreSQL. [→ Diagnosticar esperas](#Diagnosticar%20esperas)
+14. ¿Cuál es el nivel de aislamiento **mínimo** que evita la non-repeatable read?
+   - [ ] READ COMMITTED
+   - [x] REPEATABLE READ
+   - [ ] READ UNCOMMITTED
+   - [ ] SERIALIZABLE
+   > READ COMMITTED sólo evita dirty read; SERIALIZABLE también la evita, pero no es el mínimo. [→ Niveles de aislamiento](#Niveles%20de%20aislamiento)
+15. Dos médicos se dan de baja de la guardia al mismo tiempo porque cada uno vio que quedaba el otro. ¿Qué anomalía es?
+   - [ ] Dirty read
+   - [ ] Phantom
+   - [ ] Lost update
+   - [x] Serialization anomaly
+   > Cada uno leyó datos válidos, pero el resultado no coincide con ningún orden serial. [→ Schedules y anomalías](#Schedules%20y%20anomalías)
+16. Una sesión `idle in transaction` retiene locks hace 20 minutos. ¿Qué la corta y libera sus locks?
+   - [ ] `pg_cancel_backend(pid)`
+   - [x] `pg_terminate_backend(pid)`
+   - [ ] `VACUUM`
+   - [ ] `ANALYZE`
+   > La sesión no está ejecutando nada: no hay consulta que cancelar. Cerrar la conexión hace ROLLBACK y suelta los locks. [→ Diagnosticar esperas](#Diagnosticar%20esperas)
 
 ## Transacciones
 
@@ -123,6 +149,17 @@
 
 En el laboratorio se usan transacciones explícitas para que la espera y el bloqueo sean observables.
 
+```sql
+BEGIN;
+UPDATE cuenta SET saldo = saldo - 100 WHERE cuenta_id = 1;
+SAVEPOINT despues_debito;
+UPDATE cuenta SET saldo = saldo + 100 WHERE cuenta_id = 99;  -- me equivoqué de cuenta
+ROLLBACK TO despues_debito;                                  -- deshago sólo esto
+UPDATE cuenta SET saldo = saldo + 100 WHERE cuenta_id = 2;
+COMMIT;
+```
+*(Resumen parcial, p. 18)*
+
 **ACID observable**: A = COMMIT/ROLLBACK · C = constraints y reglas · I = qué ve cada sesión · D = lo confirmado sobrevive. **En U5 el foco está en la I.**
 
 ## Schedules y anomalías
@@ -131,37 +168,40 @@ En el laboratorio se usan transacciones explícitas para que la espera y el bloq
 - **Ejecución intercalada**: las lecturas y escrituras de T1 y T2 se mezclan. Es lo habitual.
 - **Serializable**: el efecto equivale a algún orden serial, aunque las operaciones se hayan intercalado.
 
-| Anomalía | Qué pasa |
-|---|---|
-| Dirty read | Leer datos no confirmados |
-| Non-repeatable read | La misma fila cambia entre dos lecturas |
-| Phantom | Cambia el conjunto de filas |
-| Lost update | Un cambio queda sobrescrito |
-| Serialization anomaly | El resultado no equivale a ningún orden serial |
+| Anomalía | Qué pasa | Ejemplo (*Resumen parcial*, p. 19) |
+|---|---|---|
+| Dirty read | Leer datos no confirmados | B pone saldo 0, A lo lee, B hace ROLLBACK: A trabajó con un 0 que nunca existió |
+| Non-repeatable read | La misma fila cambia entre dos lecturas | A lee 15.000; B actualiza a 16.000 y confirma; A relee y ve 16.000 |
+| Phantom | Cambia el conjunto de filas | A cuenta 10 pedidos del día; B inserta uno; A recuenta y hay 11 |
+| Lost update | Un cambio queda sobrescrito | Las dos leen saldo 100, una suma 50 y otra resta 30: queda 150 o 70 en vez de 120 |
+| Serialization anomaly | El resultado no equivale a ningún orden serial | Dos médicos se dan de baja de la guardia a la vez porque cada uno vio que quedaba el otro |
 
 No todos los motores implementan los fenómenos de la misma manera.
 
 ## Niveles de aislamiento
 
-| Nivel | Garantía |
-|---|---|
-| READ UNCOMMITTED | Mínima |
-| READ COMMITTED | Cada **sentencia** ve un snapshot confirmado |
-| REPEATABLE READ | Lecturas consistentes en toda la **transacción** |
-| SERIALIZABLE | Equivale a una ejecución serial |
+| Nivel | Garantía | Evita (*Resumen parcial*, p. 19) |
+|---|---|---|
+| READ UNCOMMITTED | Mínima: ve hasta cambios no confirmados | Casi nada |
+| READ COMMITTED | Cada **sentencia** ve un snapshot confirmado | Dirty read |
+| REPEATABLE READ | Toda la **transacción** ve la foto de su primera lectura | Dirty read y non-repeatable read |
+| SERIALIZABLE | Equivale a una ejecución serial; si no lo puede garantizar, aborta una transacción | Todas |
+
+Más aislamiento = menos anomalías, pero más esperas o errores. Para cambiarlo en la transacción actual: `SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;`.
 
 - **PostgreSQL 18**: default READ COMMITTED (`SHOW transaction_isolation;`).
 - **MySQL 9.7 / InnoDB**: default REPEATABLE READ (`SELECT @@transaction_isolation;`).
 
 **Experimento 2**: A hace BEGIN y lee; B actualiza y confirma; A vuelve a leer.
 - PostgreSQL (READ COMMITTED): la segunda lectura **ve el cambio**.
-- MySQL (REPEATABLE READ): reutiliza el snapshot de la primera lectura y **no lo ve**.
+- MySQL (REPEATABLE READ), o PostgreSQL con REPEATABLE READ: reutiliza el snapshot de la primera lectura y **no lo ve**.
 
 El objetivo no es memorizar defaults: es consultar el aislamiento real y relacionarlo con lo observado.
 
 ## MVCC y locks
 
-- **MVCC**: mantiene versiones para lecturas consistentes mientras hay cambios. Muchas lecturas no bloquean a los escritores.
+- **MVCC**: mantiene versiones para lecturas consistentes mientras hay cambios. Cuando B hace UPDATE crea una versión nueva, y la vieja sigue ahí para las transacciones que ya la estaban viendo; cada una lee la versión de su **snapshot**. Muchas lecturas no bloquean a los escritores.
+- En PostgreSQL cada versión de fila guarda **`xmin`** (qué transacción la creó) y **`xmax`** (cuál la borró). Las versiones que ya nadie necesita son las **tuplas muertas** que limpia `VACUUM` (*Resumen parcial*, p. 20).
 - **Locks**: siguen protegiendo las modificaciones. Dos UPDATE sobre la misma fila esperan.
 
 | | S | X |
@@ -171,9 +211,9 @@ El objetivo no es memorizar defaults: es consultar el aislamiento real y relacio
 
 Es un modelo conceptual: MySQL y PostgreSQL tienen más modos.
 
-**Granularidad**: fila (fino, más concurrencia) · rango o gap (protege un conjunto, puede afectar inserciones) · tabla (amplio). **Duración**: una transacción larga retiene recursos. Una consulta eficiente también reduce las filas afectadas.
+**Granularidad**: fila (fino, más concurrencia) · rango o gap (protege un conjunto, puede afectar inserciones; en InnoDB evita fantasmas) · tabla (amplio; por ejemplo, `ALTER TABLE` bloquea toda la tabla). **Duración**: los locks de escritura se mantienen hasta el COMMIT o ROLLBACK; una transacción larga (alguien que hizo BEGIN y se fue a almorzar) bloquea a todos los que quieran esas filas. Una consulta eficiente también reduce las filas afectadas.
 
-**Two-Phase Locking (2PL)**: tomar y soltar locks sin reglas igual permite schedules incorrectos. 2PL ordena la adquisición y la liberación para obtener serializabilidad. Los motores reales combinan MVCC, locks y reglas internas; 2PL es el modelo conceptual.
+**Two-Phase Locking (2PL)**: tomar y soltar locks sin reglas igual permite schedules incorrectos. 2PL ordena la adquisición y la liberación para obtener serializabilidad: en la fase de **crecimiento** la transacción sólo adquiere locks; en la de **decrecimiento** sólo los libera y ya no puede pedir nuevos. En la práctica se usa la variante **estricta**: todos se liberan al COMMIT (*Resumen parcial*, p. 20). Los motores reales combinan MVCC, locks y reglas internas; 2PL es el modelo conceptual.
 
 ## Diagnosticar esperas
 
@@ -188,9 +228,19 @@ Una consulta que no termina: **plan lento** o **espera por lock**. La percepció
 
 Preguntas: ¿qué proceso espera? ¿quién lo bloquea? ¿qué consulta está involucrada? Después hay que decidir: **esperar, cancelar, reintentar o rediseñar**.
 
+```sql
+-- PostgreSQL: sesiones que esperan un lock y quién las bloquea
+SELECT pid, usename, state, wait_event_type, wait_event,
+       pg_blocking_pids(pid) AS bloqueado_por, query
+FROM pg_stat_activity
+WHERE wait_event_type = 'Lock';
+```
+
+Estados de una sesión en `pg_stat_activity` (*Resumen parcial*, p. 21): `active` (ejecutando), `idle` (conectada sin hacer nada) e **`idle in transaction`** (abrió un BEGIN y no terminó: sospechoso, suele retener locks). Para cortar: `pg_cancel_backend(pid)` **cancela la consulta**; `pg_terminate_backend(pid)` **cierra la conexión**.
+
 ## Deadlocks
 
-A bloquea la cuenta 1 y pide la 2; B bloquea la 2 y pide la 1. Cada una espera lo que tiene la otra. **El motor detecta el ciclo y aborta una.** Una espera se resuelve con COMMIT o ROLLBACK; un deadlock necesita detección y ruptura.
+A bloquea la cuenta 1 y pide la 2; B bloquea la 2 y pide la 1. Cada una espera lo que tiene la otra. **El motor detecta el ciclo y aborta una.** PostgreSQL revisa el **grafo de espera** cada `deadlock_timeout` (1 s por defecto); si encuentra un ciclo, aborta una transacción, la **víctima**, con `ERROR: deadlock detected`, y la otra sigue (*Resumen parcial*, p. 22). Una espera se resuelve con COMMIT o ROLLBACK; un deadlock necesita detección y ruptura.
 
 Prevención y manejo:
 - **Orden consistente** de acceso a los recursos.
@@ -225,3 +275,5 @@ pid   | usename  | state               | wait_event_type | wait_event    | block
 - Después: A `idle in transaction` (con su UPDATE hecho); B `idle in transaction (aborted)`, sin locks en `pg_locks`, aceptando sólo ROLLBACK.
 
 **Medidas preventivas propuestas**: bloquear siempre en el mismo orden (de menor a mayor id) y configurar `lock_timeout` o `statement_timeout`.
+
+Detalle (*Resumen parcial*, p. 33): con las cuentas personales (que hacían `SET ROLE sdg` automático), `pg_stat_activity` mostraba `<insufficient privilege>` en las consultas ajenas. Por eso el diagnóstico se hizo con las cuentas `alumnoXX`, que tienen el rol **`pg_monitor`**: permiso para ver la actividad de todos.

@@ -3,7 +3,8 @@
 
 > Tema 6 · Peso: 3/3 (estimado: clase, guía de mysqldump, instructivo de binlog y Fase 2 del laboratorio) · Fuente:
 > *Clase 6 - Seguridad - Backup - Replica - HA 2026* (diap. 11–19), *Backup y Restore mysqldump*, *Instructivo binarylog*
-> y la bitácora U6 Act. 1 del grupo, Fase 2 "El DBA borró producción" (PITR en PostgreSQL).
+> y la bitácora U6 Act. 1 del grupo, Fase 2 "El DBA borró producción" (PITR en PostgreSQL). Ampliada con el
+> *Resumen parcial* del estudiante (pp. 24–27 y 33).
 
 ## Preguntas de recuperación
 
@@ -31,6 +32,13 @@
 - En el laboratorio, ¿de dónde sacaron la hora exacta del incidente? :: De la tabla auditoria_evento, que registró el INSERT del incidente con su timestamp. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
 - ¿Para qué sirven recovery.signal, recovery_target_inclusive = off y recovery_target_action = 'promote'? :: recovery.signal: avisa al motor que arranque en modo recuperación. inclusive = off: frena justo antes de la marca de tiempo. promote: al llegar al objetivo, sale de recuperación y abre la base para escritura. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
 - ¿Por qué hubo que hacer chmod 700 al directorio de datos antes de arrancar PostgreSQL? :: Porque PostgreSQL valida los permisos al iniciar y aborta si el directorio de datos es accesible para otros usuarios. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
+- Full el domingo y la base falla el jueves. ¿Qué se restaura con diferenciales y qué con incrementales? :: Con diferenciales: domingo + miércoles. Con incrementales: domingo + lunes + martes + miércoles, en orden. [→ Tipos de backup](#Tipos%20de%20backup)
+- ¿Qué hace `pg_basebackup`? :: Un backup físico de los archivos del cluster entero mientras sigue funcionando. Es la base para el PITR. [→ pg_dump y restore en PostgreSQL](#pg_dump%20y%20restore%20en%20PostgreSQL)
+- ¿Qué es `recovery_target_xid` y cómo se encuentra el xid? :: Frena la recuperación en una transacción concreta (la culpable). El xid del DELETE se busca en el WAL con `pg_waldump`. [→ Logs y PITR](#Logs%20y%20PITR)
+- ¿Qué es un LSN? :: Log Sequence Number: identifica cada posición del WAL. [→ Logs y PITR](#Logs%20y%20PITR)
+- ¿Por qué conviene hacer el PITR en una instancia aparte? :: Porque el WAL y el backup son del cluster entero: recuperar sobre el principal haría retroceder también las otras bases. Se recupera en otro puerto y se copian las filas perdidas a producción. [→ Logs y PITR](#Logs%20y%20PITR)
+- ¿Qué decide el RPO y qué el RTO? :: El RPO decide cada cuánto copiar (backups o logs); el RTO, qué tan rápido tiene que ser el procedimiento (¿alcanza un restore o hace falta una réplica lista?). [→ RPO RTO y plan de recuperación](#RPO%20RTO%20y%20plan%20de%20recuperación)
+- Si el DELETE accidental lo hizo el DBA, ¿qué lo salva? :: El backup y los logs: el mínimo privilegio no protege del administrador. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
 
 ## Cuestionario
 
@@ -106,6 +114,24 @@
     - [ ] Desactiva el archivado de WAL
     - [ ] Abre la base en sólo lectura para siempre
     > Así se excluye el borrado accidental. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
+13. Hay que recuperar las filas borradas de una base sin hacer retroceder las otras bases del mismo cluster. ¿Qué conviene?
+   - [ ] PITR sobre la instancia principal
+   - [x] PITR en una instancia aparte (otro puerto) y copiar las filas perdidas a producción
+   - [ ] Restaurar encima el último `pg_dump` de toda la instancia
+   - [ ] Promover la réplica
+   > El WAL y el backup físico son del cluster entero. La réplica ya tiene el DELETE. [→ Logs y PITR](#Logs%20y%20PITR)
+14. ¿Con qué herramienta se busca en el WAL la transacción del DELETE accidental?
+   - [ ] `pg_dump`
+   - [ ] `pg_restore`
+   - [x] `pg_waldump`
+   - [ ] `mysqlbinlog`
+   > pg_waldump muestra el contenido del WAL; de ahí sale el xid para `recovery_target_xid`. [→ Logs y PITR](#Logs%20y%20PITR)
+15. Full el domingo e incrementales diarios. La base falla el jueves. ¿Qué hay que restaurar?
+   - [ ] El full del domingo y el incremental del miércoles
+   - [x] El full del domingo y los incrementales de lunes, martes y miércoles, en orden
+   - [ ] Sólo el incremental del miércoles
+   - [ ] El full del domingo y nada más
+   > Cada incremental guarda lo cambiado desde el backup anterior: hacen falta todos. Con diferenciales alcanzaría el del miércoles. [→ Tipos de backup](#Tipos%20de%20backup)
 
 ## Backup restore y recovery
 
@@ -127,7 +153,10 @@
 | Alcance | Ventaja | Costo o límite | Uso típico |
 |---|---|---|---|
 | Full | Recuperación simple | Tiempo y espacio | Base de la cadena |
-| Diferencial (desde el último full) / Incremental (desde el último backup) | Reduce la ventana de copia | Recovery más complejo | Producción con cambios frecuentes |
+| Diferencial: lo cambiado desde el último **full** | Restore: full + **el último** diferencial | Crece día a día | Diario |
+| Incremental: lo cambiado desde el último backup **de cualquier tipo** | Copias muy chicas y rápidas | Restore: full + **todos** los incrementales en orden | Varias veces al día |
+
+Ejemplo (*Resumen parcial*, p. 25): full el domingo y falla el jueves. Con diferenciales se restaura domingo + miércoles; con incrementales, domingo + lunes + martes + miércoles.
 
 La pregunta no es cuál es mejor, sino **cuál cumple el RPO/RTO con un costo razonable**.
 
@@ -164,6 +193,8 @@ psql -U postgres -d rescate_restore -f rescate.sql     # restaurar SQL plano
 pg_restore -U postgres -d rescate_restore rescate.dump # restaurar custom
 ```
 
+**Backup físico**: `pg_basebackup` copia los archivos del cluster entero mientras sigue funcionando. Es la base para el PITR.
+
 **Verificar**: `SELECT COUNT(*) …`, totales y registros clave antes y después. "El restore terminó sin error" no alcanza.
 
 ## Logs y PITR
@@ -186,6 +217,10 @@ Sin logs suficientes, el punto de recuperación queda limitado al último backup
 - Recuperar a **10:46:59** → conserva lo válido y evita el incidente.
 
 PostgreSQL: `SHOW wal_level;`, `SELECT pg_current_wal_lsn();`, `SELECT pg_walfile_name(pg_current_wal_lsn());`. PITR requiere un backup base válido, WAL archivado y `recovery_target_time` (o un LSN objetivo).
+
+Qué hace falta, con más detalle (*Resumen parcial*, p. 26): un **backup base físico** + **todos los logs** desde ese backup hasta el punto objetivo, **archivados** (copiados a un lugar seguro a medida que se generan). En PostgreSQL, `archive_mode = on` + `archive_command` guardan cada archivo de WAL. El objetivo se fija con `recovery_target_time` o con **`recovery_target_xid`**, el número de la transacción culpable, que se busca en el WAL con **`pg_waldump`**. Cada posición del WAL se identifica con un **LSN** (*Log Sequence Number*).
+
+Buena práctica: hacer el PITR en una **instancia aparte** (otro puerto), copiar de ahí las filas perdidas y reinsertarlas en producción, sin volver atrás todo el servidor. El WAL y el backup son **del cluster entero**: recuperar sobre el principal haría retroceder también las otras bases.
 
 El desafío no es "usar PITR": es **identificar el punto objetivo y demostrar por qué es el correcto**.
 
@@ -217,8 +252,8 @@ Procedimiento del instructivo:
 
 ## RPO RTO y plan de recuperación
 
-- **RPO** (Recovery Point Objective): ¿cuántos datos puede perder la organización?
-- **RTO** (Recovery Time Objective): ¿cuánto tiempo puede estar sin servicio?
+- **RPO** (Recovery Point Objective): ¿cuántos datos puede perder la organización, **medido en tiempo**? RPO 15 min = como mucho se pierden los últimos 15 minutos. Define **cada cuánto** copiar (backups o logs).
+- **RTO** (Recovery Time Objective): ¿cuánto tiempo puede estar sin servicio? RTO 30 min = en media hora tiene que volver a andar. Define **qué tan rápido** tiene que ser el procedimiento: ¿alcanza con restaurar o hace falta una réplica lista? (*Resumen parcial*, p. 26)
 
 RPO de 5 minutos + RTO de 30 → logs frecuentes, procedimiento probado y automatización.
 
@@ -239,3 +274,10 @@ U6 Act. 1, Fase 2 "El DBA borró producción", PostgreSQL 16:
 9. **Validación**: los 5 movimientos originales + 1006 y 1007, sin el DELETE.
 
 Se descartó volver sólo al backup (perdía 1006 y 1007) y al último estado (conservaba el error).
+
+> El *Resumen parcial* (p. 33) cuenta esta fase distinto: busca el **xid** del DELETE con `pg_waldump`, levanta el backup
+> en una **instancia aparte (puerto 5433)** con `recovery_target_xid` y `recovery_target_inclusive = off`, y copia de ahí
+> las filas perdidas a producción. La bitácora de arriba restaura sobre la instancia principal con `recovery_target_time`.
+> **Verificar cuál es la versión entregada** (¿la reentrega?) antes de citarla en el parcial.
+
+Conclusión clave (*Resumen parcial*, p. 33): el incidente lo ejecutó el DBA (`postgres`), así que **el mínimo privilegio no protege del administrador**: para eso están el backup y los logs.
