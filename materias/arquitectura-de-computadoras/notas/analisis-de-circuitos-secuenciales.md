@@ -4,7 +4,7 @@
 > Unidad 2 · Peso en exámenes: 3/3 (tipo E: 45% del parcial en 3/5) · Fuente:
 > [cronograma del estudiante](../../../docs/cronograma-eval-1-arquitectura.md#Secuenciales),
 > secciones "Secuenciales" y "E. Análisis secuencial".
-> **Sin verificar todavía** contra NotebookLM ni el *Apunte teórico* (el MCP ya anda: pendiente). Si algo choca con la cátedra, manda la cátedra.
+> **Sin verificar todavía** contra el material de la cátedra (*Apunte teórico*): pendiente de `/revisar-materia`. Si algo choca con la cátedra, manda la cátedra.
 
 ## Preguntas de recuperación
 

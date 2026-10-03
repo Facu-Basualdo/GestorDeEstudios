@@ -4,7 +4,7 @@ import { Button, Card, Checkbox, Separator, Typography } from '@heroui/react';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import type { Flashcard, IrATeoria, Materia, Nota, Tema } from '@/lib/tipos';
 import { filtrarPorTema, guardado, hash, mezclar, porPeso, type Filtro } from '@/lib/util';
-import { FiltroTemas, PanelSesion, Peso, Progreso, Rico, filasPorTema } from './piezas';
+import { FiltroTemas, PanelSesion, Peso, Progreso, QueMejorar, Rico, filasPorTema, type Fallo } from './piezas';
 
 type Tarjeta = Flashcard & { tema: Tema; clave: string };
 /** `vista`: ya se mostró la respuesta de la tarjeta actual (se puede volver a la pregunta y calificar igual). */
@@ -178,6 +178,7 @@ export function Flashcards({ materia, activo, historial, onCalificar, irATeoria,
         </Typography>
       ) : !actual ? (
         <Resumen
+          materia={materia}
           mazo={mazo}
           notas={notas}
           estados={estados}
@@ -302,7 +303,8 @@ export function EnlaceTeoria({ tema, ancla, irATeoria }: { tema: Tema; ancla: st
   );
 }
 
-function Resumen({ mazo, notas, estados, onRepasar, onReiniciar, irATeoria }: {
+function Resumen({ materia, mazo, notas, estados, onRepasar, onReiniciar, irATeoria }: {
+  materia: Materia;
   mazo: Tarjeta[];
   notas: (Nota | undefined)[];
   estados: (number | undefined)[];
@@ -313,6 +315,9 @@ function Resumen({ mazo, notas, estados, onRepasar, onReiniciar, irATeoria }: {
   const cuenta = (v: Nota) => notas.filter((x) => x === v).length;
   const falladas = mazo.filter((_, k) => fallada(notas[k]));
   const sinResponder = mazo.length - notas.filter((x) => x !== undefined).length;
+  const fallos: Fallo[] = mazo.flatMap((c, k) =>
+    fallada(notas[k]) ? [{ tema: c.tema, pregunta: c.q, detalle: notas[k] === 0 ? 'no la sabía' : 'dudé' }] : [],
+  );
   return (
     <Card className="p-6 sm:p-8">
       <Card.Header>
@@ -337,6 +342,13 @@ function Resumen({ mazo, notas, estados, onRepasar, onReiniciar, irATeoria }: {
             Empezar de nuevo
           </Button>
         </div>
+        <QueMejorar
+          materia={materia}
+          modo="Flashcards"
+          filas={filasPorTema(mazo, (k) => notas[k])}
+          fallos={fallos}
+          irATeoria={irATeoria}
+        />
         {falladas.length > 0 && (
           <div className="grid">
             {falladas.map((c) => (

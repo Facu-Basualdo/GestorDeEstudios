@@ -6,7 +6,7 @@ Este repo es un vault de Obsidian: todo se escribe para leerse ahí.
 ## Roles
 
 - **Claude Code es el tutor**: planifica, prioriza, toma preguntas, hace el seguimiento y organiza el material.
-- **NotebookLM es la fuente del contenido** (MCP `notebooklm-mcp-2026`, uno o más notebooks por materia). Primero se consulta el notebook; si no tiene la info, se dice. Lo agregado por el tutor va marcado. Ver [notebooklm.md](metodo/notebooklm.md).
+- **El material de la materia es la fuente del contenido** (`materias/<materia>/material/`, fuera de git). **Gemini** (Antigravity) lo pasa a texto (`material/texto/`) y redacta la teoría; **Claude** la revisa contra ese texto y escribe preguntas y cuestionarios. Si el material no tiene la info, se dice; lo agregado por el tutor va marcado. Ver [material.md](metodo/material.md).
 - **Obsidian es donde lee el estudiante**: enlaces markdown relativos, notas navegables.
 
 ## Cómo obtener contexto
@@ -14,7 +14,7 @@ Este repo es un vault de Obsidian: todo se escribe para leerse ahí.
 1. Ubicá la materia en la tabla de abajo.
 2. Abrí su `INDICE.md`: las descripciones dicen qué cae y dónde se equivoca el estudiante.
 3. Abrí **sólo** las notas que necesitás. **Nunca leas una materia entera.**
-4. Para buscar por contenido: `grep -ril "<palabra>" materias/` antes de abrir archivos.
+4. Para buscar por contenido: `grep -ril "<palabra>" materias/` antes de abrir archivos (incluye el texto extraído en `material/texto/`).
 5. **No lances agentes de exploración**: todo lo necesario está en los índices y las notas.
 6. De `sesiones.md` leé sólo las últimas 3 entradas y la sección "Errores recurrentes".
 
@@ -30,11 +30,11 @@ Este repo es un vault de Obsidian: todo se escribe para leerse ahí.
 
 ## Materias
 
-| Materia | Notebook | Próxima fecha | Índice |
-|---|---|---|---|
-| Arquitectura de Computadoras | Arquitectura de computadoras | 2026-09-30 · Eval. Nº 1 (codificación, combinacionales, secuenciales) | [INDICE](materias/arquitectura-de-computadoras/INDICE.md) |
-| Diseño de Sistemas de Información | diseño de sistemas (+ export de Faro en `material/`) | 2026-10-21 · 2º parcial IE3 (SOLID, GRASP, arquitectura, PUDS) · antes, cuestionario 16 cierra 2026-09-30 13 hs | [INDICE](materias/diseno-de-sistemas/INDICE.md) |
-| Sistemas de Gestión de Bases de Datos | — (material en `material/`) | 2026-10-06 · Parcial BT1 (temas 1–6: arquitectura, diseño físico, SQL avanzado, programabilidad, transacciones, seguridad/backup/HA) | [INDICE](materias/sistema-de-gestion-de-base-de-datos/INDICE.md) |
+| Materia | Próxima fecha | Índice |
+|---|---|---|
+| Arquitectura de Computadoras | 2026-09-30 · Eval. Nº 1 (codificación, combinacionales, secuenciales) | [INDICE](materias/arquitectura-de-computadoras/INDICE.md) |
+| Diseño de Sistemas de Información | 2026-10-21 · 2º parcial IE3 (SOLID, GRASP, arquitectura, PUDS) · antes, cuestionario 16 cierra 2026-09-30 13 hs | [INDICE](materias/diseno-de-sistemas/INDICE.md) |
+| Sistemas de Gestión de Bases de Datos | 2026-10-06 · Parcial BT1 (temas 1–6: arquitectura, diseño físico, SQL avanzado, programabilidad, transacciones, seguridad/backup/HA) | [INDICE](materias/sistema-de-gestion-de-base-de-datos/INDICE.md) |
 
 Fechas completas en [calendario.md](calendario.md).
 
@@ -42,13 +42,13 @@ Fechas completas en [calendario.md](calendario.md).
 
 | Comando | Qué hace |
 |---|---|
-| `/nueva-materia` | Crea la carpeta de una materia desde el programa y la suma al hub y al calendario |
-| `/procesar-fuente <materia> [fuente]` | Convierte una fuente larga de NotebookLM en notas por tema |
+| `/nueva-materia` | Crea el esqueleto de una materia, la suma al hub y deja listo el prompt para Gemini |
+| `/revisar-materia <materia> [nota]` | Revisa la teoría que escribió Gemini contra el material y arma preguntas y cuestionarios |
 | `/cargar-examen <materia> <archivo>` | Analiza un modelo de examen y recalcula pesos |
 | `/estudiar <materia> [minutos]` | Arma y conduce la sesión de hoy por puntaje |
 | `/repaso [materia]` | Preguntas de los temas con repaso vencido |
 | `/progreso [materia]` | Estado y riesgo por materia (sólo lectura) |
-| `/cerrar-sesion` | Actualiza seguimiento, errores, índice; verifica y commitea |
+| `/cerrar-sesion` | Actualiza seguimiento, errores, índice; verifica y commitea. Acepta el informe que copia la web |
 
 ## Convenciones
 
@@ -65,6 +65,6 @@ Fechas completas en [calendario.md](calendario.md).
 
 ## Qué no va en el grafo
 
-- `docs/`: planes y borradores (por ejemplo [el prompt inicial](docs/prompt-inicial.md)). Se leen a demanda.
-- `materias/<materia>/material/`: material crudo importado (PDFs, export de Faro IA con `faro.json`). El verificador lo ignora; se usa como fuente para escribir las notas.
+- `docs/`: planes, borradores y el [prompt de Gemini](docs/prompt-gemini.md). Se leen a demanda.
+- `materias/<materia>/material/`: material crudo (PDFs, pptx, export de Faro IA) y su texto extraído en `material/texto/`. Está en `.gitignore` y el verificador lo ignora: las notas lo citan como texto, nunca con enlace.
 - Los PDFs de `materias/<materia>/examenes/`: se leen sólo al correr `/cargar-examen`; lo que importa queda en `examenes/analisis.md`.

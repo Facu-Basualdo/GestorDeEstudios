@@ -5,7 +5,7 @@ import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'rea
 import type { IrATeoria, Materia, Pregunta, Tema } from '@/lib/tipos';
 import { filtrarPorTema, guardado, hash, mezclar, plural, porPeso, type Filtro } from '@/lib/util';
 import { EnlaceTeoria } from './flashcards';
-import { FiltroTemas, PanelSesion, Peso, Progreso, Rico, filasPorTema } from './piezas';
+import { FiltroTemas, PanelSesion, Peso, Progreso, QueMejorar, Rico, filasPorTema, textoPlano, type Fallo } from './piezas';
 
 type Item = Pregunta & { tema: Tema; clave: string };
 /**
@@ -222,6 +222,7 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
         <Typography color="muted">No hay preguntas con este filtro.</Typography>
       ) : !actual ? (
         <Resultado
+          materia={materia}
           sesion={sesion}
           estados={estados}
           bien={bien}
@@ -329,7 +330,8 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
   );
 }
 
-function Resultado({ sesion, estados, bien, onRehacer, onNuevo, irATeoria }: {
+function Resultado({ materia, sesion, estados, bien, onRehacer, onNuevo, irATeoria }: {
+  materia: Materia;
   sesion: Sesion;
   estados: (number | undefined)[];
   bien: number;
@@ -339,6 +341,12 @@ function Resultado({ sesion, estados, bien, onRehacer, onNuevo, irATeoria }: {
 }) {
   const { items, elegidas } = sesion;
   const mal = items.map((it, k) => ({ ...it, elegida: elegidas[k] })).filter((it) => !acierta(it.p, it.elegida));
+  const texto = (p: Pregunta, ks: number[]) => ks.map((k) => textoPlano(p.opciones[k])).join(' + ');
+  const fallos: Fallo[] = mal.map(({ p, elegida }) => ({
+    tema: p.tema,
+    pregunta: p.q,
+    detalle: `${elegida ? `respondí: ${texto(p, elegida)}` : 'sin responder'} · era: ${texto(p, p.correctas)}`,
+  }));
   return (
     <Card className="p-6 sm:p-8">
       <Card.Header>
@@ -355,6 +363,13 @@ function Resultado({ sesion, estados, bien, onRehacer, onNuevo, irATeoria }: {
             Nuevo cuestionario
           </Button>
         </div>
+        <QueMejorar
+          materia={materia}
+          modo="Cuestionario"
+          filas={filasPorTema(items.map((it) => it.p), (k) => (elegidas[k] === undefined ? undefined : acierta(items[k].p, elegidas[k]) ? 2 : 0))}
+          fallos={fallos}
+          irATeoria={irATeoria}
+        />
         {mal.length > 0 && (
           <div className="grid">
             {mal.map(({ p, elegida }) => (

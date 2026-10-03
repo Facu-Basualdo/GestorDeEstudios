@@ -1,7 +1,8 @@
 'use client';
 
 import { Button, Card, Header, Kbd, ListBox, ScrollShadow, Select, Separator, Typography } from '@heroui/react';
-import type { Materia, Tema } from '@/lib/tipos';
+import { useState } from 'react';
+import type { IrATeoria, Materia, Tema } from '@/lib/tipos';
 import { nombreUnidad, unidadesDe, type Filtro } from '@/lib/util';
 
 /** HTML ya renderizado y escapado por el generador (inline: código, énfasis, enlaces). */
@@ -189,5 +190,141 @@ export function PanelSesion({ filas, atajos }: { filas: FilaSesion[]; atajos: [s
         </Card.Content>
       </Card>
     </aside>
+  );
+}
+
+/** Una pregunta fallada, para el informe. `detalle`: qué respondió y qué era (texto plano). */
+export type Fallo = { tema: Tema; pregunta: string; detalle: string };
+
+/** HTML inline del generador → texto plano, para el informe que se copia. */
+export function textoPlano(html: string) {
+  return new DOMParser().parseFromString(html, 'text/html').body.textContent?.trim() ?? '';
+}
+
+// "Dudé" cuenta medio: el mismo criterio que usa /cerrar-sesion para el dominio.
+const respondidas = (f: FilaSesion) => f.bien + f.dudas + f.mal;
+const porcentaje = (f: FilaSesion) => Math.round(((f.bien + f.dudas / 2) / respondidas(f)) * 100);
+
+function hoy() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function informe(materia: Materia, modo: string, filas: FilaSesion[], fallos: Fallo[]) {
+  const suma = (campo: 'bien' | 'dudas' | 'mal') => filas.reduce((n, f) => n + f[campo], 0);
+  const [bien, dudas, mal] = [suma('bien'), suma('dudas'), suma('mal')];
+  const total = bien + dudas + mal;
+  const lineas = [
+    `Informe de estudio · ${materia.nombre} · ${modo} · ${hoy()}`,
+    `Resultado: ${bien} de ${total} bien${dudas ? ` · ${dudas} dudé` : ''} · ${mal} mal (${Math.round(((bien + dudas / 2) / total) * 100)} %)`,
+    '',
+    'Temas, de peor a mejor:',
+    ...filas.map((f) => {
+      const extra = [f.mal && `${f.mal} mal`, f.dudas && `${f.dudas} dudé`].filter(Boolean).join(' · ');
+      return `- ${f.tema.titulo} (peso ${f.tema.peso}): ${f.bien} de ${respondidas(f)} bien (${porcentaje(f)} %)${extra ? ` · ${extra}` : ''}`;
+    }),
+  ];
+  if (fallos.length) {
+    lineas.push('', 'Falladas:');
+    for (const x of fallos) lineas.push(`- [${x.tema.titulo}] ${textoPlano(x.pregunta)} — ${x.detalle}`);
+  }
+  return lineas.join('\n');
+}
+
+async function copiar(texto: string) {
+  try {
+    await navigator.clipboard.writeText(texto);
+    return true;
+  } catch {
+    // Sin permiso de portapapeles (o sin HTTPS): el método viejo.
+    const area = document.createElement('textarea');
+    area.value = texto;
+    area.style.position = 'fixed';
+    area.style.opacity = '0';
+    document.body.append(area);
+    area.select();
+    const ok = document.execCommand('copy');
+    area.remove();
+    return ok;
+  }
+}
+
+/**
+ * Al terminar un mazo o un cuestionario: los temas de peor a mejor, con acceso a la teoría,
+ * y el informe para pegar en /cerrar-sesion (actualiza dominio y errores en el vault).
+ */
+export function QueMejorar({ materia, modo, filas, fallos, irATeoria }: {
+  materia: Materia;
+  modo: string;
+  filas: FilaSesion[];
+  fallos: Fallo[];
+  irATeoria: IrATeoria;
+}) {
+  const [estado, setEstado] = useState<'' | 'copiado' | 'error'>('');
+  const conDatos = filas
+    .filter((f) => respondidas(f) > 0)
+    .sort((a, b) => porcentaje(a) - porcentaje(b) || b.tema.peso - a.tema.peso);
+  if (!conDatos.length) return null;
+  const flojos = conDatos.filter((f) => porcentaje(f) < 90);
+  const firmes = conDatos.filter((f) => porcentaje(f) >= 90);
+
+  const alCopiar = async () => {
+    setEstado((await copiar(informe(materia, modo, conDatos, fallos))) ? 'copiado' : 'error');
+    setTimeout(() => setEstado(''), 2500);
+  };
+
+  return (
+    <section className="grid gap-4 rounded-2xl bg-surface-secondary p-5 sm:p-6" aria-label="Qué mejorar">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <span className="font-titulo text-xl font-semibold">Qué mejorar</span>
+        <span className="etiqueta">de peor a mejor · dudé cuenta medio</span>
+      </div>
+
+      {flojos.length ? (
+        <ul className="grid gap-3">
+          {flojos.map((f) => (
+            <li key={f.tema.id} className="grid gap-1.5">
+              <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-baseline gap-2.5">
+                <Peso peso={f.tema.peso} />
+                <span className="truncate font-medium" title={f.tema.titulo}>
+                  {f.tema.titulo}
+                </span>
+                <span className={`font-mono text-sm tabular-nums ${porcentaje(f) < 40 ? 'text-danger' : porcentaje(f) < 70 ? 'text-warning' : 'text-muted'}`}>
+                  {porcentaje(f)} %
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex h-1.5 flex-1 overflow-hidden rounded-full bg-default" aria-hidden="true">
+                  <span className="bg-success" style={{ width: `${(f.bien / respondidas(f)) * 100}%` }} />
+                  <span className="bg-warning" style={{ width: `${(f.dudas / respondidas(f)) * 100}%` }} />
+                  <span className="bg-danger" style={{ width: `${(f.mal / respondidas(f)) * 100}%` }} />
+                </div>
+                <Button variant="ghost" size="sm" className="-mr-2 shrink-0 text-link" onPress={() => irATeoria('nota', f.tema.id)}>
+                  Leer la teoría →
+                </Button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <Typography color="muted">Nada para reforzar en esta tanda: todos los temas por encima del 90 %.</Typography>
+      )}
+
+      {firmes.length > 0 && flojos.length > 0 && (
+        <Typography type="body-sm" color="muted">
+          <span className="text-success">Firmes:</span> {firmes.map((f) => f.tema.titulo).join(' · ')}
+        </Typography>
+      )}
+
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-separator pt-4">
+        <Button variant="secondary" onPress={alCopiar}>
+          {estado === 'copiado' ? 'Copiado ✓' : estado === 'error' ? 'No se pudo copiar' : 'Copiar informe'}
+        </Button>
+        <Typography type="body-sm" color="muted" className="min-w-0 flex-1">
+          Pegalo en Claude con <code className="font-mono text-[0.9em]">/cerrar-sesion</code> para que actualice tu dominio y
+          tus errores.
+        </Typography>
+      </div>
+    </section>
   );
 }

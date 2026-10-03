@@ -1,10 +1,9 @@
 # Fuentes — Arquitectura de Computadoras
 [← Índice Arquitectura de Computadoras](INDICE.md)
 
-- **Notebook**: "Arquitectura de computadoras" · id `84c82418-3d31-4902-a18d-330c63a590bb`
-- **Estado**: 106 fuentes al 2026-09-23 (el estudiante sigue cargando). Antes de procesar, `list_sources` de nuevo.
-- La columna "Temas que cubre" se completa con `/procesar-fuente`. Mientras tanto, la
-  unidad sale **sólo del título** (no verificada).
+- **NotebookLM ya no se usa** (desde 2026-10-03). Las notas se escribieron con el notebook
+  "Arquitectura de computadoras" (106 fuentes); lo que sigue es ese registro histórico.
+- Material nuevo: va a `material/` y se procesa con Gemini (ver [material.md](../../metodo/material.md)).
 
 ## Programa
 

@@ -4,7 +4,7 @@
 > Unidad 2 · Peso en exámenes: 3/3 (tipo B en 3/5 parciales; NAND/NOR dentro del análisis secuencial) · Fuente:
 > [cronograma del estudiante](../../../docs/cronograma-eval-1-arquitectura.md#Álgebra%20de%20Boole%20y%20combinacionales),
 > secciones "Álgebra de Boole y combinacionales" y "B. Álgebra de Boole".
-> **Sin verificar todavía** contra NotebookLM ni el *Apunte teórico* (el MCP ya anda: pendiente). Si algo choca con la cátedra, manda la cátedra.
+> **Sin verificar todavía** contra el material de la cátedra (*Apunte teórico*): pendiente de `/revisar-materia`. Si algo choca con la cátedra, manda la cátedra.
 
 ## Preguntas de recuperación
 

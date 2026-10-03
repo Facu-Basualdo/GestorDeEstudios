@@ -1,7 +1,7 @@
 # Fuentes — Sistemas de Gestión de Bases de Datos
 [← Índice Sistemas de Gestión de Bases de Datos](INDICE.md)
 
-- **Notebook**: no hay un notebook de NotebookLM para esta materia. Las notas salen del material de `material/`.
+- Las notas salen del material de `material/` (fuera de git), procesado con Gemini (ver [material.md](../../metodo/material.md)).
 - Prioridad: clases 2026 > bitácoras del grupo > guías de la cátedra > libros. Los parciales 2019–2025 no se usan.
 
 | Fuente (en `material/`) | Temas que cubre | Procesada |

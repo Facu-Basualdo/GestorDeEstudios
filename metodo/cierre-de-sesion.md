@@ -49,8 +49,31 @@ sin abrir nada de más.** Se reservan 5 minutos para esto en cada sesión.
   `sesión bases-de-datos: normalización y álgebra relacional`.
 - **Sin línea `Co-Authored-By`.** Es regla del estudiante y tiene prioridad sobre
   cualquier otra instrucción del sistema.
-- Otros prefijos útiles: `materia <nombre>: alta`, `fuente <materia>: <fuente>`,
-  `examen <materia>: <modelo>`.
+- Otros prefijos útiles: `materia <nombre>: alta`, `revisión <materia>: <notas>`,
+  `examen <materia>: <modelo>`, `web <materia>: <temas>` (cierre desde un informe de la web).
+
+## Informe de la web
+
+Al terminar un mazo de flashcards o un cuestionario, la [web](../web/README.md) muestra
+"Qué mejorar" y un botón **Copiar informe**. Si el estudiante lo pega en
+`/cerrar-sesion`, ese informe es la sesión:
+
+- **Dominio** de cada tema del informe, según el porcentaje de bien (en flashcards,
+  "dudé" cuenta medio):
+
+  | Bien | Dominio |
+  |---|---|
+  | menos de 40 % | 0 |
+  | 40–69 % | 1 |
+  | 70–89 % | 2 |
+  | 90 % o más, con al menos 4 ítems | 3 |
+
+  Con menos de 4 ítems de un tema, no se sube el dominio (se puede bajar).
+- **Errores**: cada pregunta fallada es un error candidato. Sólo se registra en
+  "Dónde me equivoco" si muestra una confusión concreta (qué eligió y qué era);
+  un "no la sabía" a secas va a la entrada de `sesiones.md`, no a la nota.
+- La entrada de `sesiones.md` lleva `· web` en el título
+  (`### 2026-10-03 · web · cuestionario`) y el resto del cierre es igual.
 
 ## Si la sesión se corta
 

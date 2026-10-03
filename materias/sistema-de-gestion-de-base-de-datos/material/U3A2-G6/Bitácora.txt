@@ -1,1 +1,0 @@
-utilizamos la IA para generar las pruebas y aún no terminamos de crear la bitácora pdf con la ejecución de cada una

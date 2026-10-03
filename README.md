@@ -8,8 +8,8 @@ Claude Code como tutor.
 
 | Pieza | Rol |
 |---|---|
-| **Claude Code** | El tutor: prioriza temas, toma preguntas, corrige y lleva el seguimiento. Sus reglas están en [CLAUDE.md](CLAUDE.md). |
-| **NotebookLM** | La fuente del contenido, vía el MCP `notebooklm-mcp-2026` (uno o más notebooks por materia). Ver [notebooklm.md](metodo/notebooklm.md). |
+| **Claude Code** | El tutor: revisa la teoría, escribe preguntas y cuestionarios, prioriza temas, toma preguntas, corrige y lleva el seguimiento. Sus reglas están en [CLAUDE.md](CLAUDE.md). |
+| **Gemini** (Antigravity) | Pasa el material de cada materia a texto y redacta la teoría por tema, con el [prompt genérico](docs/prompt-gemini.md). Ver [material.md](metodo/material.md). |
 | **Obsidian** | Donde se leen las notas: enlaces markdown relativos, todo navegable. |
 | **[Web de estudio](web/README.md)** | Flashcards y cuestionarios generados desde las notas (Next.js). |
 
@@ -18,6 +18,7 @@ Claude Code como tutor.
 - **Priorización** por `peso × (3 − dominio) × urgencia` → [priorizacion.md](metodo/priorizacion.md)
 - **Recuperación activa**: primero la pregunta, después la corrección → [recuperacion-activa.md](metodo/recuperacion-activa.md)
 - **Repetición espaciada** según el dominio de cada tema → [repeticion-espaciada.md](metodo/repeticion-espaciada.md)
+- **Material**: Gemini lo pasa a texto y teoría, Claude revisa y arma las preguntas → [material.md](metodo/material.md)
 - **Cierre de sesión**: seguimiento, errores al índice y commit → [cierre-de-sesion.md](metodo/cierre-de-sesion.md)
 
 ## Materias
@@ -26,6 +27,7 @@ Claude Code como tutor.
 |---|---|
 | Arquitectura de Computadoras | [INDICE](materias/arquitectura-de-computadoras/INDICE.md) |
 | Diseño de Sistemas de Información | [INDICE](materias/diseno-de-sistemas/INDICE.md) |
+| Sistemas de Gestión de Bases de Datos | [INDICE](materias/sistema-de-gestion-de-base-de-datos/INDICE.md) |
 
 Fechas de parciales y entregas en [calendario.md](calendario.md).
 
@@ -38,14 +40,14 @@ metodo/               cómo se prioriza, se pregunta, se repasa y se cierra una 
 materias/<materia>/
   INDICE.md           temas, qué cae y errores frecuentes
   CLAUDE.md           contexto de la materia para el tutor
-  programa.md         programa de la cátedra
-  fuentes.md          notebooks y fuentes de NotebookLM
+  programa.md         programa de la cátedra y fechas
+  fuentes.md          inventario del material: tipo, temas que cubre, estado
   notas/              una nota por tema, con preguntas de recuperación y cuestionario
   temas.md            peso, dominio y próximo repaso por tema
   sesiones.md         registro de sesiones y errores recurrentes
-  examenes/           modelos de examen y su análisis
-  material/           material crudo importado (fuera del grafo)
-docs/                 planes y borradores (fuera del grafo)
+  examenes/           análisis de los modelos de examen
+  material/           material crudo y su texto extraído (fuera de git y del grafo)
+docs/                 planes, borradores y el prompt de Gemini (fuera del grafo)
 scripts/              verificador del grafo y generador de datos de la web
 web/                  web de estudio
 .claude/commands/     comandos del tutor
@@ -57,17 +59,18 @@ Se corren desde Claude Code, abierto en la raíz del repo.
 
 | Comando | Qué hace |
 |---|---|
-| `/nueva-materia` | Crea la carpeta de una materia desde el programa y la suma al hub y al calendario |
-| `/procesar-fuente <materia> [fuente]` | Convierte una fuente larga de NotebookLM en notas por tema |
+| `/nueva-materia` | Crea el esqueleto de una materia, la suma al hub y deja listo el prompt para Gemini |
+| `/revisar-materia <materia> [nota]` | Revisa la teoría que escribió Gemini y arma preguntas y cuestionarios |
 | `/cargar-examen <materia> <archivo>` | Analiza un modelo de examen y recalcula pesos |
 | `/estudiar <materia> [minutos]` | Arma y conduce la sesión de hoy por puntaje |
 | `/repaso [materia]` | Preguntas de los temas con repaso vencido |
 | `/progreso [materia]` | Estado y riesgo por materia (sólo lectura) |
-| `/cerrar-sesion` | Actualiza seguimiento, errores e índice; verifica y commitea |
+| `/cerrar-sesion` | Actualiza seguimiento, errores e índice; verifica y commitea. Acepta el informe de la web |
 
 ## Requisitos
 
-- [Claude Code](https://claude.com/claude-code) con el MCP de NotebookLM configurado.
+- [Claude Code](https://claude.com/claude-code).
+- Gemini en Antigravity, con acceso al repo, para procesar el material.
 - [Obsidian](https://obsidian.md) para leer el vault (opcional: son archivos markdown).
 - Node.js para el verificador y la web.
 

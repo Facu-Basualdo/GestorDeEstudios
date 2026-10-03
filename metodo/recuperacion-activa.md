@@ -20,8 +20,8 @@ mejor porque responde a un hueco concreto.
    diferencia entre dos conceptos que se confunden.
 3. La sección **"Dónde me equivoco"**: al menos una pregunta por sesión apunta
    directo a un error registrado, para ver si sigue.
-4. Si el tema no tiene nota, las preguntas salen de consultar NotebookLM (ver
-   [notebooklm.md](notebooklm.md)), y se aclara de dónde vienen.
+4. Si el tema no tiene nota, las preguntas salen del texto extraído del material
+   (`material/texto/`, ver [material.md](material.md)), y se aclara de dónde vienen.
 
 Mezclar tipos: definición, procedimiento, ejercicio corto, comparación, "¿por qué?".
 El tipo que más pesa es el que aparece en los modelos de examen (`examenes/analisis.md`).
@@ -34,7 +34,7 @@ El tipo que más pesa es el que aparece en los modelos de examen (`examenes/anal
 - ➕ **Faltó**: qué hacía falta para que sea respuesta de examen.
 - ✘ **Mal**: qué está equivocado y cuál es lo correcto, con la cita de la fuente.
 
-Después, la explicación mínima necesaria, basada en la nota o en NotebookLM. Si el
+Después, la explicación mínima necesaria, basada en la nota o en el material. Si el
 tutor agrega algo propio, va marcado *(explicación del tutor, no está en las fuentes)*.
 
 ## Escalera de pistas

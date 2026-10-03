@@ -2,7 +2,7 @@
 [← Índice Diseño de Sistemas](INDICE.md)
 
 Material de la cátedra exportado de Faro IA el 2026-09-28: 1394 conceptos con
-definición, desarrollo y página, en [material/faro.json](material/faro.json). Los PDFs
+definición, desarrollo y página, en `material/faro.json` (fuera de git). Los PDFs
 están en `material/pdfs/`. Las notas citan **documento + página** tal como las da Faro.
 
 | Doc | Fuente | Págs. | Texto seleccionable | Unidad | Procesada |
@@ -23,7 +23,10 @@ están en `material/pdfs/`. Las notas citan **documento + página** tal como las
 | 33 | Larman, cap. 17: UML y patrones | 49 | sí | 3.3 | [GRASP](notas/patrones-grasp.md) |
 | 59 | Bass, Clements y Kazman, *Software Architecture in Practice* (4ª ed.) | 497 | sí | 4.1 | [arquitectura](notas/arquitectura-de-software.md) (caps. 1–2; faltan 3, 8 y 9) |
 
-## Notebook de NotebookLM
+## Notebook de NotebookLM (ya no se usa)
+
+Desde 2026-10-03 el material nuevo se procesa con Gemini (ver [material.md](../../metodo/material.md)).
+Queda el registro de lo que tenía el notebook, porque señala fuentes sin usar.
 
 "diseño de sistemas" (`9bcdb8d1-e4b6-4dd4-af41-09fe898b3524`), creado el 2026-09-28 con 21 fuentes: los
 15 PDFs de arriba más seis que **no están en Faro** y todavía no se usaron en las notas:

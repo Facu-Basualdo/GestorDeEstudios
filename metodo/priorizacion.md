@@ -79,8 +79,9 @@ puntual → ese tema entra primero aunque no tenga el mayor puntaje (decilo).
 - **Sin fechas en el calendario**: toda urgencia es 1; decilo y sugerí cargar fechas.
 - **Fecha pasada con estado `pendiente`**: preguntá cómo le fue y actualizá el estado
   antes de calcular.
-- **Tema sin nota todavía**: puede priorizarse igual; la sesión arranca consultando
-  NotebookLM y, si hay contenido real, termina creando la nota.
+- **Tema sin nota todavía**: puede priorizarse igual; la sesión arranca buscando en
+  `material/texto/` y, si hay contenido real, sugerí pasar ese material por Gemini
+  ([material.md](material.md)) para que quede la nota.
 - **Todo en dominio 3**: no hay puntaje positivo; la sesión es `/repaso` o práctica
   con modelos de examen.
 

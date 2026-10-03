@@ -6,3 +6,7 @@
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Material crudo de cada materia (PDFs, pptx, libros, export de Faro) y su texto
+# extraído: pesa y tiene derechos de autor. Ver metodo/material.md.
+materias/*/material/

@@ -7,6 +7,10 @@ Cerrar sesión: $ARGUMENTS
 
 Seguí `metodo/cierre-de-sesion.md`. Resumen:
 
+0. **Si el estudiante pegó un informe de la web** ("Informe de estudio · …"), es la
+   sesión a cerrar: dominio por tema y errores según
+   `metodo/cierre-de-sesion.md#informe-de-la-web`. Si falta la materia, sale del informe.
+
 1. **`temas.md`**: por cada tema trabajado, dominio, intervalo, último y próximo repaso
    (`metodo/repeticion-espaciada.md`: 0–1 → 1 día; 2 → 3; 3 → 7; 3 sostenido → doble;
    **nunca después del examen**: si se pasa, el día anterior).

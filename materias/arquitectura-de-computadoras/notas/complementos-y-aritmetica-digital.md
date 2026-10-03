@@ -4,7 +4,7 @@
 > Unidad 1 · Peso en exámenes: 1/3 (teoría de codificación; 0 ejercicios en 5 parciales) · Fuente:
 > [cronograma del estudiante](../../../docs/cronograma-eval-1-arquitectura.md#Codificación),
 > sección "Codificación" (números con signo y overflow).
-> **Sin verificar todavía** contra NotebookLM ni el *Apunte teórico* (el MCP ya anda: pendiente). Si algo choca con la cátedra, manda la cátedra.
+> **Sin verificar todavía** contra el material de la cátedra (*Apunte teórico*): pendiente de `/revisar-materia`. Si algo choca con la cátedra, manda la cátedra.
 
 ## Preguntas de recuperación
 
