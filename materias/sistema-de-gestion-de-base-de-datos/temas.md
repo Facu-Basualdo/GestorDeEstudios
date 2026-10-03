@@ -2,7 +2,7 @@
 [← Índice Sistemas de Gestión de Bases de Datos](INDICE.md)
 
 > Una fila por tema del [programa](programa.md). Pesos **estimados** el 2026-10-03 según el énfasis de las clases 2026
-> (no hay modelo de parcial con el formato nuevo). La columna **Eval** marca lo que entra al Parcial BT1. Criterios en
+> (no hay modelo de parcial con el formato nuevo). La columna **Eval** marca lo que entra al Parcial BT1 del 2026-10-06. Criterios en
 > [priorización](../../metodo/priorizacion.md) y [repetición espaciada](../../metodo/repeticion-espaciada.md).
 
 | Tema | Unidad | Eval | Peso (0-3) | Dominio (0-3) | Intervalo (días) | Último repaso | Próximo repaso | Nota |

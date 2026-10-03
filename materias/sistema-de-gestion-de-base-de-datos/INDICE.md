@@ -3,7 +3,7 @@
 
 [Programa](programa.md) · [Temas](temas.md) · [Sesiones](sesiones.md) · [Fuentes](fuentes.md) · [Análisis de exámenes](examenes/analisis.md)
 
-> Próxima fecha: **sin fecha · Parcial BT1** (temas 1 a 6, administración relacional). Falta cargarla en el
+> Próxima fecha: **2026-10-06 · Parcial BT1** (temas 1 a 6, administración relacional). Ver
 > [calendario](../../calendario.md).
 
 > Las notas salen de las **clases 1 a 6 de 2026** y de las **bitácoras de laboratorio del grupo** (PostgreSQL), escritas
