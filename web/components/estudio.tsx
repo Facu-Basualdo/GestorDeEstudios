@@ -2,8 +2,9 @@
 
 import { Button, Label, ListBox, Select, Separator, Tabs, Typography } from '@heroui/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { Datos, Lectura, Nota, Vista } from '@/lib/tipos';
+import type { Datos, Lectura, Materia, Nota, Vista } from '@/lib/tipos';
 import { cuentaRegresiva, guardado } from '@/lib/util';
+import { ElegirMateria, Marca } from './inicio';
 import { Cuestionario } from './cuestionario';
 import { Flashcards } from './flashcards';
 import { Teoria } from './teoria';
@@ -11,9 +12,64 @@ import { Teoria } from './teoria';
 const VISTAS: Vista[] = ['flashcards', 'cuestionario', 'teoria'];
 type Volver = { vista: Vista; scroll: number };
 
+/** Materia que nombra el `#` de la dirección: el id completo o un pedazo que sólo calce con una. */
+function materiaDelHash(datos: Datos): Materia | undefined {
+  const normalizar = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+  let crudo = location.hash.slice(1);
+  try {
+    crudo = decodeURIComponent(crudo);
+  } catch {}
+  const h = normalizar(crudo).replace(/\s+/g, '-');
+  if (!h) return undefined;
+  const exacta = datos.materias.find((m) => m.id === h);
+  if (exacta) return exacta;
+  const parecidas = datos.materias.filter((m) => m.id.includes(h) || normalizar(m.nombre).includes(h.replace(/-/g, ' ')));
+  return parecidas.length === 1 ? parecidas[0] : undefined;
+}
+
+/**
+ * La materia sale del `#` (links compartibles como `/#base-de-datos`); sin `#`, de la última
+ * visita; y si no hay ninguna, se muestra la lista para elegir.
+ * undefined = todavía no se sabe (primer render, igual en servidor y navegador); null = elegir.
+ */
 export function Estudio({ datos }: { datos: Datos }) {
-  const [materiaId, setMateriaId] = useState(datos.materias[0].id);
-  const materia = datos.materias.find((m) => m.id === materiaId) ?? datos.materias[0];
+  const [materiaId, setMateriaId] = useState<string | null | undefined>(undefined);
+
+  useEffect(() => {
+    const guardada = datos.materias.find((m) => m.id === guardado.leer('materia', ''));
+    const inicial = materiaDelHash(datos) ?? (location.hash ? undefined : guardada);
+    setMateriaId(inicial?.id ?? null);
+    if (inicial) {
+      guardado.escribir('materia', inicial.id);
+      history.replaceState(null, '', `#${inicial.id}`);
+    }
+    // Atrás/adelante del navegador, o un link con otro # pegado en la misma pestaña.
+    const alCambiar = () => {
+      const m = materiaDelHash(datos);
+      setMateriaId(m?.id ?? null);
+      if (m) guardado.escribir('materia', m.id);
+    };
+    window.addEventListener('hashchange', alCambiar);
+    return () => window.removeEventListener('hashchange', alCambiar);
+  }, [datos]);
+
+  // Cambiar el # agrega una entrada al historial y dispara hashchange, que actualiza el estado.
+  const irA = (id: string | null) => {
+    if (id) location.hash = id;
+    else {
+      history.pushState(null, '', location.pathname + location.search);
+      setMateriaId(null);
+    }
+    window.scrollTo({ top: 0 });
+  };
+
+  if (materiaId === undefined) return null;
+  const materia = datos.materias.find((m) => m.id === materiaId);
+  if (!materia) return <ElegirMateria datos={datos} onElegir={irA} />;
+  return <Sesion key={materia.id} datos={datos} materia={materia} irA={irA} />;
+}
+
+function Sesion({ datos, materia, irA }: { datos: Datos; materia: Materia; irA: (id: string | null) => void }) {
   const [vista, setVista] = useState<Vista>('flashcards');
   const [lectura, setLectura] = useState<Lectura>({ tipo: 'nota', id: materia.temas[0].id, ancla: '', n: 0 });
   const [volver, setVolver] = useState<Volver | null>(null);
@@ -25,14 +81,12 @@ export function Estudio({ datos }: { datos: Datos }) {
 
   // Preferencias de la última visita (sólo en el navegador).
   useEffect(() => {
-    const m = datos.materias.find((x) => x.id === guardado.leer('materia', '')) ?? datos.materias[0];
-    setMateriaId(m.id);
     const v = guardado.leer<Vista>('vista', 'flashcards');
     setVista(VISTAS.includes(v) ? v : 'flashcards');
     const tema = guardado.leer('tema', '');
-    if (m.temas.some((t) => t.id === tema)) setLectura({ tipo: 'nota', id: tema, ancla: '', n: 0 });
+    if (materia.temas.some((t) => t.id === tema)) setLectura({ tipo: 'nota', id: tema, ancla: '', n: 0 });
     setHistorial(guardado.leer('historial', {}));
-  }, [datos]);
+  }, [materia]);
 
   useEffect(() => setCuenta(cuentaRegresiva(materia)), [materia]);
 
@@ -102,23 +156,18 @@ export function Estudio({ datos }: { datos: Datos }) {
         className="sticky top-0 z-30 border-b border-separator bg-background/90 pt-[env(safe-area-inset-top)] backdrop-blur-md"
       >
         <div className="mx-auto flex max-w-[1680px] flex-wrap items-center gap-x-5 gap-y-3 px-4 py-3 sm:px-8 xl:px-10">
-          <div className="flex items-center gap-2.5 font-titulo text-xl font-semibold tracking-tight">
-            <span className="grid size-8 place-items-center rounded-lg bg-accent text-accent-foreground shadow-[0_4px_14px_-4px_var(--accent)]">
-              <svg viewBox="0 0 24 24" className="size-[18px]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M12 6.5C10.3 5.2 7.9 4.6 4 4.6v13.2c3.9 0 6.3.6 8 1.9 1.7-1.3 4.1-1.9 8-1.9V4.6c-3.9 0-6.3.6-8 1.9Z" />
-                <path d="M12 6.5v13.2" />
-              </svg>
-            </span>
-            Gestor de estudios
-          </div>
+          <button
+            type="button"
+            title="Elegir otra materia"
+            className="-m-1 rounded-xl p-1 outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-focus"
+            onClick={() => irA(null)}
+          >
+            <Marca />
+          </button>
 
           <div className="flex min-w-0 flex-1 flex-col gap-0.5 md:flex-none">
             {datos.materias.length > 1 ? (
-              <Select aria-label="Materia" value={materia.id} onChange={(v) => {
-                  if (v == null) return;
-                  setMateriaId(String(v));
-                  guardado.escribir('materia', String(v));
-                }} className="w-full max-w-60">
+              <Select aria-label="Materia" value={materia.id} onChange={(v) => v != null && irA(String(v))} className="w-full max-w-60">
                 <Select.Trigger>
                   <Select.Value className="truncate" />
                   <Select.Indicator />
