@@ -290,3 +290,10 @@ U3 Act. 1, "El reporte que nadie puede resolver": última venta por cliente, acu
 
 - **Jerarquía**: CTE recursiva con un arreglo `camino` de ids recorridos, que sirve para ordenar el árbol y para cortar ciclos.
 - **Validaciones**: bloques `DO … RAISE EXCEPTION` que hacen fallar el script si algo no cierra. Ejemplo: el acumulado por ventana tiene que dar lo mismo que un `GROUP BY` (dos caminos distintos al mismo número).
+
+## Dónde me equivoco
+
+- **2026-10-05** — con `ORDER BY fecha` y sin marco, a dos ventas del mismo día (100 y 50, después de una de 200) les di 250 y 350: el default es RANGE, que trata los empates como una sola fila, y **las dos muestran 350**. Para sumar de a una: ROWS + desempate (`venta_id`). [→ Funciones de ventana](#Funciones%20de%20ventana)
+- **2026-10-05** — elegí GROUP BY para "cada venta con el acumulado del cliente": GROUP BY **resume** (pierde el detalle); para conservar cada fila, `SUM(total) OVER (PARTITION BY … ORDER BY …)`.
+- **2026-10-05** — confundí LAG con LEAD: para comparar con la venta **anterior**, `LAG`; `LEAD` trae la siguiente.
+- **2026-10-05** — creí que `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` define el grupo: el grupo es `PARTITION BY`; el marco dice **qué filas del grupo entran al cálculo** (desde la primera hasta la actual → acumulado).

@@ -9,7 +9,7 @@
 |---|---|---|---|---|---|---|---|---|
 | Arquitectura de un motor de base de datos | 1 | sí | 2 | 0 | | — | — | [nota](notas/arquitectura-e-instalacion.md) |
 | Diseño físico de una BD relacional | 2 | sí | 3 | 0 | | — | — | [nota](notas/diseno-fisico.md) |
-| Lenguaje SQL avanzado | 3 | sí | 3 | 0 | | — | — | [nota](notas/lenguaje-sql-avanzado.md) |
+| Lenguaje SQL avanzado | 3 | sí | 3 | 2 | 3 | 2026-10-05 | — (parcial 2026-10-06) | [nota](notas/lenguaje-sql-avanzado.md) |
 | Herramientas de programación (funciones, SP, triggers, migraciones) | 4 | sí | 3 | 0 | | — | — | [nota](notas/herramientas-de-programacion.md) |
 | Conectividad del RDBMS | 5 | sí | 2 | 0 | | — | — | [nota](notas/conectividad.md) |
 | Transacciones y bloqueos | 5 | sí | 3 | 0 | | — | — | [nota](notas/transacciones-y-concurrencia.md) |

@@ -27,7 +27,7 @@
 
 | Nota | Peso | Qué cae · dónde me equivoco |
 |---|---|---|
-| [Lenguaje SQL avanzado](notas/lenguaje-sql-avanzado.md) | 3 | LEFT JOIN + COALESCE para no perder filas, EXISTS / NOT EXISTS · ventanas (OVER, frame) · ROW_NUMBER, RANK, DENSE_RANK · CTE y CTE recursiva · LOAD DATA / COPY |
+| [Lenguaje SQL avanzado](notas/lenguaje-sql-avanzado.md) | 3 | **acumulado por fila es ventana (OVER), no GROUP BY** · **sin marco manda RANGE: dos ventas del mismo día muestran el mismo acumulado** · **LAG es la fila anterior, LEAD la siguiente** · **el marco (ROWS BETWEEN…) es hasta dónde suma, no el grupo** · ROW_NUMBER/RANK/DENSE_RANK, CTE recursiva, LEFT JOIN + COALESCE |
 
 ## Unidad 4 — Programabilidad y migraciones
 
