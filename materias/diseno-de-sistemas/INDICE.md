@@ -7,7 +7,8 @@
 > la cursada. Entran (aula virtual): **SOLID, GRASP, Arquitectura I** (importancia, diseño
 > arquitectónico, capas, repositorio, tuberías y filtros, microkernel), **Arquitectura II**
 > (sistemas distribuidos) y **PUDS I y II** (visión general, fases, hitos, disciplinas, captura
-> de requisitos). Patrones GoF y lo ágil **no** están en la lista.
+> de requisitos). Lo ágil **no** está en la lista. Patrones GoF: según el estudiante (2026-10-21)
+> entran los 9 del resumen de Gaona → [Elegir y diagramar patrones](notas/elegir-y-diagramar-patrones.md).
 > Antes: **cuestionario 16 (PUDS intro, IE6) cierra el 30/09 a las 13 hs**. Después: TPI 04/11 ·
 > IE5 18/11. Todas las instancias en el [programa](programa.md#Instancias%20de%20evaluación).
 
@@ -22,6 +23,7 @@
 |---|---|---|
 | [Principios SOLID](notas/principios-solid.md) | 2 | **2º parcial**. Enunciado de cada principio y su ejemplo (correo, EditorGrafico, cuadrado, ITrabajador, House) · los distractores son los otros principios |
 | [Patrones GRASP y UML](notas/patrones-grasp.md) | 2 | **2º parcial**. Experto, Creador, Controlador, Bajo acoplamiento, Alta cohesión, Polimorfismo, Fabricación pura, Indirección, Variaciones protegidas · cuándo aplica cada uno · realización de CU (Guía de TP N° 6) |
+| [Elegir y diagramar los 9 patrones del resumen](notas/elegir-y-diagramar-patrones.md) | 2 | **2º parcial**. Singleton, Factory Method, Abstract Factory, Composite, Facade, Proxy, State, Observer, Iterator (resumen de Gaona) · qué señal del enunciado lleva a cada uno · cómo se dibuja su diagrama |
 | [Principios de diseño orientado a objetos](notas/principios-de-diseno-orientado-a-objetos.md) | 1 | Dudoso para el parcial. GoF cap. 1: programar para una interfaz, composición antes que herencia, causas de rediseño |
 | [Fundamentos de patrones de diseño](notas/fundamentos-de-patrones-de-diseno.md) | 1 | No está en la lista del 2º parcial. Qué es un patrón, clasificación, caso Lexi |
 | [Patrones creacionales](notas/patrones-creacionales.md) | 1 | Abstract Factory, Builder, Factory Method, Prototype, Singleton |

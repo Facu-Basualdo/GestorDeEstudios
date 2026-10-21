@@ -16,6 +16,7 @@
 | Patrones creacionales | 3 | — | 1 | 0 | | — | — | [nota](notas/patrones-creacionales.md) |
 | Patrones estructurales | 3 | — | 1 | 0 | | — | — | [nota](notas/patrones-estructurales.md) |
 | Patrones de comportamiento | 3 | — | 1 | 0 | | — | — | [nota](notas/patrones-de-comportamiento.md) |
+| Los 9 patrones del resumen de Gaona: elegir y diagramar | 3 | sí (según el estudiante) | 2 | 1 | | — | — | [nota](notas/elegir-y-diagramar-patrones.md) |
 | Importancia de la arquitectura y diseño arquitectónico | 4 | sí | 2 | 0 | | — | — | [nota](notas/arquitectura-de-software.md) |
 | Estilos: capas, repositorio, tuberías y filtros, microkernel | 4 | sí | 2 | 0 | | — | — | [nota](notas/estilos-arquitectonicos.md) |
 | Arquitecturas de sistemas distribuidos | 4 | sí | 2 | 0 | | — | — | [nota](notas/arquitecturas-de-sistemas-distribuidos.md) |
