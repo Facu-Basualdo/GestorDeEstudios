@@ -34,7 +34,7 @@ Este repo es un vault de Obsidian: todo se escribe para leerse ahí.
 |---|---|---|
 | Arquitectura de Computadoras | 2026-09-30 · Eval. Nº 1 (codificación, combinacionales, secuenciales) | [INDICE](materias/arquitectura-de-computadoras/INDICE.md) |
 | Diseño de Sistemas de Información | 2026-10-21 · 2º parcial IE3 (SOLID, GRASP, arquitectura, PUDS) · antes, cuestionario 16 cierra 2026-09-30 13 hs | [INDICE](materias/diseno-de-sistemas/INDICE.md) |
-| Sistemas de Gestión de Bases de Datos | 2026-10-06 · Parcial BT1 (temas 1–6: arquitectura, diseño físico, SQL avanzado, programabilidad, transacciones, seguridad/backup/HA) | [INDICE](materias/sistema-de-gestion-de-base-de-datos/INDICE.md) |
+| Sistemas de Gestión de Bases de Datos | Parcial 2 · fecha a confirmar (temas 7–11: semiestructurados, MongoDB, Redis/Cassandra/Neo4j/CAP, DBaaS) | [INDICE](materias/sistema-de-gestion-de-base-de-datos/INDICE.md) |
 
 Fechas completas en [calendario.md](calendario.md).
 

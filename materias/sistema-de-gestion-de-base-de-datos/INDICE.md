@@ -3,7 +3,7 @@
 
 [Programa](programa.md) · [Temas](temas.md) · [Sesiones](sesiones.md) · [Fuentes](fuentes.md) · [Análisis de exámenes](examenes/analisis.md)
 
-> Próxima fecha: **2026-10-06 · Parcial BT1** (temas 1 a 6, administración relacional). Ver
+> Próxima fecha: **Parcial 2, fecha a confirmar** (temas 7 a 11, NoSQL y nube: bloque 2, más abajo). El Parcial BT1 (temas 1 a 6) fue el 2026-10-06. Ver
 > [calendario](../../calendario.md).
 
 > Las notas salen de las **clases 1 a 6 de 2026** y de las **bitácoras de laboratorio del grupo** (PostgreSQL), escritas
@@ -50,4 +50,32 @@
 | [Seguridad y auditoría](notas/seguridad-y-auditoria.md) | 2 | Mínimo privilegio **probado** (OK + error esperado) · GRANT/REVOKE con roles · en PG: CONNECT, USAGE y SELECT |
 | [Replicación y alta disponibilidad](notas/replicacion-y-alta-disponibilidad.md) | 2 | **La réplica replica el DELETE**: HA no es backup · sincrónica frente a asincrónica · failover y split brain · estrategia por criticidad |
 
-El bloque 2 (NoSQL y nube, temas 7 a 12) todavía no tiene notas: está en [temas.md](temas.md).
+# Bloque 2 — NoSQL y nube (Parcial 2)
+
+> Notas escritas el 2026-11-10 con las **clases 7 a 10 de 2026** y las **bitácoras del grupo** (U7 Act. 1 y 2, U8 Act. 1
+> y 2, U9 Act. 1 y 2). Pesos **estimados** por el énfasis de las clases. El tema 12 (herramientas de datos distribuidos)
+> no tiene material todavía.
+
+## Unidad 7 — Datos semiestructurados
+
+| Nota | Peso | Qué cae · dónde me equivoco |
+|---|---|---|
+| [Datos semiestructurados y transición a NoSQL](notas/datos-semiestructurados.md) | 2 | Tensiones del relacional · **semiestructurado no es "sin estructura"** · json frente a jsonb, GIN, columna generada en MySQL, Document Store · scale up/out, sharding · **ACID/BASE no son etiquetas de familias** · 4 familias y árbol de decisión |
+
+## Unidad 8 — MongoDB
+
+| Nota | Peso | Qué cae · dónde me equivoco |
+|---|---|---|
+| [MongoDB y el modelo documental](notas/mongodb.md) | 3 | **Diseñar desde los patrones de acceso, no traducir tablas** · embed frente a referencia, arrays sin tope (16 MB) · CRUD con operadores · explain: COLLSCAN → IXSCAN · pipeline · $jsonSchema · atomicidad por documento · conexión / autenticación / autorización |
+
+## Unidad 9 — Redis, Cassandra, Neo4j y CAP
+
+| Nota | Peso | Qué cae · dónde me equivoco |
+|---|---|---|
+| [Redis, Cassandra, Neo4j y CAP](notas/redis-cassandra-neo4j.md) | 3 | Estructuras y TTL, RDB frente a AOF · **partition key y clustering; sin la partición no hay consulta** · **RF ≠ CL** (QUORUM = mayoría) · Cypher · ACID por motor · **CAP sólo bajo partición, no es "dos de tres"** · OmniMarket |
+
+## Unidad 10 — DBaaS y nube
+
+| Nota | Peso | Qué cae · dónde me equivoco |
+|---|---|---|
+| [Bases de datos como servicio en la nube](notas/dbaas-y-nube.md) | 2 | **Managed no es sin dueño**: matriz de responsabilidad compartida · endpoint, público ≠ abierto · **backup enabled no es restore probado** · escalar frente a optimizar, costos · IAM + roles · migración en 6 pasos · estrategia de salida |
