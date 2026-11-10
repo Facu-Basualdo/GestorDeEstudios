@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Label, ListBox, Select, Separator, Tabs, Typography } from '@heroui/react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Datos, Lectura, Materia, Nota, Vista } from '@/lib/tipos';
 import { cuentaRegresiva, guardado } from '@/lib/util';
 import { ElegirMateria, Marca } from './inicio';
@@ -10,6 +10,19 @@ import { Flashcards } from './flashcards';
 import { Teoria } from './teoria';
 
 const VISTAS: Vista[] = ['flashcards', 'cuestionario', 'teoria'];
+
+/** Sin elección guardada: el parcial que tiene la próxima fecha, o el último. 0 = la materia no separa. */
+const parcialPorDefecto = (m: Materia) => (m.parciales.find((p) => p.fecha) ?? m.parciales.at(-1))?.n ?? 0;
+
+/**
+ * La materia recortada al parcial elegido. El id propio hace que flashcards y cuestionario
+ * guarden su avance por separado en cada parcial.
+ */
+function recortar(m: Materia, n: number): Materia {
+  const p = m.parciales.find((x) => x.n === n);
+  if (!p) return m;
+  return { ...m, id: `${m.id}--parcial-${n}`, fecha: p.fecha, evento: p.evento, temas: m.temas.filter((t) => t.parcial === n) };
+}
 type Volver = { vista: Vista; scroll: number };
 
 /** Materia que nombra el `#` de la dirección: el id completo o un pedazo que sólo calce con una. */
@@ -71,7 +84,9 @@ export function Estudio({ datos }: { datos: Datos }) {
 
 function Sesion({ datos, materia, irA }: { datos: Datos; materia: Materia; irA: (id: string | null) => void }) {
   const [vista, setVista] = useState<Vista>('flashcards');
-  const [lectura, setLectura] = useState<Lectura>({ tipo: 'nota', id: materia.temas[0].id, ancla: '', n: 0 });
+  const [parcial, setParcial] = useState(() => parcialPorDefecto(materia));
+  const actual = useMemo(() => recortar(materia, parcial), [materia, parcial]);
+  const [lectura, setLectura] = useState<Lectura>({ tipo: 'nota', id: actual.temas[0].id, ancla: '', n: 0 });
   const [volver, setVolver] = useState<Volver | null>(null);
   const [historial, setHistorial] = useState<Record<string, Nota>>({});
   const [pedidoFc, setPedidoFc] = useState<{ tema: string; n: number } | null>(null);
@@ -83,12 +98,16 @@ function Sesion({ datos, materia, irA }: { datos: Datos; materia: Materia; irA: 
   useEffect(() => {
     const v = guardado.leer<Vista>('vista', 'flashcards');
     setVista(VISTAS.includes(v) ? v : 'flashcards');
+    const elegido = guardado.leer(`parcial:${materia.id}`, 0);
+    const p = materia.parciales.some((x) => x.n === elegido) ? elegido : parcialPorDefecto(materia);
+    setParcial(p);
     const tema = guardado.leer('tema', '');
-    if (materia.temas.some((t) => t.id === tema)) setLectura({ tipo: 'nota', id: tema, ancla: '', n: 0 });
+    if (recortar(materia, p).temas.some((t) => t.id === tema)) setLectura({ tipo: 'nota', id: tema, ancla: '', n: 0 });
+    else setLectura({ tipo: 'nota', id: recortar(materia, p).temas[0].id, ancla: '', n: 0 });
     setHistorial(guardado.leer('historial', {}));
   }, [materia]);
 
-  useEffect(() => setCuenta(cuentaRegresiva(materia)), [materia]);
+  useEffect(() => setCuenta(cuentaRegresiva(actual)), [actual]);
 
   // Alto real de la barra fija, para el índice lateral y los saltos a secciones.
   useEffect(() => {
@@ -108,8 +127,25 @@ function Sesion({ datos, materia, irA }: { datos: Datos; materia: Materia; irA: 
     window.scrollTo({ top: 0 });
   };
 
+  const cambiarParcial = (n: number) => {
+    setParcial(n);
+    guardado.escribir(`parcial:${materia.id}`, n);
+    setVolver(null);
+    setPedidoFc(null);
+    setPedidoCu(null);
+    const temas = recortar(materia, n).temas;
+    setLectura((l) => (l.tipo === 'nota' && !temas.some((t) => t.id === l.id) ? { tipo: 'nota', id: temas[0].id, ancla: '', n: l.n + 1 } : l));
+    window.scrollTo({ top: 0 });
+  };
+
   const leer = useCallback(
     (tipo: Lectura['tipo'], id: string, ancla = '') => {
+      // Un enlace a una nota de otro parcial cambia de parcial (pasa en la teoría: DBaaS cita a Backup).
+      const destino = tipo === 'nota' ? materia.temas.find((t) => t.id === id) : undefined;
+      if (destino && destino.parcial && destino.parcial !== parcial) {
+        setParcial(destino.parcial);
+        guardado.escribir(`parcial:${materia.id}`, destino.parcial);
+      }
       setLectura((l) => ({ tipo, id, ancla, n: l.n + 1 }));
       if (tipo === 'nota') guardado.escribir('tema', id);
       if (vista !== 'teoria') {
@@ -117,7 +153,7 @@ function Sesion({ datos, materia, irA }: { datos: Datos; materia: Materia; irA: 
         setVista('teoria');
       }
     },
-    [vista],
+    [vista, materia, parcial],
   );
 
   const volverAtras = () => {
@@ -141,12 +177,12 @@ function Sesion({ datos, materia, irA }: { datos: Datos; materia: Materia; irA: 
     });
   }, []);
 
-  const nFc = materia.temas.reduce((n, t) => n + t.flashcards.length, 0);
-  const nCu = materia.temas.reduce((n, t) => n + t.preguntas.length, 0);
+  const nFc = actual.temas.reduce((n, t) => n + t.flashcards.length, 0);
+  const nCu = actual.temas.reduce((n, t) => n + t.preguntas.length, 0);
   const pestañas: [Vista, string, number][] = [
     ['flashcards', 'Flashcards', nFc],
     ['cuestionario', 'Cuestionario', nCu],
-    ['teoria', 'Teoría', materia.temas.length],
+    ['teoria', 'Teoría', actual.temas.length],
   ];
 
   return (
@@ -195,6 +231,21 @@ function Sesion({ datos, materia, irA }: { datos: Datos; materia: Materia; irA: 
             )}
           </div>
 
+          {materia.parciales.length > 1 && (
+            <Tabs selectedKey={String(parcial)} onSelectionChange={(k) => cambiarParcial(Number(k))} className="w-auto">
+              <Tabs.ListContainer>
+                <Tabs.List aria-label="Parcial">
+                  {materia.parciales.map((p) => (
+                    <Tabs.Tab key={p.n} id={String(p.n)} className="whitespace-nowrap">
+                      Parcial {p.n}
+                      <Tabs.Indicator />
+                    </Tabs.Tab>
+                  ))}
+                </Tabs.List>
+              </Tabs.ListContainer>
+            </Tabs>
+          )}
+
           <div className="order-last w-full md:order-none md:ml-auto md:w-auto">
             <Tabs selectedKey={vista} onSelectionChange={(k) => cambiarVista(k as Vista)} className="w-full md:w-[440px]">
               <Tabs.ListContainer>
@@ -217,7 +268,8 @@ function Sesion({ datos, materia, irA }: { datos: Datos; materia: Materia; irA: 
       <main className="mx-auto max-w-[1680px] px-4 pb-28 pt-6 sm:px-8 sm:pt-8 xl:px-10">
         <section hidden={vista !== 'flashcards'} aria-label="Flashcards">
           <Flashcards
-            materia={materia}
+            key={actual.id}
+            materia={actual}
             activo={vista === 'flashcards'}
             historial={historial}
             onCalificar={calificar}
@@ -226,17 +278,17 @@ function Sesion({ datos, materia, irA }: { datos: Datos; materia: Materia; irA: 
           />
         </section>
         <section hidden={vista !== 'cuestionario'} aria-label="Cuestionario">
-          <Cuestionario materia={materia} activo={vista === 'cuestionario'} irATeoria={leer} pedido={pedidoCu} />
+          <Cuestionario key={actual.id} materia={actual} activo={vista === 'cuestionario'} irATeoria={leer} pedido={pedidoCu} />
         </section>
         <section hidden={vista !== 'teoria'} aria-label="Teoría">
-          <Teoria materia={materia} fuentes={datos.fuentes} lectura={lectura} onLeer={leer} onPracticar={practicar} />
+          <Teoria key={actual.id} materia={actual} fuentes={datos.fuentes} lectura={lectura} onLeer={leer} onPracticar={practicar} />
         </section>
       </main>
 
       <footer className="mx-auto grid max-w-[1680px] gap-4 px-4 pb-10 sm:px-8 xl:px-10">
         <Separator />
         <Typography type="body-xs" color="muted" className="font-mono leading-relaxed">
-          Generada el {datos.generado} desde las notas del vault · {materia.temas.length} temas · {nFc} flashcards · {nCu} preguntas.
+          Generada el {datos.generado} desde las notas del vault · {actual.temas.length} temas · {nFc} flashcards · {nCu} preguntas.
           <br />
           Cada tema dice de qué fuente sale su contenido. Si algo choca con la cátedra, manda la cátedra.
         </Typography>

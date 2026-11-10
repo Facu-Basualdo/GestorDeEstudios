@@ -28,6 +28,7 @@ hosting estático para abrirla desde el celular.
 | Cuestionario | `## Cuestionario`: lista numerada con opciones `- [ ]` / `- [x]` y explicación en `>`. Con más de una `- [x]` es de varias correctas: se tildan todas y se comprueba |
 | Teoría | el resto de la nota; los enlaces a `docs/` aparecen como "Fuentes citadas" |
 | Orden, unidad y peso | `INDICE.md` y la columna Nota de `temas.md` |
+| Selector de parcial | columna opcional **Parcial** de `temas.md` (1, 2…): con dos o más, la web muestra un parcial por vez, cada uno con su avance. La cuenta regresiva va en el parcial cuyos temas tienen Eval "sí" |
 
 El formato completo está en `metodo/recuperacion-activa.md`. El generador avisa si una
 pregunta no tiene la opción correcta marcada o si un `[→ …]` apunta a una sección que no existe.

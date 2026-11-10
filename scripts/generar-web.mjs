@@ -283,7 +283,8 @@ function leerNota(ruta, id, notas) {
 // ---------------------------------------------------------------- materias
 
 function leerTemas(dirMateria) {
-  // ruta absoluta de nota -> { unidad, peso, entra, dominio }
+  // ruta absoluta de nota -> { unidad, parcial, peso, entra, dominio }
+  // La columna Parcial es opcional: con ella la web separa los temas por parcial.
   const ruta = join(dirMateria, 'temas.md');
   const porNota = new Map();
   if (!existsSync(ruta)) return porNota;
@@ -296,10 +297,11 @@ function leerTemas(dirMateria) {
     const col = (prefijo) => c[columnas.findIndex((x) => x.startsWith(prefijo))] ?? '';
     for (const [, destino] of col('nota').matchAll(/\]\(([^)\s]+)\)/g)) {
       const abs = resolve(dirMateria, decodeURIComponent(destino.split('#')[0]));
-      const fila = { unidad: Number(col('unidad')) || 0, peso: Number(col('peso')) || 0, entra: col('eval'), dominio: Number(col('dominio')) || 0 };
+      const fila = { unidad: Number(col('unidad')) || 0, parcial: Number(col('parcial')) || 0, peso: Number(col('peso')) || 0, entra: col('eval'), dominio: Number(col('dominio')) || 0 };
       const previa = porNota.get(abs);
       porNota.set(abs, previa ? {
         unidad: Math.min(previa.unidad, fila.unidad),
+        parcial: previa.parcial || fila.parcial,
         peso: Math.max(previa.peso, fila.peso),
         entra: previa.entra === 'sí' ? previa.entra : fila.entra,
         dominio: Math.min(previa.dominio, fila.dominio),
@@ -337,19 +339,23 @@ function leerMateria(carpeta) {
 
   const temas = orden.map(({ ruta, descripcion }) => {
     const id = notas.get(ruta);
-    const m = meta.get(ruta) ?? { unidad: 0, peso: 0, entra: '', dominio: 0 };
+    const m = meta.get(ruta) ?? { unidad: 0, parcial: 0, peso: 0, entra: '', dominio: 0 };
     if (!meta.has(ruta)) avisos.push(`${rel(ruta)}: no figura en la columna Nota de temas.md (sin peso ni unidad)`);
     return { id, ...m, descripcion: inline(descripcion, ctxIndice), ...leerNota(ruta, id, notas) };
   });
 
-  return {
-    id: carpeta,
-    nombre,
-    fecha: fecha.match(/\d{4}-\d{2}-\d{2}/)?.[0] ?? '',
-    evento: fecha.split('·').slice(1).join('·').trim(),
-    unidades,
-    temas,
-  };
+  const proxima = { fecha: fecha.match(/\d{4}-\d{2}-\d{2}/)?.[0] ?? '', evento: fecha.split('·').slice(1).join('·').trim() };
+
+  // Con la columna Parcial, la próxima fecha del índice es la del parcial cuyos temas entran ("sí");
+  // si ninguno lo dice, la del último parcial.
+  const numeros = [...new Set(temas.map((t) => t.parcial).filter((n) => n > 0))].sort((a, b) => a - b);
+  const conFecha = temas.find((t) => t.parcial > 0 && t.entra === 'sí')?.parcial ?? numeros.at(-1);
+  const parciales = numeros.map((n) => ({ n, ...(n === conFecha ? proxima : { fecha: '', evento: '' }) }));
+  if (numeros.length) {
+    for (const t of temas) if (!t.parcial) avisos.push(`${rel(join(dir, 'temas.md'))}: ${t.id} no tiene Parcial y no aparece en la web`);
+  }
+
+  return { id: carpeta, nombre, ...proxima, unidades, parciales, temas };
 }
 
 const materias = readdirSync(MATERIAS, { withFileTypes: true })

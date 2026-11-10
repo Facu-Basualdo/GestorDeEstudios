@@ -22,6 +22,8 @@ export type Tema = {
   id: string;
   titulo: string;
   unidad: number;
+  /** Columna "Parcial" de temas.md; 0 si la materia no separa por parcial. */
+  parcial: number;
   peso: number;
   /** Columna "Eval 1" de temas.md: "sí", "teoría", "dudoso" o "—". */
   entra: string;
@@ -33,12 +35,17 @@ export type Tema = {
   preguntas: Pregunta[];
 };
 
+/** Un parcial de la materia: sólo el que tiene la próxima fecha trae `fecha` y `evento`. */
+export type Parcial = { n: number; fecha: string; evento: string };
+
 export type Materia = {
   id: string;
   nombre: string;
   fecha: string;
   evento: string;
   unidades: Record<string, string>;
+  /** Vacío si la materia no separa sus temas por parcial. */
+  parciales: Parcial[];
   temas: Tema[];
 };
 

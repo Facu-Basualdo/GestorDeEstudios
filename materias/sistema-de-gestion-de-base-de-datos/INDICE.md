@@ -74,7 +74,7 @@
 |---|---|---|
 | [Redis, Cassandra, Neo4j y CAP](notas/redis-cassandra-neo4j.md) | 3 | Estructuras y TTL, RDB frente a AOF · **partition key y clustering; sin la partición no hay consulta** · **RF ≠ CL** (QUORUM = mayoría) · Cypher · ACID por motor · **CAP sólo bajo partición, no es "dos de tres"** · OmniMarket |
 
-## Unidad 10 — DBaaS y nube
+## Unidad 11 — DBaaS y nube
 
 | Nota | Peso | Qué cae · dónde me equivoco |
 |---|---|---|
