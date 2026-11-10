@@ -3,7 +3,7 @@
 
 [Programa](programa.md) · [Temas](temas.md) · [Sesiones](sesiones.md) · [Fuentes](fuentes.md) · [Análisis de exámenes](examenes/analisis.md)
 
-> Próxima fecha: **Parcial 2, fecha a confirmar** (temas 7 a 11, NoSQL y nube: bloque 2, más abajo). El Parcial BT1 (temas 1 a 6) fue el 2026-10-06. Ver
+> Próxima fecha: **2026-11-17 · Parcial 2** (temas 7 a 11, NoSQL y nube: bloque 2, más abajo). El Parcial BT1 (temas 1 a 6) fue el 2026-10-06. Ver
 > [calendario](../../calendario.md).
 
 > Las notas salen de las **clases 1 a 6 de 2026** y de las **bitácoras de laboratorio del grupo** (PostgreSQL), escritas
