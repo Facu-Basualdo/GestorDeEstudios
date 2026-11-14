@@ -151,19 +151,19 @@ Casos de uso y arquitectura se equilibran: los casos de uso dicen **qué** tiene
 | **Construcción** | **Desarrollar** el producto | **Software ejecutable** casi completo, todos los casos de uso definidos; no libre de errores |
 | **Transición** | **Instalarlo** y que lo usen los usuarios finales | Producto **funcionando en el sitio del cliente**, con correcciones y casos de uso menores |
 
-- **Inicio** (p. 29): ser iterativo e incremental lo hace menos riesgoso. El **modelo de negocio** describe el dominio en alto nivel; su caso especial es el **modelo de dominio** (clases conceptuales).
-- **Elaboración** (p. 30): al final la arquitectura tiene que estar definida, porque **cambiarla después cuesta mucho**; el PU admite cambios de requisitos, no de arquitectura. Se mira el proyecto más a largo plazo. Cuesta distinguirla de la construcción: la construcción es implementar el sistema final.
+- **Inicio** (p. 29): ser iterativo e incremental lo hace menos riesgoso. El **modelo de negocio** describe el dominio en alto nivel; su caso especial es el **modelo de dominio** (clases conceptuales). Además, valida si la solución propuesta resuelve el problema para los usuarios y clientes (`2do Parcial - Powers de Clase (2), pp. 143–145`).
+- **Elaboración** (p. 30): al final la arquitectura tiene que estar definida, porque **cambiarla después cuesta mucho**; el PU admite cambios de requisitos, no de arquitectura. Se fija la **línea base de la arquitectura** (`2do Parcial - Powers de Clase (2), pp. 143–145`) y se llega a capturar cerca del **80% de los requisitos** (`Apunte Ivo 2do Parcial, p. 190`, apunte de estudiante), a diferencia de Construcción (donde se implementa el sistema final). Trampa de `Segundo Parcial Teoria 2024, P10` *(cátedra)*: "captura casos de uso hasta ~80%" y "crea una línea base de la arquitectura" son **distractores de Inicio**; Inicio es **delimitar el alcance** y **demostrar a usuarios o clientes que el sistema propuesto resuelve su problema**. Se mira el proyecto más a largo plazo. Cuesta distinguirla de la construcción: la construcción es implementar el sistema final.
 - **Construcción** (p. 31): el artefacto más importante es el **ejecutable**.
 - **Transición** (p. 32): los artefactos son los mismos que en construcción. No es mantenimiento: se corrigen detalles que no se vieron al construir.
 
 ### Flujos de trabajo y disciplinas
 
-- **Flujo de trabajo fundamental** (*core workflow*) = **disciplina**: un agrupamiento de actividades que, al ejecutarse, toma una secuencia y lo realizan los trabajadores (doc 13, pp. 20 y 27).
+- **Flujo de trabajo fundamental** (*core workflow*) = **disciplina**: un agrupamiento de actividades que, al ejecutarse, toma una secuencia y lo realizan los trabajadores (doc 13, pp. 20 y 27). Se distingue del **flujo de trabajo de la iteración**, que representa el trabajo concreto dentro de una iteración particular (`2do Parcial - Powers de Clase (2), p. 134`).
 - La cascada es fácil de entender pero no es realista: el PU toma sus disciplinas y las **repite en cada iteración**.
-- **Disciplinas básicas**: **requisitos → análisis → diseño → implementación → prueba** (p. 33):
+- **Disciplinas básicas**: **requisitos → análisis → diseño → implementación → prueba** (p. 33) — ver detalle por disciplina en [Flujos de trabajo del PU](flujos-de-trabajo-del-pu.md):
   - **Requisitos**: se arma el **modelo de casos de uso**.
-  - **Análisis**: un modelo **conceptual**, con menos detalle.
-  - **Diseño**: llevar esas clases a una **tecnología** (lenguaje, ventanas, framework); el modelo es más físico.
+  - **Análisis**: un modelo **conceptual**, con menos detalle; también **realiza casos de uso**, pero de manera conceptual (`2do Parcial - Powers de Clase (2), p. 129`).
+  - **Diseño**: llevar esas clases a una **tecnología** (lenguaje, ventanas, framework); realiza los casos de uso de forma física (`2do Parcial - Powers de Clase (2), p. 129`).
   - **Implementación**: **ejecutables** y componentes.
   - **Prueba**: casos y procedimientos de prueba.
 - **Cómo cambia el énfasis** (doc 14, p. 2): en las primeras iteraciones pesan **requisitos y análisis**; en las últimas, **diseño, implementación y prueba**.
@@ -177,9 +177,9 @@ Casos de uso y arquitectura se equilibran: los casos de uso dicen **qué** tiene
 
 ### Conceptos clave
 
-- **Trabajador** (*worker*): el nombre abstracto del **rol** que cumple una persona; un **concentrador de responsabilidades**. En un proyecto, a cada trabajador se le asigna una o más personas. En **RUP** se llama **rol** (doc 13, pp. 22 y 27).
+- **Trabajador** (*worker*): el nombre abstracto del **rol** que cumple una persona; un **concentrador de responsabilidades**. En un proyecto, a cada trabajador se le asigna una o más personas. En **RUP** se llama **rol** (doc 13, pp. 22 y 27). El **Arquitecto** participa en requisitos, análisis, diseño e implementación (sólo sale en prueba) (`2do Parcial - Powers de Clase (2), pp. 136, 157`).
 - **Actividad**: una responsabilidad bien definida de un trabajador dentro de un flujo, con **artefactos de entrada** que usa y **de salida** que produce.
-- **Artefacto**: cualquier producto o parte del sistema: modelos, ejecutables, prototipos de interfaz. (Lo que en UML era un "artefacto", en el PU es un **componente**.)
+- **Artefacto**: cualquier producto o parte del sistema: modelos, ejecutables, prototipos de interfaz. (Lo que en UML era un "artefacto", en el PU es un **componente**.) Los artefactos se mantienen **versionados** a lo largo de las iteraciones (`2do Parcial - Powers de Clase (2), pp. 136, 157`). Dentro de las **4P+H** (cuatro P más Herramientas), el Apéndice C clasifica herramientas de requisitos, modelado visual, programación, QA/regresión y control de versiones/configuración/defectos (`2do Parcial - Powers de Clase (2), p. 121`).
 - **Modelo**: es **autocontenido**: se entiende solo, aunque tenga **relaciones de traza** con otros. La traza **une sin agregar información** (por eso los modelos siguen siendo autocontenidos), aunque para construir un modelo se dependa del anterior.
 - **PUDS vs. RUP** (p. 26): RUP deriva del PU y a veces se lo llama "proceso unificado", pero no son lo mismo. RUP usa **rol** en vez de trabajador, tiene **más disciplinas** (y junta algunas del PU) y **mucho más detalle**.
 

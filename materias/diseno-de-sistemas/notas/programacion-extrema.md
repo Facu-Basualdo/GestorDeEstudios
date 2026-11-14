@@ -128,7 +128,7 @@
 - **Centrales**: **cambio incremental** (entregas estimadas en 2 semanas, 4 como máximo) y **trabajo de calidad** (mantiene motivado al equipo).
 - **Secundarios**: **pequeña inversión inicial** (un presupuesto acotado al principio mantiene el foco) · **adaptación local** (cambia en cada proyecto) · **viaje liviano** (sólo los artefactos indispensables: el único necesario es el código, que en muchos proyectos es la documentación).
 
-**Actividades básicas** (p. 20), mnemotecnia **PPED**: **programar** (la principal) · **probar** (central: dice si el código funciona) · **escuchar** (retroalimentación, por ejemplo del cliente) · **diseñar** (poco foco, sólo para mejorar lo hecho).
+**Actividades básicas** (p. 20), mnemotecnia **PPED**: **programar / codificar** (la principal) · **probar** (central: dice si el código funciona) · **escuchar** (retroalimentación, por ejemplo del cliente) · **diseñar** (poco foco, sólo para mejorar lo hecho). Trampa de examen: **analizar** y **planificar** no figuran entre estas cuatro actividades básicas (`Segundo Parcial Teoria 2024, P11`).
 
 En XP los diagramas están bien para comunicar con no desarrolladores, pero son descartables: **el código tiene que ser su propia documentación**.
 
@@ -153,11 +153,11 @@ En XP los diagramas están bien para comunicar con no desarrolladores, pero son 
 - **Historia de usuario**: la escribe **el cliente**, en su lenguaje y sin terminología técnica, como algo que el sistema debe hacer. Cumple el mismo propósito que un caso de uso, pero **no es lo mismo**. Tiene el detalle justo para **estimarla**; el detalle fino se conversa cara a cara al implementarla. Dura **de 1 a 3 semanas** (más, se parte) y no incluye tecnología, base de datos ni algoritmos (doc 3, p. 29).
 - **Pruebas de aceptación**: salen de las historias; son de **caja negra**; el **cliente** es responsable de verificarlas. Una historia **no está terminada** hasta pasarlas. Se automatizan porque, bajo presión, las manuales se dejan de lado (p. 30).
 - **Pruebas del programador** (*test-first*): ciclos muy cortos de escribir una prueba y después el código; casi el 100% de cobertura. Cada vez que alguien sube código, **todas las pruebas tienen que pasar**.
-- **Spike**: solución muy sencilla para experimentar y **reducir el riesgo técnico** o **mejorar una estimación**.
+- **Spike (o *Architectural Spike*)**: solución muy sencilla (y en general descartable) para experimentar enfoques, **reducir incertidumbre o riesgo técnico** y **mejorar una estimación** antes de comprometerse con una solución definitiva (por ejemplo, probar una parte puntual de la API de AFIP al encarar un sistema de facturación; `2do Parcial - Powers de Clase (2), pp. 339–340`; `Copia de Simulación Parcial 2 ndfvjsnvk (IE3)`).
 
 ### Diseño en XP
 
-- **Diseño simple**: el diseño soporta **específicamente la funcionalidad requerida actualmente**. No se anticipan funcionalidades futuras (evita el sobrediseño) (doc 3, p. 28).
+- **Diseño simple**: el diseño soporta **específicamente la funcionalidad requerida actualmente**. No se anticipan funcionalidades futuras —opuesto a "implemente para hoy, diseñe para mañana"— (doc 3, p. 28; `2do Parcial - Powers de Clase (2), p. 335`). En un momento dado, XP considera correcto/simple el diseño cuando **ejecuta todas las pruebas** y **declara las intenciones importantes para los programadores** con la menor cantidad necesaria de clases y métodos (`2do Parcial - Powers de Clase (2), p. 335`; `2do recu parcial Teoria 2024, P16`).
 - El diseño **no se hace una sola vez al comienzo**: hay pasos de diseño en **cada planificación de entrega y de iteración**. Es **incremental e iterativo**, con **revisiones periódicas y refactorización**.
 - **Mejora del diseño (refactorización)**: proceso de diseño continuo (el nombre viene del libro de Martin Fowler) que **elimina código duplicado, aumenta la cohesión y baja el acoplamiento**. Se empieza con un diseño simple y bueno y se lo mantiene así todo el proyecto.
 - Lo que hace segura la refactorización son las **pruebas intensivas**: el diseño evoluciona sin romper lo hecho.

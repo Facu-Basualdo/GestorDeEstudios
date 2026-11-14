@@ -118,6 +118,7 @@
 | Objetos | Uno solo, sin indirección | Uno más, con indirección |
 
 - **Por eso Adapter es el único patrón en las dos filas de ámbito** (clase y objeto).
+- En clase se aclara que GoF usa "interfaz" como lo que la clase expone hacia afuera (no necesariamente el clasificador `interface`), que el adaptador se integra mediante **LSP y polimorfismo**, y que en ambas variantes hay cuatro participantes donde `Target` es el objetivo a adaptar (aunque `Client` falte en varios diagramas de ejemplo del libro) (`2do Parcial - Powers de Clase (2), pp. 300–301`).
 - Variantes: **adaptadores conectables** (*pluggable*): la clase ya trae incorporada la adaptación a una **interfaz estrecha** (pocas operaciones), con operaciones abstractas, delegados o bloques · **adaptadores bidireccionales**: cumplen las dos interfaces, para que dos clientes vean el mismo objeto de forma distinta.
 
 ### Bridge
@@ -132,7 +133,7 @@
 ### Composite
 
 - **Intención**: componer objetos en **estructuras de árbol** para representar jerarquías **parte–todo**, y que los clientes traten **uniformemente** a los objetos individuales y a las composiciones (doc 2, pp. 163 y ss.).
-- **Motivación**: en un editor gráfico, el usuario agrupa primitivas (`Line`, `Text`) en dibujos y los dibujos en otros dibujos. Sin Composite, el código tendría que distinguir primitivas de contenedores aunque el usuario no lo haga.
+- **Motivación**: en un editor gráfico, el usuario agrupa primitivas (`Line`, `Text`) en dibujos y los dibujos en otros dibujos. Sin Composite, el código tendría que distinguir primitivas de contenedores aunque el usuario no lo haga. En clase también se ejemplifica con un `soldado` individual frente a un `ejército de soldados`, tratados uniformemente mediante la operación `atacar` (`2do Parcial - Powers de Clase (2), p. 310`).
 - **Participantes**: `Component` (`Graphic`: interfaz común, comportamiento por defecto, gestión de hijos) · `Leaf` (`Rectangle`, `Line`, `Text`: sin hijos) · `Composite` (`Picture`: guarda hijos y les reenvía los pedidos) · `Client`.
 - **Consecuencias**: donde se espera un primitivo puede ir un compuesto · **simplifica el cliente** · es **fácil agregar componentes nuevos** · puede volver el diseño **demasiado general**: cuesta restringir qué puede contener un compuesto (hay que controlarlo en ejecución).
 - **Transparencia vs. seguridad**: si `Add`/`Remove` se declaran en `Component`, todo se trata igual pero se le pueden agregar hijos a una hoja (inseguro). Si se declaran sólo en `Composite`, es seguro pero las hojas y los compuestos tienen interfaces distintas. **GoF prioriza la transparencia** (con `Add` y `Remove` que fallan por defecto).

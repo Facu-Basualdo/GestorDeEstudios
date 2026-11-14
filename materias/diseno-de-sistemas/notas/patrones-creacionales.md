@@ -102,6 +102,7 @@
   3. **Promueve la consistencia** entre productos.
   4. **Dificulta agregar tipos nuevos de productos**: la interfaz fija el conjunto; extenderla obliga a cambiar la fábrica abstracta y todas sus subclases.
 - **Implementación**: normalmente hay una sola fábrica concreta por familia → **Singleton**. Cada producto se crea con un **Factory Method**; si hay muchas familias, con **Prototype**. Una variante más flexible (y menos segura) recibe el tipo de producto por parámetro.
+- En clase se ilustra con familias de mundos (`MundoMedieval` / `MundoFuturista` con armas y personajes propios que comparten la misma familia sin mezclarse) (`2do Parcial - Powers de Clase (2), pp. 305–307`).
 - En Lexi resuelve el soporte de **múltiples estándares de apariencia** (ver [fundamentos](fundamentos-de-patrones-de-diseno.md#Caso%20de%20estudio:%20el%20editor%20Lexi)).
 
 ### Builder
@@ -122,7 +123,7 @@
   - **Desventaja**: a veces hay que subclasificar el `Creator` sólo para crear un producto concreto.
   - Da **ganchos** (*hooks*) a las subclases: más flexible que crear el objeto directamente.
   - **Conecta jerarquías de clases paralelas**, localizando el conocimiento de qué clases van juntas.
-- **Implementación**: `Creator` abstracto (obliga a redefinir) o concreto (con implementación por defecto) · **métodos parametrizados** (un parámetro indica el tipo de producto) · en C++ no se llama desde el constructor; se usa inicialización perezosa · conviene un nombre que lo delate (`DoMakeClass()`).
+- **Implementación**: `Creator` abstracto (obliga a redefinir) o concreto (con implementación por defecto) · **métodos parametrizados** (un parámetro indica el tipo de producto) · en C++ no se llama desde el constructor; se usa inicialización perezosa · conviene un nombre que lo delate (`DoMakeClass()`). Los frameworks se apoyan en este patrón con clases abstractas cuyo método se redefine (*override*) en las subclases, aplicando **LSP y polimorfismo** (`2do Parcial - Powers de Clase (2), pp. 296–298`).
 
 ### Prototype
 
@@ -138,7 +139,7 @@
 - **Intención**: asegurar que una clase tenga **una sola instancia** y proveer un punto de acceso global a ella. La instancia es un objeto normal; lo que cambia es que la clase está escrita para que sólo se pueda crear uno (doc 2, pp. 127 y ss.).
 - **Implementación**:
   - operación de clase `Instance()` con **inicialización perezosa**: crea el objeto la primera vez y lo guarda en un atributo estático `_instance`;
-  - **constructor protegido** para impedir la instanciación directa;
+  - **constructor protegido o privado** para impedir la instanciación directa (`2do Parcial - Powers de Clase (2), p. 299`);
   - evitar objetos globales o estáticos (problemas de orden de inicialización).
 - La instancia única puede ser de una **subclase**: se elige en `Instance()` (por ejemplo, con una variable de entorno, como `MAZESTYLE` para `BombedMazeFactory` o `EnchantedMazeFactory`) o con un **registro de singletons**.
 - **Beneficios**: acceso controlado · reduce el espacio de nombres (en lugar de variables globales) · permite refinar por subclases · permite pasar a un número variable de instancias · más flexible que las operaciones de clase.

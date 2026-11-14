@@ -138,11 +138,11 @@ Bass da **trece razones** (doc 59, pp. 44–57). Las filminas las resumen (doc 1
   - **grande**: **sistemas empresariales** complejos que incluyen otros sistemas, programas y componentes, quizás distribuidos y de distintas empresas (caps. 17 y 18).
 - **Ventajas de diseñarla y documentarla explícitamente**: 1) comunicación con los interesados; 2) análisis del sistema; 3) reutilización a gran escala.
 - **Decisiones del diseño arquitectónico**: cómo se distribuye en el hardware · qué estrategia de control usar · cómo se documenta · cómo se organizan los requisitos no funcionales · qué patrones o estilos usar · cómo se descomponen los componentes · cuál es el enfoque fundamental (por ejemplo, repositorio o tuberías y filtros).
-- **Modelos arquitectónicos**: se usan para **fomentar el debate** (abstractos, de alto nivel, para comunicarse, planificar y repartir tareas) o para **documentar** una arquitectura ya diseñada (completos, con componentes, interfaces y conexiones).
+- **Modelos arquitectónicos**: se usan para **fomentar el debate** (abstractos, de alto nivel, para comunicarse, planificar y repartir tareas) o para **documentar** una arquitectura ya diseñada (completos, con componentes, interfaces y conexiones). Las vistas se diseñan para comunicar la arquitectura a los distintos interesados (*stakeholders*) durante el diseño arquitectónico.
 
 ### Arquitectura y atributos de calidad
 
-- **Atributo de calidad**: propiedad **no funcional y medible** que indica qué tan bien el sistema satisface a los interesados. La capacidad de cumplirlos está determinada **sustancialmente por la arquitectura** (doc 12, p. 11).
+- **Atributo de calidad**: propiedad **no funcional y medible** que indica qué tan bien el sistema satisface a los interesados. La capacidad de cumplirlos está determinada **sustancialmente por la arquitectura** (doc 12, p. 11; ver detalle completo en [Atributos de calidad y tácticas](atributos-de-calidad-y-tacticas.md)).
 - **Los requisitos no funcionales determinan la forma de la arquitectura**; los funcionales sólo ayudan. Al arquitecto la funcionalidad le interesa en cuanto interactúa con las otras cualidades y las restringe.
 - **Escenario de atributo de calidad** (p. 14): la forma precisa de especificarlo para **evaluar la arquitectura**. Partes: **fuente** (de dónde viene), **estímulo**, **artefacto** (qué se ve afectado), **entorno** (normal, con fallas…), **respuesta** y **medición** (si no se mide, no se sabe si la decisión fue buena).
 - **Qué arquitectura según el atributo prioritario** (Sommerville, en doc 12, pp. 36 y 40):
@@ -166,13 +166,13 @@ Bass agrupa las estructuras en tres familias (doc 59, pp. 22–33; doc 12, pp. 5
 
 | Familia | Qué muestra | Preguntas que responde | Ejemplos |
 |---|---|---|---|
-| **De módulos** | Unidades de **implementación**; vista **estática**. Es lo más parecido a UML | ¿Qué hace cada módulo? ¿Qué usa? ¿Quién depende de él? | Descomposición, usos, capas, clases, modelo de datos |
-| **De componentes y conectores** (C&C) | Elementos **en ejecución** (procesos, servicios, clientes, servidores, filtros) y sus **interacciones** | ¿Qué corre y cómo interactúa? ¿Qué se replica? ¿Qué corre en paralelo? | Servicios, concurrencia |
-| **De asignación** | Cómo el software se asigna a lo que **no es software** | ¿En qué procesador corre? ¿En qué archivo está? ¿Qué equipo lo hace? | Despliegue, implementación, asignación de trabajo |
+| **De módulos** | Unidades de **implementación**; vista **estática**. Es lo más parecido a UML | ¿Qué hace cada módulo? ¿Qué otros módulos usa? ¿Qué módulos se relacionan por **herencia (generalización/especialización)**? | Descomposición, usos, capas, clases, esquema/modelo de datos |
+| **De componentes y conectores** (C&C) | Elementos **en ejecución** (procesos, hilos, servicios, clientes, servidores, filtros, colas) y sus **interacciones** | ¿Cuáles son los componentes ejecutables y cómo interactúan? ¿Qué se **replica**? ¿Qué corre en **paralelo**? | Servicios, concurrencia, cliente-servidor (`2do recu parcial Teoria 2024, P10`) |
+| **De asignación** | Cómo el software se asigna a lo que **no es software** (entorno físico, archivos, equipos) | ¿En qué **procesador** corre? ¿En qué **directorios o archivos** se almacena durante desarrollo/pruebas/construcción? ¿Qué equipo lo hace? | Despliegue, implementación, asignación de trabajo (`Segundo Parcial Teoria 2024, P9`) |
 
 - Las de módulos son la herramienta principal para razonar sobre la **modificabilidad**; las C&C, sobre **rendimiento, seguridad y disponibilidad**.
 - Las estructuras se relacionan entre sí (un módulo puede ser varios componentes en ejecución: en un cliente–servidor hay 2 módulos y 11 componentes). Se documentan **sólo las que rinden** ("menos es más").
-- **Vista**: representación de un conjunto de elementos y sus relaciones. **Documentar una arquitectura es documentar sus vistas relevantes**. Nunca alcanza **un solo diagrama**.
+- **Vista**: representación de un conjunto de elementos y sus relaciones. **Documentar una arquitectura es documentar sus vistas relevantes**. Nunca se debe modelar una arquitectura con **un solo diagrama**, porque cada vista prioriza información distinta y omite otra (`2do Parcial - Powers de Clase (2), p. 96`).
 
 ### Vistas 4+1
 

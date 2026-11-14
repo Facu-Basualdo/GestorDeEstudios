@@ -91,7 +91,7 @@
 
 - Un **patrón arquitectónico** es la abstracción de una **buena práctica probada** en distintos sistemas y entornos, presentada como **problema y solución de alto nivel**. Debería decir **cuándo conviene usarlo y cuándo no** (doc 12, p. 41).
 - En la materia, **estilo y patrón se toman como iguales**; Sommerville, en las últimas ediciones, pasó a llamar "patrón" a lo que antes era "estilo".
-- En Bass, un patrón **empaqueta varias tácticas** y hace concesiones entre atributos de calidad. No hay patrones para todo: a veces se combinan tácticas sueltas (ver [arquitectura de software](arquitectura-de-software.md#Arquitectura%20y%20atributos%20de%20calidad)).
+- En Bass, un patrón **empaqueta varias tácticas** y hace concesiones entre atributos de calidad. No hay patrones para todo: a veces se combinan tácticas sueltas (ver [arquitectura de software](arquitectura-de-software.md#Arquitectura%20y%20atributos%20de%20calidad) y [atributos de calidad y tácticas](atributos-de-calidad-y-tacticas.md)).
 - Los cuatro que pide el programa:
 
 | Estilo | Idea | Cuándo | Problema principal |
@@ -115,8 +115,8 @@
 ### Repositorio y pizarrón
 
 - Un **componente central contiene los datos** de los demás componentes, y la comunicación entre ellos es **sólo a través del repositorio**: no hay comunicación directa (doc 12, p. 41).
-  - Si el componente central es **pasivo** (no emite señales), es un **repositorio**.
-  - Si toma un **rol activo**, es un **pizarrón** (*blackboard*): da soporte a operaciones no determinísticas.
+  - Si el componente central es **pasivo** (los otros componentes disparan la acción sobre los datos), es un **repositorio**.
+  - Si toma un **rol activo** (el estado o la llegada de datos al componente central dispara a los componentes/agentes), es un **pizarrón** (*blackboard*): da soporte a operaciones no determinísticas (`2do Parcial - Powers de Clase (2), pp. 75–76`).
 - **Cuándo usarlo**: con **grandes volúmenes de información** que se guardan mucho tiempo · en sistemas **guiados por datos**, donde incluir un dato dispara una acción.
 - **Ventajas**: los componentes son **independientes** y no se conocen · los cambios de uno se propagan a todos · los datos se manejan de forma **consistente** · el **backup** es más fácil (todo en un lugar).
 - **Desventajas**: **punto único de falla** · **cuello de botella** por centralizar toda la comunicación · **difícil de distribuir** en varias computadoras.
@@ -134,7 +134,7 @@
 
 - Un **núcleo** con la funcionalidad básica y **variantes especializadas (plug-ins)** que le agregan funcionalidad mediante un **conjunto fijo de interfaces**. Se vinculan al compilar o después (doc 12, pp. 23 y 41).
 - Se parte de un **núcleo al que se le van agregando cosas**, a diferencia de un sistema central completo. Los plug-ins cargados en **ejecución** dan más **modificabilidad** (no hay que recompilar todo).
-- Ejemplos: un **sistema operativo** con un micronúcleo (memoria, hilos, comunicación entre procesos) y los controladores como plug-ins · **Chrome** y sus extensiones · **Visual Studio** · un sistema de reclamos con un plug-in por zona.
+- Ejemplos: un **sistema operativo** con un micronúcleo (memoria, hilos, comunicación entre procesos) y los controladores como plug-ins · **Eclipse IDE** (núcleo para gestión de recursos, proyectos e interfaz y plug-ins separados por lenguaje como Java, Python o C++; `Segundo Parcial Teoria 2024, P13`) · **Chrome** y sus extensiones · **Visual Studio** · un sistema de reclamos con un plug-in por zona (`2do Parcial - Powers de Clase (2), pp. 82–85`).
 - **Beneficios**: extensión **controlada** del producto · los plug-ins los pueden hacer **otros equipos u organizaciones** (dos mercados) · evolucionan **independientemente** del núcleo mientras las interfaces no cambien.
 - **Desventaja**: al venir de terceros, es más fácil que traigan **vulnerabilidades y amenazas a la privacidad**.
 

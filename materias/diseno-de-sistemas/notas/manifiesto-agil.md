@@ -220,6 +220,8 @@ Aportes de Crystal a la cultura de equipo:
 - **Seguridad psicológica**: nadie tiene miedo de opinar; en Crystal, "poder proponer". En XP es el valor del **respeto**.
 - **Mejora reflexiva**: antecesora de las **retrospectivas**.
 
+En las filminas de cátedra también se menciona el **post-agilismo** (`2do Parcial - Powers de Clase (2), p. 344`): tras el Manifiesto Ágil surgieron múltiples variantes diluidas de marcos más estructurados, seguidas de un retorno a los fundamentos cuando se perdió su sentido original. (Los exámenes evalúan especialmente la entrega frecuente de software funcional, la colaboración con el cliente sobre negociación contractual y el trabajo diario conjunto entre negocio y desarrolladores: `Segundo Parcial Teoria 2024, P4`; `2do recu parcial Teoria 2024, P11`.)
+
 ## Dónde me equivoco
 
 _Sin errores registrados todavía._ Trampas de los cuestionarios: invertir los valores del Manifiesto; creer que descarta la documentación; la duración de iteración de Scrum (un mes, no una semana).

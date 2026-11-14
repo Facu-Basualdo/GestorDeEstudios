@@ -129,7 +129,7 @@
 
 - **GRASP** (Larman): nueve principios o patrones básicos de diseño OO que sirven de **ayuda para aprender a asignar responsabilidades** a los objetos de forma metódica, racional y explicable (doc 33, pp. 1–21).
 - Se piensa en responsabilidades al codificar o al modelar. En UML, **dibujar diagramas de interacción** es el momento de decidir responsabilidades, y GRASP guía esas decisiones.
-- ¿Patrones o principios? Larman cita a los GoF: "el patrón de una persona es el bloque de construcción primitivo de otra". Lo importante es que el nombre ayuda a recordar ideas clásicas de diseño.
+- ¿Patrones o principios? Larman cita a los GoF: "el patrón de una persona es el bloque de construcción primitivo de otra". Lo importante es que el nombre ayuda a recordar ideas clásicas de diseño. En clase se agrupan en tres bloques (`2do Parcial - Powers de Clase (2), p. 14`): **asignación básica** (Creador, Experto en información, Controlador), **evaluación de alternativas** (Bajo acoplamiento, Alta cohesión) y **contención del impacto del cambio** (Fabricación pura, Variaciones protegidas, Polimorfismo, Indirección).
 
 | Patrón | Problema que resuelve |
 |---|---|
@@ -167,7 +167,7 @@ B debe crear instancias de A si (doc 1, pp. 30–32; doc 33):
 
 Ejemplos: `Cliente` contiene, persiste, conoce el id y usa `Pedido` → `Cliente` crea `Pedido`. En NextGen, `Sale` agrega `SalesLineItem` → `Sale.makeLineItem()`.
 
-- **Por qué**: el creador ya está conectado con lo que crea, así que no suma acoplamiento.
+- **Por qué**: el creador ya está conectado con lo que crea, así que no suma acoplamiento. Creador no se confunde con el constructor de la clase: determina **qué objeto tiene la responsabilidad de invocar al constructor** (por ejemplo, `Tablero` crea a `Cuadrado`) (`2do Parcial - Powers de Clase (2), p. 14`).
 - **Contraindicación**: si crear es complejo (reciclar instancias, crear condicionalmente una familia de clases), se delega a una *Factory* (ver [patrones creacionales](patrones-creacionales.md)).
 
 ### Controlador
@@ -200,8 +200,8 @@ Formas de que X se acople a Y: X tiene un atributo de tipo Y, llama a servicios 
 Tipos de acoplamiento en el doc 1 (p. 25): **de contenido** (un módulo referencia directamente el contenido de otro), **común** (comparten una variable global) y **de control** (uno le manda al otro un elemento que decide su lógica).
 
 - Es un principio **evaluativo**: se tiene en cuenta en todas las decisiones.
-- Una **subclase está fuertemente acoplada** a su superclase: heredar es una decisión cuidadosa.
-- Llevado al extremo (cero acoplamiento) contradice la idea de objetos que colaboran con mensajes.
+- Una **subclase está fuertemente acoplada** a su superclase (`la herencia también es un tipo de acoplamiento`; `2do Parcial - Powers de Clase (2), p. 17`): heredar es una decisión cuidadosa.
+- Llevado al extremo (cero acoplamiento) contradice la idea de objetos que colaboran con mensajes y destruye la cohesión (`2do Parcial - Powers de Clase (2), p. 17`).
 - **Elegí tus batallas**: el problema no es el acoplamiento alto sino el acoplamiento a elementos **inestables**. Acoplarse a `java.util` no preocupa; a calculadoras de impuestos de terceros, sí.
 
 **Cohesión**: cuán relacionadas y enfocadas están las responsabilidades de un elemento. Con alta cohesión, una clase tiene pocos métodos, muy relacionados, y colabora si la tarea es grande. Con baja cohesión es difícil de entender, reutilizar y mantener, y es frágil.

@@ -141,7 +141,7 @@ Composition* slick = new Composition(new TeXCompositor);
   5. **Desventaja**: el cliente tiene que conocer las estrategias para elegir.
   6. **Desventaja**: sobrecarga de comunicación (la interfaz común puede pasar datos que alguna estrategia no usa).
   7. **Desventaja**: más objetos (se mitiga compartiendo estrategias sin estado, como flyweights).
-- En Lexi resuelve el **formateo**.
+- En Lexi resuelve el **formateo**. En clase se ejemplifica también con estrategias de ataque de personajes (cuerpo a cuerpo, a distancia y mágico intercambiables en ejecución) y se remarcan dos diferencias clave: frente a State, **Strategy depende de una elección externa** mientras State depende de valores internos; frente a Template Method, **Strategy usa composición** en tiempo de ejecución y Template Method usa herencia en compilación (`2do Parcial - Powers de Clase (2), pp. 308–309`).
 
 ### State
 
@@ -150,7 +150,7 @@ Composition* slick = new Composition(new TeXCompositor);
 - **Aplicabilidad**: el comportamiento depende del estado y cambia en ejecución · hay **condicionales grandes que dependen del estado** (constantes enumeradas): cada rama pasa a una clase.
 - **Participantes**: `Context` (`TCPConnection`) · `State` (`TCPState`) · `ConcreteState` (`TCPEstablished`, `TCPListen`, `TCPClosed`).
 - **Consecuencias**: localiza el comportamiento de cada estado en un objeto (más clases, pero sin condicionales esparcidos) · hace **explícitas las transiciones** (son atómicas: se reasigna una variable) · los estados sin atributos **se pueden compartir** (flyweights).
-- **¿Quién define las transiciones?** El patrón no lo fija: el contexto (si los criterios son fijos) o, más flexible, cada estado conoce a su sucesor. Alternativa: tablas de transiciones (más regulares pero menos explícitas).
+- **¿Quién define las transiciones?** El patrón no lo fija: el contexto (si los criterios son fijos) o, más flexible, cada estado conoce a su sucesor. Alternativa: tablas de transiciones (más regulares pero menos explícitas). En examen se evalúa aplicarlo sobre cadenas de `if/else` de estado (como `UserAccount` en C#): cada estado pasa a su clase propia y el contexto deja de concentrar la lógica específica de cada estado (`Segundo Parcial Teoria 2024, P2`).
 
 ### Observer
 

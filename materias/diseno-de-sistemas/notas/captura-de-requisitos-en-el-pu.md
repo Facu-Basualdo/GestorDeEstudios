@@ -135,6 +135,17 @@
   - los **generales** van en la **lista de requisitos suplementarios**;
   - los propios de un caso de uso son sus **requisitos especiales** (sinónimo de no funcionales).
 - Los casos de uso también sirven como **agrupadores** de requisitos.
+- **Cuatro pasos resumidos** y artefactos resultantes (`2do Parcial - Powers de Clase (2), p. 154`):
+  1. **Enumerar requisitos candidatos** → Lista de características.
+  2. **Comprender el contexto del sistema** → Modelo del dominio o del negocio.
+  3. **Capturar requisitos funcionales** → Modelo de casos de uso.
+  4. **Capturar requisitos no funcionales** → Requisitos adicionales o casos de uso concretos (cuando aplican a un CU específico).
+- **Subtipos de requisitos adicionales (o suplementarios)** (sección 6.7 en `2do Parcial - Powers de Clase (2), p. 154`):
+  - **De interfaz**: especifica la interfaz con un elemento externo o restricciones de formatos, tiempos o factores de interacción.
+  - **Físicos**: características físicas del sistema o su hardware (material, forma, tamaño, peso, configuraciones físicas de red).
+  - **Restricciones de diseño**: limitan el diseño (extensibilidad, mantenibilidad, reutilización de sistemas heredados).
+  - **Restricciones de implementación**: limitan la codificación/construcción (estándares, normas de codificación, lenguajes, políticas de integridad de base de datos, limitaciones de recursos, entornos operativos).
+  - **Requisitos legales y normativas**.
 
 ### Trabajadores y artefactos
 
@@ -142,7 +153,7 @@
 
 | Trabajador | Responsable de |
 |---|---|
-| **Analista de sistemas** | Encontrar actores y casos de uso y **estructurar el modelo**; tiene la **visión completa** |
+| **Analista de sistemas** | Encontrar actores y casos de uso y **estructurar el modelo**; tiene la **visión completa**, dirige el modelado y coordina la captura de requisitos, aunque **no** es responsable de detallar cada CU en particular (`2do Parcial - Powers de Clase (2), p. 159`) |
 | **Arquitecto** | **Priorizar** los casos de uso (está presente en todos los flujos) |
 | **Especificador de casos de uso** | **Detallar** cada caso de uso (sólo ve el suyo) |
 | **Diseñador de interfaz de usuario** | **Prototipar** la interfaz |
@@ -155,6 +166,7 @@
 - **Glosario**: los términos comunes; sale de encontrar actores y casos de uso y sirve para el análisis.
 - **Prototipo de interfaz de usuario**.
 - **Requisitos adicionales** (o suplementarios).
+- **No pertenecen a Requisitos**: diagramas de clases de diseño, realizaciones de casos de uso ni componentes pertenecen a análisis, diseño o implementación (`2do Parcial - Powers de Clase (2), pp. 158 y ss.`).
 
 ### El flujo de trabajo de requisitos
 
@@ -175,6 +187,31 @@ Detalles:
 - **Detallar**: lo más importante es la **descripción textual**; si se vuelve inentendible, se formaliza con diagramas (el **de actividades** especifica qué hace). Puede participar más de una persona.
 - **Prototipar la interfaz**: sirve para **validar** los casos de uso (¿se entendieron bien?) y pueden aparecer nuevos. La calidad del prototipo depende de cuánto importe la **usabilidad**: de un dibujo a mano alzada a uno **navegable** (más caro). El usuario **ve** lo que se construye y da mejor retroalimentación.
 - **Estructurar**: se agregan relaciones de **inclusión, extensión y generalización** y se extraen los caminos comunes. Los diagramas tienen que seguir siendo **entendibles para el cliente**.
+
+### Realización de casos de uso (convenciones de la cátedra)
+
+- **Qué es y dos aspectos** (`2do Parcial - Powers de Clase (2), pp. 167–168`): describe cómo se realiza un caso de uso en el modelo de diseño en función de los **objetos que colaboran**, dejando explícita la relación entre requisitos y diseño. Tiene una **parte estática** (diagrama de clases intervinientes + tarjetas CRC) y una **parte dinámica** (diagrama de secuencia).
+- **Nueve pasos de realización** (`2do Parcial - Powers de Clase (2), p. 168`):
+  1. Describir textualmente el flujo de eventos del caso de uso.
+  2. Crear una realización del caso de uso.
+  3. Extender la descripción del caso de uso (si hace falta).
+  4. Encontrar clases de análisis a partir de la descripción del CU (identificando sustantivos como candidatas).
+  5. Describir las responsabilidades de las clases.
+  6. Establecer relaciones entre clases.
+  7. Distribuir el comportamiento entre las clases.
+  8. Describir atributos y asociaciones.
+  9. Determinar mecanismos necesarios de las clases *(la cátedra no realiza el paso 9 por corresponder al pasaje a base de datos, `p. 174`)*.
+- **Clases iniciales y filtrado de candidatas** (`2do Parcial - Powers de Clase (2), pp. 170, 174`):
+  - Toda realización de CU incorpora una clase **interfaz** (`UI<CasoDeUso>`) y una **controladora** (`CTRL<CasoDeUso>`).
+  - Preguntas filtro para incluir una clase candidata en el diagrama (`p. 170`): (1) ¿está dentro de los límites/dominio del sistema?, (2) ¿tiene un comportamiento identificable en el dominio?, (3) ¿tiene una estructura de datos identificable?, (4) ¿tiene relaciones con otras clases?
+- **Tarjetas CRC** (`2do Parcial - Powers de Clase (2), pp. 171–172`): **responsabilidad ≠ método** (los métodos implementan responsabilidades, aunque puede haber métodos sin responsabilidad asociada; la responsabilidad abarca el *conocer* y el *hacer*). Cada tarjeta documenta Clase/Propósito, Responsabilidades y Colaboraciones.
+- **Acuerdos prácticos de la cátedra** (`2do Parcial - Powers de Clase (2), pp. 174–175`):
+  - Incluir en el diagrama de clases **sólo las clases necesarias** para ese caso de uso.
+  - La clase de interfaz **colabora únicamente con el controlador**.
+  - En el diagrama de secuencia se dibuja **sólo el camino feliz** (no los flujos alternativos).
+  - Los **actores secundarios** se ubican del lado derecho al final (mismo formato que el actor izquierdo) y **no llevan interfaz ni controlador propio**: se les envía directamente la solicitud.
+  - Si se recupera **un solo objeto**, usar `get` sin recorrer toda la lista; sólo cuando no hay filtro al devolver una lista la cátedra admite devolver la lista completa.
+  - Una **consulta simple** puede ir directamente a la clase indicada sin pasar necesariamente por el controlador/sistema.
 
 ## Dónde me equivoco
 

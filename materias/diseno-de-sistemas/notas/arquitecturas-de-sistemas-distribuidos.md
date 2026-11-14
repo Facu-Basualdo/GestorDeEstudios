@@ -115,15 +115,15 @@
 
 ### Maestro-esclavo
 
-- Un componente central, el **maestro**, y **procesos esclavos** que hacen el trabajo. Son al menos **dos procesos distintos** (en la misma máquina o en varias) (doc 11, p. 7).
-- Sommerville lo plantea como un patrón para **aumentar el rendimiento**. Se usaba sobre todo para tener **datos distribuidos y duplicados** en distintos lugares, por **confiabilidad** o **performance** (típico en bases de datos).
+- Un componente central, el **maestro**, y **procesos esclavos** que hacen el trabajo. Son al menos **dos procesos distintos** (en la misma máquina o en varias) (`2do Parcial - Powers de Clase (2), p. 92`; doc 11, p. 7).
+- El **nodo maestro** suele encargarse del **cálculo, la coordinación y las comunicaciones**, y **controla los procesos esclavos** (`Copia de Simulación Parcial 2 ndfvjsnvk (IE3)`). Sommerville lo plantea como un patrón para **aumentar el rendimiento**. Se usaba sobre todo para tener **datos distribuidos y duplicados** en distintos lugares, por **confiabilidad** o **performance** (típico en bases de datos).
 - Los esclavos le mandan información al maestro, y cada tanto el maestro a los esclavos. **Los esclavos no necesariamente se conocen**.
 - En el programa figura como "maestro-esclavo (multiprocesador)".
 
 ### Cliente-servidor
 
-- Un **servidor** da servicios simultáneamente a **muchos clientes distribuidos** (ejemplo típico: un servidor web) (doc 12, p. 22; doc 11, pp. 12–13).
-- Secuencia: **descubrimiento** (el cliente inicia y ubica al servidor) e **interacción** (pedidos y respuestas).
+- Un **servidor** da servicios simultáneamente a **muchos clientes distribuidos** (ejemplo típico: un servidor web) (doc 12, p. 22; doc 11, pp. 12–13). **Clientes y servidores son procesos separados** que pueden ejecutarse **en la misma máquina o en máquinas diferentes** (`2do Parcial - Powers de Clase (2), pp. 77, 93`; `2do recu parcial Teoria 2024, P8`).
+- Secuencia: **descubrimiento** (algún mecanismo de descubrimiento permite al cliente ubicar los servidores disponibles) e **interacción** (pedidos y respuestas). Los servidores **no necesitan conocer de antemano a los clientes** (relación asimétrica), pero los clientes sí conocen qué servidores y servicios hay disponibles (`2do Parcial - Powers de Clase (2), p. 77`).
 - Servidor **sin estado**: cada pedido es independiente. **Con estado**: cada pedido identifica al cliente, hay "fin de sesión" y tiempos de expiración.
 - **Ventajas**: conexión dinámica (el servidor no conoce de antemano a los clientes: bajo acoplamiento) · no hay acoplamiento entre clientes · **escala** fácil · cliente y servidor **evolucionan por separado** · servicios comunes compartidos · la interacción con el usuario queda en el cliente.
 - **Desventajas**: la **red** puede retrasar mensajes y volver **impredecible el rendimiento** · hay que cuidar la **seguridad** y la integridad en redes compartidas.
@@ -152,14 +152,14 @@
 - Según el **W3C**: una aplicación compuesta por **servicios independientes** que puede brindar **cualquier proveedor** y que se pueden **cambiar incluso en ejecución**. La aplicación queda más liviana porque buena parte de los servicios está afuera (doc 11, p. 21).
 - SOA se centra en **qué hace**, no en cómo: la entiende la gente de negocio.
 - El servicio es **autocontenido**: se describe a sí mismo y tiene toda la información para que otros se conecten. Para usarlo, primero hay que **buscarlo**.
-- Estándares de servicios web: **SOAP** (intercambio de mensajes), la **interfaz**, que dice qué datos se necesitan (en la práctica, WSDL: *dato del tutor, no está en las filminas*) y **UDDI** (catálogo para **descubrir** servicios; cayó rápido en desuso). Como depende de estándares, no sufre incompatibilidades tecnológicas.
+- Estándares de servicios web: **SOAP** (intercambio de mensajes), la **interfaz**, que dice qué datos se necesitan (WSDL) y **UDDI** (catálogo para **descubrir** servicios; cayó rápido en desuso) (`2do Parcial - Powers de Clase (2), p. 109`). Como depende de estándares, no sufre incompatibilidades tecnológicas.
 - Hoy se usa poco en su forma original; su especialización son los **microservicios**.
 
 ### Microservicios
 
-- Servicios de **escala más chica** que SOA y, sobre todo, **autónomos**: cada uno se despliega como su propio nodo (doc 11, p. 25).
+- Servicios de **escala más chica** que SOA y, sobre todo, **autónomos**: cada uno se despliega como su propio nodo (doc 11, p. 25; `2do Parcial - Powers de Clase (2), pp. 110–113`).
 - Se relaciona con la **responsabilidad única** de [SOLID](principios-solid.md#S%20—%20Responsabilidad%20única).
-- Frente a la arquitectura **monolítica**: muy **escalable**, pero **más compleja** de manejar porque hay más módulos. Al estar todo tan dividido, hace falta una **capa de API** que junte los microservicios.
+- Frente a la arquitectura **monolítica**: muy **escalable**, pero **más compleja** de manejar porque hay más módulos. Al estar todo tan dividido, hace falta una **capa de API** (*API Layer*) que junte los microservicios. Como este estilo no figura desarrollado en Sommerville cap. 17, la cátedra recomienda el artículo de **Martin Fowler** y remarca que Arquitectura tiene alto peso en el examen (`2do Parcial - Powers de Clase (2), p. 113`).
 - **SaaS** (*software as a service*) **no es un patrón de arquitectura**: es un **modelo de entrega y negocio**. El software se aloja en forma remota (en la nube) y se usa por internet, y lo controla su dueño. Beneficios: sin licencias por dispositivo, actualizaciones y correcciones más baratas. Desventajas: mucha **carga de red**, y el cliente no controla la evolución del software. Se implementa más con componentes que con servicios.
 
 ## Dónde me equivoco

@@ -141,7 +141,7 @@
 ### S — Responsabilidad única
 
 - **Enunciado**: "There should never be more than one reason for a class to change" → no debería haber nunca más de una razón para cambiar una clase (doc 1, pp. 7–8).
-- **Interpretación**: la clase se concentra en una sola cosa; cuando cambia un requisito, el cambio afecta a esa clase por un único motivo.
+- **Interpretación**: la clase se concentra en una sola cosa; cuando cambia un requisito, el cambio afecta a esa clase por un único motivo. Como advierten las filminas, el peligro de llevarlo al extremo es terminar con muchas clases de una sola línea: se busca una clase **cohesiva** (si una mitad de los métodos usa un subconjunto y la otra mitad otro, conviene dividirla) (`2do Parcial - Powers de Clase (2), p. 3`).
 - **Ejemplo que no cumple**: `ICorreoElectronico` con `SetEmisor`, `SetReceptor` y `SetContenido`. Si cambia el contenido (tipos nuevos) o el protocolo (campos nuevos), hay que tocar `CorreoElectronico`: dos motivos de cambio.
 - **Solución**: el contenido pasa a una interfaz propia.
 
@@ -161,7 +161,7 @@ Ahora `CorreoElectronico` sólo cambia por emisor/receptor; los cambios de conte
 ### O — Abierto-cerrado
 
 - **Enunciado**: "Software entities (classes, modules, functions, etc.) should be open for extension, but closed for modification" (doc 1, pp. 9–11).
-- **Interpretación**: el comportamiento se cambia con **herencia, polimorfismo y composición**. Anticiparse al cambio: preparar el código para que lo nuevo se agregue, no se edite.
+- **Interpretación**: el comportamiento se cambia con **herencia, polimorfismo y composición**. Anticiparse al cambio: preparar el código para que lo nuevo se agregue, no se edite (sin exagerar de antemano: intentar hacerlo abierto/cerrado en exceso vuelve más complejo el diseño, así que conviene aplicarlo cuando surge la necesidad; `2do Parcial - Powers de Clase (2), p. 4`).
 - **Ejemplo que no cumple**: `EditorGrafico.DibujarForma(IForma)` hace un `switch` sobre `GetTipo()` y llama a `DibujaUnRectangulo` o `DibujaUnCirculo`. Cada forma nueva obliga a modificar el método y agregar otro privado: viola **OCP y también SRP**.
 - **Solución**: clase abstracta `Forma` con `abstract Dibujar()`; cada forma concreta se dibuja sola y el editor queda reducido a `forma.Dibujar()`.
 
@@ -190,6 +190,7 @@ Agregar una forma = crear una clase nueva que herede de `Forma`, sin tocar `Edit
 - **Ejemplo**: `ITrabajador` con `Trabajar`, `Descansar` y `Comer`; `Robot` queda obligado a implementar `Descansar` y `Comer`.
 - **Solución**: segregar en `ITrabajar`, `IDescansar`, `IComer` y que cada clase implemente las que necesita.
 - Beneficios (doc 10, p. 6): evita dependencias innecesarias y errores inesperados, y reutiliza código de forma más inteligente.
+- Aclaración frente a una redacción ambigua de los apuntes de clase (`2do Parcial - Powers de Clase (2), p. 6`): donde el texto dice "convertir unas interfaces en otras", eso corresponde al patrón **Adapter**; **ISP** en cambio **diseña o divide** interfaces grandes en interfaces pequeñas y cohesivas desde el principio.
 
 ### D — Inversión de dependencias
 

@@ -113,14 +113,15 @@
 
 - **De diseño**, en tres niveles: **arquitectónicos** (cliente-servidor, microservicios), **de diseño** y **de codificación**, también llamados idiomas o modismos (el nivel más bajo).
 - **De análisis**.
+- **De organización** (`2do Parcial - Powers de Clase (2), p. 291`).
 
 ### Cómo se documenta un patrón
 
 - **Forma canónica de Alexander** (doc 16, p. 6): componentes básicos + **nombre** (para comunicar) + **fuerzas** (características del contexto que ayudan a caracterizar el problema y la solución) + **ejemplos**. Puede sumar racionalidad y patrones relacionados.
-- **Formato GoF** (doc 16, p. 7): **clasificación** (en 3 categorías), **intención** (qué hace y qué resuelve), **aplicabilidad** (el contexto con otro nombre) y **estructura** (diagrama de clases), más consecuencias, implementación y código.
+- **Formato GoF** (doc 16, p. 7): **clasificación** (en 3 categorías), **intención** (qué hace y qué resuelve), **aplicabilidad** (el contexto con otro nombre) y **estructura** (diagrama de clases), más consecuencias, implementación y código. En las filminas y en la plantilla GoF no existen secciones tituladas `Contexto` ni `Pautas`: el contexto aparece dentro de *Aplicabilidad* (`2do Parcial - Powers de Clase (2), p. 292`; `Copia de Simulación Parcial 2 (IE3)`).
 - **Plantilla completa del libro** (doc 2, pp. 16–17): nombre y clasificación · intención · también conocido como · motivación · aplicabilidad · estructura · participantes · colaboraciones · consecuencias · implementación · código de ejemplo · usos conocidos · patrones relacionados.
 - **Catálogo de patrones**: patrones relacionados con una relación **débil**. **Sistema de patrones**: conjunto **más cohesivo**, los patrones se usan juntos para armar la solución (p. 9).
-- **Lenguaje de patrones** (Alexander): conjunto ordenado que genera edificios completos. Los GoF aclaran que su catálogo **no** es un lenguaje de patrones: no genera programas completos.
+- **Lenguaje de patrones** (Alexander / Coplien): conjunto ordenado que genera edificios o soluciones completas (`2do Parcial - Powers de Clase (2), p. 293`). Los GoF aclaran que su catálogo **no** es un lenguaje de patrones: no genera programas completos.
 
 ### Clasificación de los patrones GoF
 
