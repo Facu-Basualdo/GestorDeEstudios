@@ -7,7 +7,7 @@ import { ENTRA, nombreUnidad, unidadesDe } from '@/lib/util';
 import { Contenido } from './contenido';
 import { Ajustes, BotonEscuchar, useAjustesVoz, useLectura, useSesionDeVoz } from './escuchar';
 import { Peso, Rico } from './piezas';
-import { bloquesParaLeer, hablar, paraLeer } from '@/lib/voz';
+import { agrupar, bloquesParaLeer, hablar, paraLeer } from '@/lib/voz';
 
 const SELECCION = 'data-[selected=true]:bg-surface data-[selected=true]:font-semibold data-[selected=true]:shadow-sm';
 /** Alto disponible para las columnas fijas (índice de temas e índice de la página). */
@@ -29,12 +29,12 @@ export function Teoria({ materia, fuentes, lectura, onLeer, onPracticar, activo 
   const clave = fuente ? `fuente:${fuente.id}` : `nota:${tema?.id}`;
   const articulo = useRef<HTMLElement>(null);
 
-  // Lectura en voz alta de la nota, de a un fragmento (título, párrafo, ítem o fila de tabla).
+  // Lectura en voz alta de la nota, en tramos de varios párrafos (menos pausas).
   const [leyendo, setLeyendo] = useState(false);
   const [fragmento, setFragmento] = useState(0);
   const voz = useAjustesVoz();
   const fragmentos = useMemo(
-    () => [paraLeer(fuente?.titulo ?? tema?.titulo ?? ''), ...bloquesParaLeer(fuente?.bloques ?? tema?.bloques ?? [])].filter(Boolean),
+    () => agrupar([paraLeer(fuente?.titulo ?? tema?.titulo ?? ''), ...bloquesParaLeer(fuente?.bloques ?? tema?.bloques ?? [])].filter(Boolean)),
     [fuente, tema],
   );
   useEffect(() => {

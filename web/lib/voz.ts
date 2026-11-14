@@ -1,7 +1,7 @@
 // Lectura en voz alta con la síntesis de voz del navegador (Web Speech API).
 // No hay audio pregrabado: la voz la pone el sistema (las "Natural" de Edge suenan mejor).
 
-import { tramos } from './ingles';
+import { castellanizar } from './ingles';
 import type { Bloque } from './tipos';
 
 export const vozDisponible = () => typeof window !== 'undefined' && 'speechSynthesis' in window;
@@ -95,9 +95,12 @@ export function bloquesParaLeer(bloques: Bloque[]): string[] {
   return salida.filter(Boolean);
 }
 
-/** Chrome corta los enunciados largos a los ~15 s: se lee de a oraciones. */
-function trozos(texto: string): string[] {
-  if (texto.length <= 220) return [texto];
+/**
+ * Las voces de Google en Chrome cortan los enunciados largos a los ~15 s: con ellas se lee de a
+ * oraciones. Las demás leen el texto de una vez (cada enunciado nuevo suma una pausa).
+ */
+function trozos(texto: string, voz?: SpeechSynthesisVoice): string[] {
+  if (texto.length <= 220 || !/google/i.test(voz?.name ?? '')) return [texto];
   const salida: string[] = [];
   for (const oracion of texto.split(/(?<=[.!?])\s+(?=[\p{Lu}¿¡"(])/u)) {
     if (oracion.length <= 220) salida.push(oracion);
@@ -115,8 +118,22 @@ function trozos(texto: string): string[] {
   return salida.filter((s) => s.trim());
 }
 
-/** `vozIngles`: voz para los términos en inglés; '' = la mejor que haya, 'no' = leer todo en español. */
-export type OpcionesVoz = { velocidad: number; voz: string; vozIngles: string };
+/**
+ * Junta fragmentos seguidos hasta ~`max` caracteres: cada enunciado arranca con una pausa,
+ * así que leer de a párrafo corta demasiado. Los títulos quedan como una oración más.
+ */
+export function agrupar(fragmentos: string[], max = 700): string[] {
+  const salida: string[] = [];
+  for (const f of fragmentos) {
+    const conPunto = /[.!?:;…]$/.test(f) ? f : `${f}.`;
+    const ultimo = salida.at(-1);
+    if (ultimo !== undefined && ultimo.length + conPunto.length < max) salida[salida.length - 1] = `${ultimo} ${conPunto}`;
+    else salida.push(conPunto);
+  }
+  return salida;
+}
+
+export type OpcionesVoz = { velocidad: number; voz: string };
 
 // Referencia viva a los enunciados: si el recolector de basura se los lleva, Chrome no dispara onend.
 const enCurso = new Set<SpeechSynthesisUtterance>();
@@ -147,16 +164,11 @@ function decir(texto: string, voz: SpeechSynthesisVoice | undefined, o: Opciones
 /** Lee el texto entero; se corta al abortar la señal. */
 export async function hablar(texto: string, o: OpcionesVoz, señal: AbortSignal) {
   const es = voces('es');
-  const vozEs = es.find((v) => v.voiceURI === o.voz) ?? es[0];
-  const en = o.vozIngles === 'no' ? [] : voces('en');
-  const vozEn = en.find((v) => v.voiceURI === o.vozIngles) ?? en[0];
-  for (const t of trozos(texto)) {
-    // Los términos en inglés, con la voz en inglés; si no hay, todo con la voz en español.
-    const partes = vozEn ? tramos(t) : [{ texto: t, ingles: false }];
-    for (const p of partes) {
-      if (señal.aborted) return;
-      await decir(p.texto, p.ingles ? vozEn : vozEs, o, señal);
-    }
+  const voz = es.find((v) => v.voiceURI === o.voz) ?? es[0];
+  // Una sola voz: los términos en inglés van reescritos como suenan ("fáctori métod").
+  for (const t of trozos(castellanizar(texto), voz)) {
+    if (señal.aborted) return;
+    await decir(t, voz, o, señal);
   }
 }
 
