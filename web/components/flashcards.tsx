@@ -4,6 +4,8 @@ import { Button, Card, Checkbox, Separator, Typography } from '@heroui/react';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import type { Flashcard, IrATeoria, Materia, Nota, Tema } from '@/lib/tipos';
 import { filtrarPorTema, guardado, hash, mezclar, porPeso, type Filtro } from '@/lib/util';
+import { Ajustes, BotonEscuchar, useAjustesVoz, useLectura, useSesionDeVoz } from './escuchar';
+import { esperar, hablar, paraLeer } from '@/lib/voz';
 import { FiltroTemas, PanelSesion, Peso, Progreso, QueMejorar, Rico, filasPorTema, type Fallo } from './piezas';
 
 type Tarjeta = Flashcard & { tema: Tema; clave: string };
@@ -96,6 +98,44 @@ export function Flashcards({ materia, activo, historial, onCalificar, irATeoria,
 
   const { mazo, i, girada, vista, notas } = sesion;
   const actual = mazo[i];
+
+  // Modo audio: lee la pregunta, deja pensar, lee la respuesta y pasa sola a la siguiente
+  // (calificar mientras tanto también avanza). Se corta al salir de la pestaña.
+  const [escuchando, setEscuchando] = useState(false);
+  const [fase, setFase] = useState<'pregunta' | 'pausa' | 'respuesta' | 'calificar'>('pregunta');
+  const voz = useAjustesVoz();
+  useEffect(() => {
+    if (!activo) setEscuchando(false);
+  }, [activo]);
+  useSesionDeVoz(escuchando && activo);
+  useLectura(
+    escuchando && activo,
+    async (señal) => {
+      const o = voz.ref.current;
+      if (!actual) {
+        await hablar(mazo.length ? 'Terminaste el mazo.' : 'No hay tarjetas con este filtro.', o, señal);
+        if (!señal.aborted) setEscuchando(false);
+        return;
+      }
+      setSesion((s) => ({ ...s, girada: false }));
+      setFase('pregunta');
+      const tema = mazo[i - 1]?.tema.id !== actual.tema.id ? `${paraLeer(actual.tema.titulo)}. ` : '';
+      await hablar(tema + paraLeer(actual.q), o, señal);
+      if (señal.aborted) return;
+      setFase('pausa');
+      await esperar(voz.ref.current.pausa * 1000, señal);
+      if (señal.aborted) return;
+      setSesion((s) => ({ ...s, girada: true, vista: true }));
+      setFase('respuesta');
+      await hablar(paraLeer(actual.a), voz.ref.current, señal);
+      if (señal.aborted) return;
+      setFase('calificar');
+      await esperar(3000, señal);
+      if (!señal.aborted) setSesion((s) => ({ ...s, i: s.i + 1, girada: false, vista: false }));
+    },
+    [i, actual?.clave, mazo.length],
+  );
+
   // Da vuelta la tarjeta en los dos sentidos: se puede volver a leer la pregunta.
   const girar = useCallback(
     () => setSesion((s) => (s.i < s.mazo.length ? { ...s, girada: !s.girada, vista: true } : s)),
@@ -166,10 +206,30 @@ export function Flashcards({ materia, activo, historial, onCalificar, irATeoria,
             Sólo las que fallé{nFalladas ? <span className="font-mono text-muted"> ({nFalladas})</span> : null}
           </Checkbox.Content>
         </Checkbox>
-        <Button variant="ghost" size="sm" className="sm:ml-auto" onPress={() => armar(opciones)}>
-          Empezar de nuevo
-        </Button>
+        <div className="flex gap-2 sm:ml-auto">
+          <BotonEscuchar activo={escuchando} onCambio={setEscuchando} />
+          <Button variant="ghost" size="sm" onPress={() => armar(opciones)}>
+            Empezar de nuevo
+          </Button>
+        </div>
       </div>
+
+      {escuchando && (
+        <Card className="grid gap-3 p-4 sm:p-5">
+          <Typography type="body-sm" weight="medium" aria-live="polite">
+            {!actual
+              ? 'Fin del mazo.'
+              : fase === 'pregunta'
+                ? 'Escuchá la pregunta…'
+                : fase === 'pausa'
+                  ? `Respondé en voz alta: tenés ${voz.ajustes.pausa} segundos.`
+                  : fase === 'respuesta'
+                    ? 'La respuesta…'
+                    : '¿La sabías? Calificá, o en 3 segundos pasa sola a la siguiente.'}
+          </Typography>
+          <Ajustes ajustes={voz.ajustes} onCambio={voz.cambiar} conPausa />
+        </Card>
+      )}
 
       {mazo.length === 0 ? (
         <Typography color="muted">

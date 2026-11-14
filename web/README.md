@@ -33,6 +33,21 @@ hosting estático para abrirla desde el celular.
 El formato completo está en `metodo/recuperacion-activa.md`. El generador avisa si una
 pregunta no tiene la opción correcta marcada o si un `[→ …]` apunta a una sección que no existe.
 
+## Escuchar
+
+Con el botón **Escuchar** (auriculares) se estudia sin mirar la pantalla:
+
+- **Flashcards**: lee el tema y la pregunta, deja unos segundos para responder en voz alta
+  (4, 8 o 15), lee la respuesta y pasa sola a la siguiente. Calificar mientras tanto también
+  avanza. Respetan el filtro, el mezclado y "Sólo las que fallé".
+- **Teoría**: lee la nota (o la fuente) de a un párrafo, ítem o fila de tabla, con anterior y
+  siguiente. No lee los bloques de código.
+
+La voz es la del navegador (`lib/voz.ts`, Web Speech API): en Edge están las "Natural",
+que suenan mucho mejor; se elige en el selector de voz. Velocidad, voz y tiempo para pensar se
+guardan en el navegador. Mientras suena, la pantalla no se apaga (Wake Lock); con la pantalla
+bloqueada o la pestaña en segundo plano el celular puede cortar la voz.
+
 La última nota de cada tarjeta ("No la sabía", "Dudé", "La sabía") y los filtros se
 guardan en el navegador (localStorage): no llegan al vault ni al tutor. Lo que cuenta
 para el seguimiento sigue siendo `/estudiar`, `/repaso` y `/cerrar-sesion`.

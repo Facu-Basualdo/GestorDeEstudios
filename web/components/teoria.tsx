@@ -1,11 +1,13 @@
 'use client';
 
-import { Button, Chip, Header, Link, ListBox, ScrollShadow, Select, Separator, Typography } from '@heroui/react';
-import { useEffect, useRef, useState } from 'react';
+import { Button, Card, Chip, Header, Link, ListBox, ScrollShadow, Select, Separator, Typography } from '@heroui/react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Fuente, Lectura, Materia, Tema, Vista } from '@/lib/tipos';
 import { ENTRA, nombreUnidad, unidadesDe } from '@/lib/util';
 import { Contenido } from './contenido';
+import { Ajustes, BotonEscuchar, useAjustesVoz, useLectura, useSesionDeVoz } from './escuchar';
 import { Peso, Rico } from './piezas';
+import { bloquesParaLeer, hablar, paraLeer } from '@/lib/voz';
 
 const SELECCION = 'data-[selected=true]:bg-surface data-[selected=true]:font-semibold data-[selected=true]:shadow-sm';
 /** Alto disponible para las columnas fijas (índice de temas e índice de la página). */
@@ -14,8 +16,9 @@ const ALTO_INDICE_PAGINA = 'max-h-[calc(100dvh-var(--alto-barra,120px)-80px)]';
 
 type Leer = (tipo: Lectura['tipo'], id: string, ancla?: string) => void;
 
-export function Teoria({ materia, fuentes, lectura, onLeer, onPracticar }: {
+export function Teoria({ materia, fuentes, lectura, onLeer, onPracticar, activo }: {
   materia: Materia;
+  activo: boolean;
   fuentes: Fuente[];
   lectura: Lectura;
   onLeer: Leer;
@@ -25,6 +28,36 @@ export function Teoria({ materia, fuentes, lectura, onLeer, onPracticar }: {
   const fuente = lectura.tipo === 'fuente' ? fuentes.find((f) => f.id === lectura.id) : null;
   const clave = fuente ? `fuente:${fuente.id}` : `nota:${tema?.id}`;
   const articulo = useRef<HTMLElement>(null);
+
+  // Lectura en voz alta de la nota, de a un fragmento (título, párrafo, ítem o fila de tabla).
+  const [leyendo, setLeyendo] = useState(false);
+  const [fragmento, setFragmento] = useState(0);
+  const voz = useAjustesVoz();
+  const fragmentos = useMemo(
+    () => [paraLeer(fuente?.titulo ?? tema?.titulo ?? ''), ...bloquesParaLeer(fuente?.bloques ?? tema?.bloques ?? [])].filter(Boolean),
+    [fuente, tema],
+  );
+  useEffect(() => {
+    setLeyendo(false);
+    setFragmento(0);
+  }, [clave]);
+  useEffect(() => {
+    if (!activo) setLeyendo(false);
+  }, [activo]);
+  useSesionDeVoz(leyendo && activo);
+  useLectura(
+    leyendo && activo,
+    async (señal) => {
+      if (fragmento >= fragmentos.length) {
+        setLeyendo(false);
+        setFragmento(0);
+        return;
+      }
+      await hablar(fragmentos[fragmento], voz.ref.current, señal);
+      if (!señal.aborted) setFragmento((f) => f + 1);
+    },
+    [fragmento, fragmentos],
+  );
 
   // Salto a la sección pedida (o arriba de todo) cada vez que cambia la lectura.
   useEffect(() => {
@@ -87,7 +120,7 @@ export function Teoria({ materia, fuentes, lectura, onLeer, onPracticar }: {
       </div>
 
       <article ref={articulo} className="min-w-0" onClick={alHacerClic}>
-        {fuente ? <CabeceraFuente fuente={fuente} /> : tema ? <CabeceraNota tema={tema} materia={materia} onPracticar={onPracticar} onLeer={onLeer} /> : null}
+        {fuente ? <CabeceraFuente fuente={fuente} leyendo={leyendo} onLeyendo={setLeyendo} /> : tema ? <CabeceraNota tema={tema} materia={materia} onPracticar={onPracticar} onLeer={onLeer} leyendo={leyendo} onLeyendo={setLeyendo} /> : null}
         <div className="prosa enriquecido">
           <Contenido bloques={fuente?.bloques ?? tema?.bloques ?? []} />
         </div>
@@ -95,6 +128,29 @@ export function Teoria({ materia, fuentes, lectura, onLeer, onPracticar }: {
       </article>
 
       <IndicePagina contenedor={articulo} clave={clave} />
+
+      {leyendo && (
+        <div className="fixed inset-x-0 bottom-[calc(72px+env(safe-area-inset-bottom))] z-40 flex justify-center px-4">
+          <Card className="grid w-full max-w-3xl gap-3 p-4 shadow-lg">
+            <div className="flex flex-wrap items-center gap-2">
+              <Typography type="body-sm" weight="medium" className="mr-auto font-mono tabular-nums" aria-live="polite">
+                Leyendo {Math.min(fragmento + 1, fragmentos.length)} de {fragmentos.length}
+              </Typography>
+              <Button variant="ghost" size="sm" isDisabled={fragmento === 0} onPress={() => setFragmento((f) => Math.max(0, f - 1))}>
+                ← Anterior
+              </Button>
+              <Button variant="ghost" size="sm" onPress={() => setFragmento((f) => f + 1)}>
+                Siguiente →
+              </Button>
+              <BotonEscuchar activo onCambio={setLeyendo} />
+            </div>
+            <Typography type="body-sm" color="muted" className="line-clamp-2">
+              {fragmentos[fragmento]}
+            </Typography>
+            <Ajustes ajustes={voz.ajustes} onCambio={voz.cambiar} />
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
@@ -132,11 +188,13 @@ function itemsDelIndice(materia: Materia, fuentes: Fuente[]) {
 
 const TITULO_NOTA = 'font-titulo text-[clamp(1.9rem,4.4vw,2.6rem)] font-semibold leading-[1.1] tracking-tight text-balance';
 
-function CabeceraNota({ tema, materia, onPracticar, onLeer }: {
+function CabeceraNota({ tema, materia, onPracticar, onLeer, leyendo, onLeyendo }: {
   tema: Tema;
   materia: Materia;
   onPracticar: (vista: Exclude<Vista, 'teoria'>, tema: string) => void;
   onLeer: Leer;
+  leyendo: boolean;
+  onLeyendo: (v: boolean) => void;
 }) {
   // Índice de la nota: las subsecciones del contenido y las secciones propias del tutor.
   const secciones = tema.secciones.filter((s) => s.nivel === 3 || s.id !== 'contenido');
@@ -169,6 +227,9 @@ function CabeceraNota({ tema, materia, onPracticar, onLeer }: {
             Cuestionario · {tema.preguntas.length}
           </Button>
         )}
+        <span className="self-center">
+          <BotonEscuchar activo={leyendo} onCambio={onLeyendo} texto="Escuchar la teoría" />
+        </span>
       </div>
       {secciones.length > 0 && (
         <nav aria-label="Secciones" className="flex flex-wrap gap-x-4 gap-y-1.5 text-sm xl:hidden">
@@ -184,7 +245,7 @@ function CabeceraNota({ tema, materia, onPracticar, onLeer }: {
   );
 }
 
-function CabeceraFuente({ fuente }: { fuente: Fuente }) {
+function CabeceraFuente({ fuente, leyendo, onLeyendo }: { fuente: Fuente; leyendo: boolean; onLeyendo: (v: boolean) => void }) {
   return (
     <header className="grid gap-3 pb-6">
       <div className="flex flex-wrap items-center gap-2">
@@ -199,6 +260,9 @@ function CabeceraFuente({ fuente }: { fuente: Fuente }) {
       <Typography color="muted" className="max-w-[64ch]">
         Documento citado por las notas, tal como está en el repositorio.
       </Typography>
+      <div>
+        <BotonEscuchar activo={leyendo} onCambio={onLeyendo} texto="Escuchar" />
+      </div>
       <Separator className="mt-2" />
     </header>
   );

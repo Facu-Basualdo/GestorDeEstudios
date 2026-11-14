@@ -294,7 +294,7 @@ function Sesion({ datos, materia, irA }: { datos: Datos; materia: Materia; irA: 
           <Cuestionario key={actual.id} materia={actual} activo={vista === 'cuestionario'} irATeoria={leer} pedido={pedidoCu} />
         </section>
         <section hidden={vista !== 'teoria'} aria-label="Teoría">
-          <Teoria key={actual.id} materia={actual} fuentes={datos.fuentes} lectura={lectura} onLeer={leer} onPracticar={practicar} />
+          <Teoria key={actual.id} materia={actual} activo={vista === 'teoria'} fuentes={datos.fuentes} lectura={lectura} onLeer={leer} onPracticar={practicar} />
         </section>
       </main>
 
