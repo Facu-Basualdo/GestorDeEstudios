@@ -17,7 +17,7 @@ Parciales, finales, recuperatorios y entregas. La urgencia de la
 | 2026-11-04 | [Diseño de Sistemas](materias/diseno-de-sistemas/INDICE.md) | entrega | IE4 TPI 2ª etapa: entrega | pendiente |
 | 2026-11-11 | [Diseño de Sistemas](materias/diseno-de-sistemas/INDICE.md) | recuperatorio | IR de IE3 | pendiente |
 | 2026-11-17 | [Sistemas de Gestión de BD](materias/sistema-de-gestion-de-base-de-datos/INDICE.md) | parcial | Parcial 2: temas 7 a 11 (datos semiestructurados, MongoDB, Redis/Cassandra/Neo4j/CAP, DBaaS); el tema 12 es dudoso | pendiente |
-| 2026-11-18 | [Diseño de Sistemas](materias/diseno-de-sistemas/INDICE.md) | parcial | IE5 Fundamentos teóricos (cuenta para cursada; se movió del 25/11) | pendiente |
+| 2026-11-18 | [Diseño de Sistemas](materias/diseno-de-sistemas/INDICE.md) | parcial | IE5 Fundamentos teóricos (cuenta para cursada; se movió del 25/11), sólo teórico y acumulativo: SOLID, GRASP, Arquitectura I y II, PUDS (con flujos de trabajo), patrones GoF, agilidad y XP, calidad, seguridad | pendiente |
 | 2026-11-25 | [Diseño de Sistemas](materias/diseno-de-sistemas/INDICE.md) | entrega | IE4 TPI 2ª etapa: defensa (1ª fecha) · último cuestionario semanal (IE6) | pendiente |
 | 2026-12-02 | [Diseño de Sistemas](materias/diseno-de-sistemas/INDICE.md) | entrega | IE4 TPI 2ª etapa: defensa (2ª fecha) | pendiente |
 | 2026-12-10 | [Diseño de Sistemas](materias/diseno-de-sistemas/INDICE.md) | recuperatorio | IR de IE4 e IE5 (se movió del 02/12) | pendiente |

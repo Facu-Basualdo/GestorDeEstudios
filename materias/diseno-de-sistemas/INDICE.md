@@ -3,10 +3,11 @@
 
 [Programa](programa.md) · [Temas](temas.md) · [Sesiones](sesiones.md) · [Fuentes](fuentes.md) · [Análisis de exámenes](examenes/analisis.md)
 
-> Próxima fecha: **2026-11-18 · IE5 Fundamentos teóricos** — cuenta para la cursada. Temas
-> todavía sin lista; en la web es el **Parcial 2**. Recuperatorio 2026-12-10. Su material va en
-> `material/parcial-2/` y entra con el [prompt de Gemini](../../docs/prompt-gemini.md) con
-> "Parcial: 2": notas nuevas, sin tocar las del Parcial 1.
+> Próxima fecha: **2026-11-18 · IE5 Fundamentos teóricos** — cuenta para la cursada, **sólo
+> teórico**; en la web es el **Parcial 2**. Recuperatorio 2026-12-10. Es **acumulativo**: SOLID,
+> GRASP, Arquitectura I y II, PUDS (ahora también los flujos de análisis, diseño, implementación
+> y prueba, y la realización de CU), patrones GoF, agilidad y XP, **calidad** y **seguridad**
+> (CIA, STRIDE, tácticas, OWASP Top 10). Temario y plan en [docs/diseno-ie5.md](../../docs/diseno-ie5.md).
 
 > **Parcial 1 de la web = IE3** (2026-10-21, "2º parcial" de la cátedra; recuperatorio 2026-11-11). Entraron (aula virtual): **SOLID, GRASP, Arquitectura I** (importancia, diseño
 > arquitectónico, capas, repositorio, tuberías y filtros, microkernel), **Arquitectura II**
@@ -51,5 +52,5 @@
 | [Programación Extrema (XP)](notas/programacion-extrema.md) | 1 | Unidad supuesta. Valores, prácticas, diseño simple y refactorización |
 | [Modelado Ágil (AM)](notas/modelado-agil.md) | 1 | Unidad supuesta. "Prueba antes del diseño" reemplaza al modelado detallado |
 
-Los temas sin nota (análisis/diseño/implementación/prueba en el PU, atributos de calidad y
-tácticas, calidad de software) están en [temas.md](temas.md).
+Los temas sin nota, los tres del IE5 (flujos de análisis, diseño, implementación y prueba en el
+PU; atributos de calidad y tácticas; calidad; seguridad), están en [temas.md](temas.md).

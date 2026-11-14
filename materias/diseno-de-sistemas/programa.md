@@ -41,7 +41,15 @@ por el tutor a partir del material.
   - clases 22 y 23, PUDS I y II.
 
   **No** figuran los patrones GoF ni lo ágil.
-- **IE5 (2026-11-18)**, "fundamentos teóricos": todavía sin lista. Probablemente el resto de PUDS y calidad.
+- **IE5 (2026-11-18)**, "fundamentos teóricos", sólo teórico. Temario (pasado por el estudiante el 2026-11-14), acumulativo:
+  1. SOLID · 2. GRASP · 3. Arquitectura I · 4. Arquitectura II;
+  5. PUDS: además de lo del IE3, los flujos de requisitos, análisis, diseño, implementación y prueba (trabajadores, artefactos y flujo de cada uno) y la realización de casos de uso (Jacobson et al., caps. 1–5 y 9–11);
+  6. patrones GoF: reutilización, concepto, clasificación; intención, problema, participantes y consecuencias de cada uno (GoF; Freeman y Robson 2020; refactoring.guru);
+  7. agilidad y XP: procesos predecibles vs. adaptables, factor humano, Manifiesto, valores, principios y prácticas de XP, el proyecto XP, límites (Beck 2004);
+  8. calidad: concepto, factores, relación con la seguridad, revisiones, aseguramiento y control, métricas (Pressman y Maxim 2019, caps. 15–19);
+  9. seguridad: tríada CIA; amenaza, vulnerabilidad, ataque y riesgo; STRIDE; escenarios y tácticas; OWASP Top 10 (Bass et al. 2021, cap. 11; OWASP Top 10:2025; Pressman, cap. 18; Sommerville 2016, cap. 13).
+
+  Plan de estudio y faltantes de material en [docs/diseno-ie5.md](../../docs/diseno-ie5.md).
 
 ## Actividades de práctica
 
