@@ -21,7 +21,7 @@ const parcialPorDefecto = (m: Materia) => (m.parciales.find((p) => p.fecha) ?? m
 function recortar(m: Materia, n: number): Materia {
   const p = m.parciales.find((x) => x.n === n);
   if (!p) return m;
-  return { ...m, id: `${m.id}--parcial-${n}`, fecha: p.fecha, evento: p.evento, temas: m.temas.filter((t) => t.parcial === n) };
+  return { ...m, id: `${m.id}--parcial-${n}`, fecha: p.fecha, evento: p.evento, temas: m.temas.filter((t) => t.parciales.includes(n)) };
 }
 type Volver = { vista: Vista; scroll: number };
 
@@ -144,9 +144,10 @@ function Sesion({ datos, materia, irA }: { datos: Datos; materia: Materia; irA: 
       // Un enlace a una nota de otro parcial cambia de parcial (pasa en la teoría: DBaaS cita a Backup).
       // En "Todo" (0) están todas, no hace falta cambiar.
       const destino = tipo === 'nota' ? materia.temas.find((t) => t.id === id) : undefined;
-      if (destino && destino.parcial && parcial !== 0 && destino.parcial !== parcial) {
-        setParcial(destino.parcial);
-        guardado.escribir(`parcial:${materia.id}`, destino.parcial);
+      if (destino && destino.parciales.length && parcial !== 0 && !destino.parciales.includes(parcial)) {
+        const otro = destino.parciales.at(-1)!;
+        setParcial(otro);
+        guardado.escribir(`parcial:${materia.id}`, otro);
       }
       setLectura((l) => ({ tipo, id, ancla, n: l.n + 1 }));
       if (tipo === 'nota') guardado.escribir('tema', id);

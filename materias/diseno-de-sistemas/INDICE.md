@@ -4,7 +4,9 @@
 [Programa](programa.md) · [Temas](temas.md) · [Sesiones](sesiones.md) · [Fuentes](fuentes.md) · [Análisis de exámenes](examenes/analisis.md)
 
 > Próxima fecha: **2026-11-18 · IE5 Fundamentos teóricos** — cuenta para la cursada. Temas
-> todavía sin lista; en la web es el **Parcial 2**. Recuperatorio 2026-12-10.
+> todavía sin lista; en la web es el **Parcial 2**. Recuperatorio 2026-12-10. Su material va en
+> `material/parcial-2/` y entra con el [prompt de Gemini](../../docs/prompt-gemini.md) con
+> "Parcial: 2": notas nuevas, sin tocar las del Parcial 1.
 
 > **Parcial 1 de la web = IE3** (2026-10-21, "2º parcial" de la cátedra; recuperatorio 2026-11-11). Entraron (aula virtual): **SOLID, GRASP, Arquitectura I** (importancia, diseño
 > arquitectónico, capas, repositorio, tuberías y filtros, microkernel), **Arquitectura II**

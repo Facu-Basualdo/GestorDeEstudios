@@ -22,8 +22,8 @@ export type Tema = {
   id: string;
   titulo: string;
   unidad: number;
-  /** Columna "Parcial" de temas.md; 0 si la materia no separa por parcial. */
-  parcial: number;
+  /** Columna "Parcial" de temas.md ("1", "1, 2"…); vacía si la materia no separa por parcial. */
+  parciales: number[];
   peso: number;
   /** Columna "Eval 1" de temas.md: "sí", "teoría", "dudoso" o "—". */
   entra: string;

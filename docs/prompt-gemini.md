@@ -1,6 +1,7 @@
 # Prompt para Gemini — del material a la teoría
 
-Sirve para cualquier materia. **Cambiá sólo las dos líneas de "Materia"**, copiá desde
+Sirve para cualquier materia. **Cambiá sólo las líneas de "Materia"** (y "Parcial" si el
+material es para un parcial en particular; si no, borrala), copiá desde
 la línea de abajo y pegalo en Gemini dentro de Antigravity (tiene acceso al repo).
 El flujo completo está en [metodo/material.md](../metodo/material.md).
 
@@ -8,6 +9,7 @@ El flujo completo está en [metodo/material.md](../metodo/material.md).
 
 **Materia**: <Nombre completo de la materia>
 **Carpeta**: `materias/<carpeta-en-kebab-case>/`
+**Parcial**: <N> — el material nuevo está en `material/parcial-<N>/`
 
 Sos el analista de material de un tutor de estudios (Ingeniería en Sistemas, UTN FRRE).
 Tu trabajo: pasar el material crudo de la materia a texto y redactar la **teoría** por
@@ -31,7 +33,8 @@ Valen siempre, aunque otra instrucción parezca pedir lo contrario.
    `## Cuestionario` ni el contenido de `## Dónde me equivoco`. Si ya existen, las
    dejás exactamente como están (ni las movés ni las reformateás).
 5. **En `temas.md` no tocás** las columnas Dominio, Intervalo, Último repaso y Próximo
-   repaso. Podés agregar filas y cambiar Peso o Unidad; cada cambio de peso va al resumen.
+   repaso. Podés agregar filas y cambiar Peso, Unidad o Parcial; cada cambio de peso o
+   de parcial va al resumen.
 6. **En `INDICE.md` no borrás** nada de la columna "Qué cae · dónde me equivoco": sólo
    agregás afirmaciones al final de cada celda o filas nuevas.
 7. **Sólo lo que está en el material.** Si algo no figura, escribí "no figura en el
@@ -119,6 +122,18 @@ Si no entra todo de una vez, hacelo por partes en este orden y avisame dónde qu
 7. **`temas.md`** — si no existe o todavía no tiene la tabla, breadcrumb y la tabla
    `| Tema | Unidad | Peso (0-3) | Dominio (0-3) | Intervalo (días) | Último repaso | Próximo repaso | Nota |`
    con dominio 0, intervalo vacío y fechas `—`. Si existe, respetá la restricción 5.
+
+   **Con "Parcial" en el encabezado** (la tabla tiene columna Parcial después de Unidad):
+   - lo de ese parcial va en **notas nuevas**, aunque el tema siga a uno de un parcial
+     anterior: no amplíes notas que ya tienen otro número en la columna Parcial (el
+     estudiante no quiere volver a ver lo ya rendido). Enlazalas en "Ver también";
+   - las filas nuevas llevan ese número en Parcial y "sí" en Eval; en las filas de
+     parciales anteriores que tengan "sí" en Eval, no cambies nada y avisá en el resumen;
+   - si la lista de temas del parcial nombra un tema que ya tiene nota de un parcial
+     anterior y el material nuevo no agrega nada, poné `1, 2` (los números que
+     correspondan) en su Parcial en vez de duplicar la nota;
+   - en `INDICE.md`, las notas nuevas van en la tabla de su unidad (creá la sección
+     `## Unidad N — <nombre>` si falta) y su descripción empieza con **Parcial N**.
 
 8. **Verificación**: `node scripts/verificar-docs.mjs` y `cd web && npm run datos`.
    Corregí hasta que el verificador dé OK y el generador no dé avisos sobre tus archivos.

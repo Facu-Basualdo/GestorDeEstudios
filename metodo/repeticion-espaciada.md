@@ -56,8 +56,10 @@ examen es mañana, no hay más repasos: se registra igual).
 Un tema nunca trabajado: dominio 0, intervalo vacío, fechas `—`.
 
 Si la materia se rinde en parciales, se agrega una columna **Parcial** (1, 2…) después de
-Unidad: la [web](../web/README.md) muestra cada parcial por separado (ver
-[SGBD](../materias/sistema-de-gestion-de-base-de-datos/temas.md)).
+Unidad: la [web](../web/README.md) muestra cada parcial por separado y la materia entera en
+"Todo" (ver [SGBD](../materias/sistema-de-gestion-de-base-de-datos/temas.md)). Un tema que entra
+en dos parciales lleva `1, 2`. Lo nuevo de un parcial va en notas nuevas: ampliar una nota del
+parcial anterior la mezcla con lo ya rendido.
 
 ## Ver también
 
