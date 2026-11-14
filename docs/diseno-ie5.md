@@ -52,36 +52,83 @@ falte va *(agregado)*: no hay que inventar lo que "dice la cátedra".
 
 ## Prompt para Gemini
 
-Pegale [prompt-gemini.md](prompt-gemini.md) con este encabezado y, debajo, el bloque
-"Alcance":
+Material cargado en `material/parcial-2/` el 2026-11-14. Pegale a Gemini (Antigravity) el
+bloque de abajo tal cual: le dice que siga [prompt-gemini.md](prompt-gemini.md) con este alcance.
 
-```
+````
+Seguí `docs/prompt-gemini.md` (leelo entero, con sus restricciones) con este encabezado:
+
 **Materia**: Diseño de Sistemas de Información
 **Carpeta**: `materias/diseno-de-sistemas/`
 **Parcial**: 2 — el material nuevo está en `material/parcial-2/`
 
-## Alcance (IE5, 2026-11-18, sólo teórico)
+Leé también `docs/diseno-ie5.md` (temario del IE5 y qué falta) y `materias/diseno-de-sistemas/temas.md`.
 
-No proceses todo `material/`: sólo esto, en este orden, y avisame al terminar cada nota.
+## Alcance: IE5, 2026-11-18, sólo teórico y acumulativo
 
-1. `notas/seguridad-de-software.md` (unidad 6): tríada CIA; amenaza, vulnerabilidad, ataque y
-   riesgo; STRIDE; escenarios de seguridad y tácticas (detectar, resistir, reaccionar,
-   recuperarse de ataques); OWASP Top 10. Fuentes: lo que haya en `material/parcial-2/` y
-   el cap. 11 de `material/pdfs/59-…bass…pdf` (buscalo por el índice; no extraigas el libro entero).
-2. `notas/calidad-de-software.md` (unidad 6): concepto, factores (McCall, ISO 25010),
-   relación con la seguridad, revisiones técnicas, aseguramiento (SQA) y control, métricas.
-   Fuentes: `17-calidad.pdf`, `4-pressman…pdf` (caps. 15–17) y `material/parcial-2/`.
-3. `notas/flujos-de-trabajo-del-pu.md` (unidad 5): análisis, diseño, implementación y prueba;
-   por cada uno, propósito, trabajadores, artefactos y flujo de trabajo; realización de casos
-   de uso. Fuentes: `14-flujos-de-trabajo.pdf` y `13-proceso_unificado_compressed.pdf`.
-   No amplíes `proceso-unificado.md` ni `captura-de-requisitos-en-el-pu.md`: enlazalas.
-4. `notas/atributos-de-calidad-y-tacticas.md` (unidad 4): qué es un atributo de calidad,
-   escenarios de calidad (las 6 partes), tácticas; modificabilidad y rendimiento.
-   Fuente: Bass caps. 3, 8 y 9.
+Procesá sólo `material/parcial-2/`, no el resto de `material/`. Ignorá
+`Licenciatura-en-Economia-Universidad-Nacional-Autonoma-de-Honduras.pdf` (no es de la materia)
+y `LEEME.md`. Hacelo en este orden y avisame al terminar cada etapa.
 
-En `temas.md` las filas de estos temas ya existen (Parcial 2, Eval "sí"): completá sólo la
-columna Nota. En `INDICE.md` agregá `## Unidad 6 — Calidad y seguridad (supuesta)`.
-```
+### Etapa 1 — Exámenes y bancos de preguntas (lo más importante: dicen qué se toma)
+
+Extraé a `material/texto/` (paso 1 del prompt), completos y fieles, sin resumir:
+- `Segundo Parcial Teoria 2024.docx`, `2do recu parcial Teoria 2024.docx`,
+  `Copia de Apunte y preguntas parcial 2023.pdf` (sólo las partes de preguntas o examen),
+  las dos `Copia de Simulación Parcial 2 … (IE3)_ Revisión del intento (1).pdf`;
+- `preguntas multiple choice.docx`, `quizzis (preguntas de cuest y parciales).docx`,
+  `Preguntas Patrones GOF.docx`, `preguntas de los diagramas.docx`,
+  `Simulacro DSI (preguntas viejas y nuevas).html`.
+Conservá enunciado, opciones y la respuesta marcada como correcta cuando la haya. Decí en la
+línea de tipo de cada archivo si es examen de la cátedra, simulación del aula o banco armado
+por estudiantes.
+
+Con eso, el paso 4 del prompt: `examenes/analisis.md`. **No borres** la sección
+"Confusiones probables (IE5)": agregá tus secciones arriba de ella. Además de la frecuencia
+por tema, decí qué formato tienen los parciales de teoría (opción múltiple, V/F, varias
+correctas, desarrollo, diagramas) y cuántas preguntas tienen. Con la frecuencia podés
+cambiar el Peso en `temas.md` (restricción 5); cada cambio va al resumen.
+
+### Etapa 2 — Notas nuevas (no existen todavía)
+
+Fuentes, en este orden de prioridad (restricción 10): `2do Parcial - Powers de Clase (2).pdf`
+(es de la cátedra y pesa 222 MB: extraelo por partes), después los libros (sólo los capítulos
+que se usan) y por último los apuntes de estudiantes (`Apunte Diseño 2do Teoria.pdf`,
+`Apunte Ivo 2do Parcial.pdf`, `Apunte Segundo Parcial - Celina.pdf`,
+`Apunte diseño (saque del grupo).docx.pdf`), que sirven para ver qué se remarca pero no
+son fuente de la cátedra: si los citás, aclaralo ("apunte de estudiante").
+
+1. `notas/seguridad-de-software.md` (unidad 6): tríada CIA; amenaza, vulnerabilidad,
+   ataque y riesgo; STRIDE; escenarios y tácticas de seguridad; OWASP Top 10. Libro:
+   `DSI-03-Arquitectura I - Bass …pdf`, cap. 11 (buscalo por el índice).
+2. `notas/calidad-de-software.md` (unidad 6): concepto, factores, relación con la
+   seguridad, revisiones, aseguramiento y control, métricas. También `material/pdfs/17-calidad.pdf`
+   y `material/pdfs/4-pressman…pdf`.
+3. `notas/flujos-de-trabajo-del-pu.md` (unidad 5): análisis, diseño, implementación y
+   prueba; por cada uno, propósito, trabajadores, artefactos y flujo de trabajo;
+   realización de casos de uso. También `material/pdfs/14-flujos-de-trabajo.pdf`.
+4. `notas/atributos-de-calidad-y-tacticas.md` (unidad 4): atributo de calidad, escenario
+   de calidad (sus 6 partes), tácticas; modificabilidad y rendimiento. Bass, caps. 3, 8 y 9.
+
+En `temas.md` estas filas ya existen (Parcial 2, Eval "sí"): completá sólo la columna Nota.
+En `INDICE.md` agregá `## Unidad 6 — Calidad y seguridad (supuesta)` y las filas nuevas
+en su unidad, con la descripción empezando por **Parcial 2**.
+
+### Etapa 3 — Completar las notas que ya existen
+
+Las notas con Parcial `1, 2` en `temas.md` también entran al IE5: en éstas **sí** podés
+ampliar (modo material nuevo: en la sección que corresponda, sin reescribir). Agregá sólo lo
+que los exámenes de la etapa 1 o los Powers de Clase toman y la nota no tiene, con su cita.
+Prioridad: lo que más aparece en los exámenes. Libros sólo para huecos:
+`DSI-02-GRASP - Larman Cap17.pdf`, `DSI-06-Patrones - GoF Design Patterns.pdf` (sólo el
+catálogo de patrones), `DSI-06-Patrones - Resumen Patrones de Diseno.pdf`.
+
+### Resumen final
+
+El del paso 9 del prompt, y además: cuántas preguntas extrajiste por archivo de la etapa 1
+y qué temas del temario no aparecen en ningún examen.
+````
+
 
 ## Preguntas del IE5 (Claude, con `/revisar-materia diseno-de-sistemas`)
 
