@@ -3,14 +3,15 @@
 
 [Programa](programa.md) · [Temas](temas.md) · [Sesiones](sesiones.md) · [Fuentes](fuentes.md) · [Análisis de exámenes](examenes/analisis.md)
 
-> Próxima fecha: **2026-10-21 · 2º parcial (IE3 Diseño de solución informática)** — cuenta para
-> la cursada. Entran (aula virtual): **SOLID, GRASP, Arquitectura I** (importancia, diseño
+> Próxima fecha: **2026-11-18 · IE5 Fundamentos teóricos** — cuenta para la cursada. Temas
+> todavía sin lista; en la web es el **Parcial 2**. Recuperatorio 2026-12-10.
+
+> **Parcial 1 de la web = IE3** (2026-10-21, "2º parcial" de la cátedra; recuperatorio 2026-11-11). Entraron (aula virtual): **SOLID, GRASP, Arquitectura I** (importancia, diseño
 > arquitectónico, capas, repositorio, tuberías y filtros, microkernel), **Arquitectura II**
 > (sistemas distribuidos) y **PUDS I y II** (visión general, fases, hitos, disciplinas, captura
 > de requisitos). Lo ágil **no** está en la lista. Patrones GoF: según el estudiante (2026-10-21)
 > entran los 9 del resumen de Gaona → [Elegir y diagramar patrones](notas/elegir-y-diagramar-patrones.md).
-> Antes: **cuestionario 16 (PUDS intro, IE6) cierra el 30/09 a las 13 hs**. Después: TPI 04/11 ·
-> IE5 18/11. Todas las instancias en el [programa](programa.md#Instancias%20de%20evaluación).
+> TPI: entrega 04/11, defensa 25/11 y 02/12. Todas las instancias en el [programa](programa.md#Instancias%20de%20evaluación).
 
 > Las notas salen del **export de Faro IA** (conceptos extraídos de los PDFs de la cátedra,
 > con documento y página: ver [fuentes](fuentes.md)). Desde el 2026-09-28 también hay notebook de
