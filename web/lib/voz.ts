@@ -1,25 +1,34 @@
 // Lectura en voz alta con la síntesis de voz del navegador (Web Speech API).
 // No hay audio pregrabado: la voz la pone el sistema (las "Natural" de Edge suenan mejor).
 
+import { tramos } from './ingles';
 import type { Bloque } from './tipos';
 
 export const vozDisponible = () => typeof window !== 'undefined' && 'speechSynthesis' in window;
 
-/** Voces en español, primero las rioplatenses y las de mejor calidad. */
-export function vocesEnEspañol(): SpeechSynthesisVoice[] {
+const PREFERIDAS: Record<'es' | 'en', Record<string, number>> = {
+  es: { 'es-ar': 40, 'es-uy': 35, 'es-419': 20, 'es-us': 20, 'es-mx': 20 },
+  en: { 'en-us': 30, 'en-gb': 25 },
+};
+
+/** Voces del idioma, primero las rioplatenses (o la de EE. UU.) y las de mejor calidad. */
+export function voces(idioma: 'es' | 'en'): SpeechSynthesisVoice[] {
   if (!vozDisponible()) return [];
   const puntaje = (v: SpeechSynthesisVoice) => {
-    const lang = v.lang.toLowerCase().replace('_', '-');
-    let p = lang === 'es-ar' ? 40 : lang === 'es-uy' ? 35 : ['es-419', 'es-us', 'es-mx'].includes(lang) ? 20 : 10;
+    let p = PREFERIDAS[idioma][v.lang.toLowerCase().replace('_', '-')] ?? 10;
     if (/natural|online|neural/i.test(v.name)) p += 30;
     else if (/google/i.test(v.name)) p += 15;
+    // Las "Multilingual" leen con acento según el texto: para palabras sueltas, mejor una nativa.
+    if (/multilingual/i.test(v.name)) p -= 5;
     return p;
   };
   return speechSynthesis
     .getVoices()
-    .filter((v) => v.lang.toLowerCase().startsWith('es'))
+    .filter((v) => v.lang.toLowerCase().startsWith(idioma))
     .sort((a, b) => puntaje(b) - puntaje(a));
 }
+
+export const vocesEnEspañol = () => voces('es');
 
 /** Las voces llegan tarde en Chrome: avisa cuando cambian. Devuelve la función para dejar de escuchar. */
 export function alCambiarVoces(fn: () => void) {
@@ -102,16 +111,16 @@ function trozos(texto: string): string[] {
   return salida.filter((s) => s.trim());
 }
 
-export type OpcionesVoz = { velocidad: number; voz: string };
+/** `vozIngles`: voz para los términos en inglés; '' = la mejor que haya, 'no' = leer todo en español. */
+export type OpcionesVoz = { velocidad: number; voz: string; vozIngles: string };
 
 // Referencia viva a los enunciados: si el recolector de basura se los lleva, Chrome no dispara onend.
 const enCurso = new Set<SpeechSynthesisUtterance>();
 
-function decir(texto: string, o: OpcionesVoz, señal: AbortSignal): Promise<void> {
+function decir(texto: string, voz: SpeechSynthesisVoice | undefined, o: OpcionesVoz, señal: AbortSignal): Promise<void> {
   return new Promise((resolver) => {
     if (señal.aborted) return resolver();
     const u = new SpeechSynthesisUtterance(texto);
-    const voz = vocesEnEspañol().find((v) => v.voiceURI === o.voz) ?? vocesEnEspañol()[0];
     if (voz) u.voice = voz;
     u.lang = voz?.lang ?? 'es-AR';
     u.rate = o.velocidad;
@@ -133,9 +142,17 @@ function decir(texto: string, o: OpcionesVoz, señal: AbortSignal): Promise<void
 
 /** Lee el texto entero; se corta al abortar la señal. */
 export async function hablar(texto: string, o: OpcionesVoz, señal: AbortSignal) {
+  const es = voces('es');
+  const vozEs = es.find((v) => v.voiceURI === o.voz) ?? es[0];
+  const en = o.vozIngles === 'no' ? [] : voces('en');
+  const vozEn = en.find((v) => v.voiceURI === o.vozIngles) ?? en[0];
   for (const t of trozos(texto)) {
-    if (señal.aborted) return;
-    await decir(t, o, señal);
+    // Los términos en inglés, con la voz en inglés; si no hay, todo con la voz en español.
+    const partes = vozEn ? tramos(t) : [{ texto: t, ingles: false }];
+    for (const p of partes) {
+      if (señal.aborted) return;
+      await decir(p.texto, p.ingles ? vozEn : vozEs, o, señal);
+    }
   }
 }
 

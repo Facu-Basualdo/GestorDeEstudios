@@ -45,7 +45,14 @@ Con el botón **Escuchar** (auriculares) se estudia sin mirar la pantalla:
 
 La voz es la del navegador (`lib/voz.ts`, Web Speech API): en Edge están las "Natural",
 que suenan mucho mejor; se elige en el selector de voz. Velocidad, voz y tiempo para pensar se
-guardan en el navegador. Mientras suena, la pantalla no se apaga (Wake Lock); con la pantalla
+guardan en el navegador.
+
+Los términos en inglés (Factory Method, ConcreteObserver, framework, failover…) se leen con una
+voz en inglés y el resto con la voz en español; el selector "Inglés" permite elegir esa voz o
+leer todo en español. Qué cuenta como inglés lo decide `lib/ingles.ts`: un diccionario de
+términos de las notas más reglas (letras que no existen en castellano, CamelCase). Si una
+palabra se lee con la voz equivocada, se agrega al diccionario (`TERMINOS`) o a las
+excepciones (`CASTELLANAS`, `AMBIGUAS`). Mientras suena, la pantalla no se apaga (Wake Lock); con la pantalla
 bloqueada o la pestaña en segundo plano el celular puede cortar la voz.
 
 La última nota de cada tarjeta ("No la sabía", "Dudé", "La sabía") y los filtros se

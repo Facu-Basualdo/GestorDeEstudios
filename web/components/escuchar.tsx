@@ -3,12 +3,12 @@
 import { Button, Label, ListBox, Select, Tabs, Typography } from '@heroui/react';
 import { useEffect, useRef, useState } from 'react';
 import { guardado } from '@/lib/util';
-import { alCambiarVoces, callar, esperar, mantenerPantalla, vocesEnEspañol, vozDisponible } from '@/lib/voz';
+import { alCambiarVoces, callar, esperar, mantenerPantalla, voces as vocesDe, vozDisponible, type OpcionesVoz } from '@/lib/voz';
 
 /** `pausa`: segundos para pensar la respuesta de una flashcard antes de oírla. */
-export type AjustesVoz = { velocidad: number; voz: string; pausa: number };
+export type AjustesVoz = OpcionesVoz & { pausa: number };
 
-const POR_DEFECTO: AjustesVoz = { velocidad: 1, voz: '', pausa: 8 };
+const POR_DEFECTO: AjustesVoz = { velocidad: 1, voz: '', vozIngles: '', pausa: 8 };
 const VELOCIDADES = [0.9, 1, 1.15, 1.3];
 const PAUSAS = [4, 8, 15];
 
@@ -66,12 +66,17 @@ export function Ajustes({ ajustes, onCambio, conPausa }: {
   conPausa?: boolean;
 }) {
   const [voces, setVoces] = useState<SpeechSynthesisVoice[]>([]);
+  const [inglesas, setInglesas] = useState<SpeechSynthesisVoice[]>([]);
   useEffect(() => {
-    const leer = () => setVoces(vocesEnEspañol());
+    const leer = () => {
+      setVoces(vocesDe('es'));
+      setInglesas(vocesDe('en'));
+    };
     leer();
     return alCambiarVoces(leer);
   }, []);
   const voz = voces.find((v) => v.voiceURI === ajustes.voz) ?? voces[0];
+  const vozIngles = ajustes.vozIngles === 'no' ? 'no' : (inglesas.find((v) => v.voiceURI === ajustes.vozIngles) ?? inglesas[0])?.voiceURI;
 
   return (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
@@ -104,6 +109,36 @@ export function Ajustes({ ajustes, onCambio, conPausa }: {
                   <ListBox.ItemIndicator />
                 </ListBox.Item>
               ))}
+            </ListBox>
+          </Select.Popover>
+        </Select>
+      )}
+      {inglesas.length > 0 && (
+        <Select
+          aria-label="Voz para los términos en inglés"
+          value={vozIngles}
+          onChange={(v) => v != null && onCambio({ vozIngles: String(v) })}
+          className="w-full min-w-0 sm:w-72"
+        >
+          <Select.Trigger>
+            <Select.Value className="truncate">{({ selectedText }) => `Inglés: ${selectedText}`}</Select.Value>
+            <Select.Indicator />
+          </Select.Trigger>
+          <Select.Popover>
+            <ListBox>
+              {[
+                <ListBox.Item key="no" id="no" textValue="Leer todo en español">
+                  <Label>Leer todo en español</Label>
+                  <ListBox.ItemIndicator />
+                </ListBox.Item>,
+                ...inglesas.map((v) => (
+                  <ListBox.Item key={v.voiceURI} id={v.voiceURI} textValue={v.name}>
+                    <Label>{v.name}</Label>
+                    <span className="font-mono text-xs text-muted">{v.lang}</span>
+                    <ListBox.ItemIndicator />
+                  </ListBox.Item>
+                )),
+              ]}
             </ListBox>
           </Select.Popover>
         </Select>
