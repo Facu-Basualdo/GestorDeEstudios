@@ -16,7 +16,7 @@ const parcialPorDefecto = (m: Materia) => (m.parciales.find((p) => p.fecha) ?? m
 
 /**
  * La materia recortada al parcial elegido. El id propio hace que flashcards y cuestionario
- * guarden su avance por separado en cada parcial.
+ * guarden su avance por separado en cada parcial. 0 = "Todo": la materia entera.
  */
 function recortar(m: Materia, n: number): Materia {
   const p = m.parciales.find((x) => x.n === n);
@@ -98,8 +98,9 @@ function Sesion({ datos, materia, irA }: { datos: Datos; materia: Materia; irA: 
   useEffect(() => {
     const v = guardado.leer<Vista>('vista', 'flashcards');
     setVista(VISTAS.includes(v) ? v : 'flashcards');
-    const elegido = guardado.leer(`parcial:${materia.id}`, 0);
-    const p = materia.parciales.some((x) => x.n === elegido) ? elegido : parcialPorDefecto(materia);
+    const elegido = guardado.leer<number>(`parcial:${materia.id}`, -1);
+    const valido = materia.parciales.some((x) => x.n === elegido) || (elegido === 0 && materia.parciales.length > 1);
+    const p = valido ? elegido : parcialPorDefecto(materia);
     setParcial(p);
     const tema = guardado.leer('tema', '');
     if (recortar(materia, p).temas.some((t) => t.id === tema)) setLectura({ tipo: 'nota', id: tema, ancla: '', n: 0 });
@@ -141,8 +142,9 @@ function Sesion({ datos, materia, irA }: { datos: Datos; materia: Materia; irA: 
   const leer = useCallback(
     (tipo: Lectura['tipo'], id: string, ancla = '') => {
       // Un enlace a una nota de otro parcial cambia de parcial (pasa en la teoría: DBaaS cita a Backup).
+      // En "Todo" (0) están todas, no hace falta cambiar.
       const destino = tipo === 'nota' ? materia.temas.find((t) => t.id === id) : undefined;
-      if (destino && destino.parcial && destino.parcial !== parcial) {
+      if (destino && destino.parcial && parcial !== 0 && destino.parcial !== parcial) {
         setParcial(destino.parcial);
         guardado.escribir(`parcial:${materia.id}`, destino.parcial);
       }
@@ -201,7 +203,7 @@ function Sesion({ datos, materia, irA }: { datos: Datos; materia: Materia; irA: 
             <Marca />
           </button>
 
-          <div className="flex min-w-0 flex-1 flex-col gap-0.5 md:flex-none">
+          <div className="flex min-w-0 flex-1 md:flex-none">
             {datos.materias.length > 1 ? (
               <Select aria-label="Materia" value={materia.id} onChange={(v) => v != null && irA(String(v))} className="w-full max-w-60">
                 <Select.Trigger>
@@ -224,26 +226,27 @@ function Sesion({ datos, materia, irA }: { datos: Datos; materia: Materia; irA: 
                 {materia.nombre}
               </Typography>
             )}
-            {cuenta && (
-              <Typography type="body-xs" weight="medium" className="font-mono text-accent">
-                {cuenta}
-              </Typography>
-            )}
           </div>
 
           {materia.parciales.length > 1 && (
             <Tabs selectedKey={String(parcial)} onSelectionChange={(k) => cambiarParcial(Number(k))} className="w-auto">
               <Tabs.ListContainer>
                 <Tabs.List aria-label="Parcial">
-                  {materia.parciales.map((p) => (
-                    <Tabs.Tab key={p.n} id={String(p.n)} className="whitespace-nowrap">
-                      Parcial {p.n}
+                  {[...materia.parciales.map((p) => [p.n, `Parcial ${p.n}`] as const), [0, 'Todo'] as const].map(([n, texto]) => (
+                    <Tabs.Tab key={n} id={String(n)} className="whitespace-nowrap">
+                      {texto}
                       <Tabs.Indicator />
                     </Tabs.Tab>
                   ))}
                 </Tabs.List>
               </Tabs.ListContainer>
             </Tabs>
+          )}
+
+          {cuenta && (
+            <Typography type="body-xs" weight="medium" className="whitespace-nowrap font-mono text-accent">
+              {cuenta}
+            </Typography>
           )}
 
           <div className="order-last w-full md:order-none md:ml-auto md:w-auto">
