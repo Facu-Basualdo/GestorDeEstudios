@@ -11,10 +11,14 @@ const PREFERIDAS: Record<'es' | 'en', Record<string, number>> = {
   en: { 'en-us': 30, 'en-gb': 25 },
 };
 
-/** Voces del idioma, primero las rioplatenses (o la de EE. UU.) y las de mejor calidad. */
+/** La voz que eligió el estudiante como predeterminada (si el navegador la tiene). */
+const FAVORITA: Partial<Record<'es' | 'en', RegExp>> = { es: /Karla .*Honduras/i };
+
+/** Voces del idioma: primero la favorita, después las rioplatenses (o la de EE. UU.) y las de mejor calidad. */
 export function voces(idioma: 'es' | 'en'): SpeechSynthesisVoice[] {
   if (!vozDisponible()) return [];
   const puntaje = (v: SpeechSynthesisVoice) => {
+    if (FAVORITA[idioma]?.test(v.name)) return 1000;
     let p = PREFERIDAS[idioma][v.lang.toLowerCase().replace('_', '-')] ?? 10;
     if (/natural|online|neural/i.test(v.name)) p += 30;
     else if (/google/i.test(v.name)) p += 15;
