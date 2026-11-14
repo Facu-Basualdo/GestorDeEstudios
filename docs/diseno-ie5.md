@@ -19,6 +19,10 @@ preguntas → web. Lo que se toma de ese prompt es el **temario**, la **bibliogr
 
 ## Temario → notas
 
+Lo que la cátedra remarcó en clase y el contenido de las notas nuevas, sacado de los Powers y
+del apunte de Celina: [ie5-powers-y-celina.md](ie5-powers-y-celina.md).
+
+
 El IE5 es **sólo teórico** y **acumulativo**. En [temas.md](../materias/diseno-de-sistemas/temas.md)
 lo que ya tenía nota lleva Parcial `1, 2` y lo nuevo, `2`.
 
