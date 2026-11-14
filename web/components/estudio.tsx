@@ -194,7 +194,7 @@ function Sesion({ datos, materia, irA }: { datos: Datos; materia: Materia; irA: 
         ref={barra}
         className="sticky top-0 z-30 border-b border-separator bg-background/90 pt-[env(safe-area-inset-top)] backdrop-blur-md"
       >
-        <div className="mx-auto flex max-w-[1680px] flex-wrap items-center gap-x-5 gap-y-3 px-4 py-3 sm:px-8 xl:px-10">
+        <div className="mx-auto flex max-w-[1680px] flex-wrap items-center xl:flex-nowrap gap-x-5 gap-y-3 px-4 py-3 sm:px-8 xl:px-10">
           <button
             type="button"
             title="Elegir otra materia"
@@ -244,14 +244,23 @@ function Sesion({ datos, materia, irA }: { datos: Datos; materia: Materia; irA: 
             </Tabs>
           )}
 
-          {cuenta && (
-            <Typography type="body-xs" weight="medium" className="whitespace-nowrap font-mono text-accent">
-              {cuenta}
-            </Typography>
-          )}
+          <div className="flex min-w-0 flex-1 overflow-hidden">
+            {cuenta && (
+              <Typography type="body-xs" weight="medium" title={cuenta} className="flex min-w-0 font-mono text-accent">
+                {cuenta.includes(' · ') ? (
+                  <>
+                    <span className="truncate">{cuenta.slice(0, cuenta.lastIndexOf(' · '))}</span>
+                    <span className="shrink-0 whitespace-pre">{cuenta.slice(cuenta.lastIndexOf(' · '))}</span>
+                  </>
+                ) : (
+                  <span className="truncate">{cuenta}</span>
+                )}
+              </Typography>
+            )}
+          </div>
 
-          <div className="order-last w-full md:order-none md:ml-auto md:w-auto">
-            <Tabs selectedKey={vista} onSelectionChange={(k) => cambiarVista(k as Vista)} className="w-full md:w-[440px]">
+          <div className="order-last w-full xl:order-none xl:w-auto">
+            <Tabs selectedKey={vista} onSelectionChange={(k) => cambiarVista(k as Vista)} className="w-full xl:w-auto">
               <Tabs.ListContainer>
                 <Tabs.List aria-label="Modo de estudio" className="w-full">
                   {pestañas.map(([id, texto, n]) => (
