@@ -23,6 +23,7 @@
 - ¿Cuáles son los flujos de trabajo fundamentales (disciplinas)? :: **Requisitos, análisis, diseño, implementación y prueba**. En las primeras iteraciones pesan requisitos y análisis; en las últimas, diseño, implementación y prueba. [→ Flujos de trabajo y disciplinas](#Flujos%20de%20trabajo%20y%20disciplinas)
 - Trabajador, actividad y artefacto :: **Trabajador**: un rol (en RUP se llama "rol"). **Actividad**: una responsabilidad bien definida que un trabajador hace con artefactos de entrada y produce artefactos de salida. **Artefacto**: cualquier producto del proceso (modelo, ejecutable, prototipo). [→ Conceptos clave](#Conceptos%20clave)
 - ¿Qué diferencias hay entre PUDS y RUP? :: RUP deriva del PU: usa **rol** en lugar de trabajador, tiene **más disciplinas** (y junta algunas del PU) y **mucho más detalle**. [→ Conceptos clave](#Conceptos%20clave)
+- ¿Cuáles son los dos entregables clave de la fase de Construcción? :: El **software ejecutable** (capacidad operativa inicial) y la **descripción de la arquitectura mantenida y mínimamente actualizada**. La línea base de la arquitectura es de Elaboración. [→ Las cuatro fases](#Las%20cuatro%20fases)
 - ¿Qué beneficios da el enfoque iterativo e incremental? :: **Retroalimentación temprana y continua**, **más calidad** (se corrigen errores constantemente, y antes es más barato) y **más adaptabilidad al cambio**. [→ Las tres características](#Las%20tres%20características)
 
 ## Cuestionario
@@ -99,6 +100,13 @@
     - [ ] el que se mantiene durante todo el ciclo de vida
     - [ ] el que tiene más capas y estereotipos
     > Las otras opciones describen al modelo de diseño. [→ Flujos de trabajo y disciplinas](#Flujos%20de%20trabajo%20y%20disciplinas)
+13. ¿Cuáles son entregables clave de la fase de Construcción del PUDS? (recuperatorio 2024)
+    - [x] El software ejecutable: la versión inicial con capacidad operativa
+    - [x] La descripción de la arquitectura mantenida y mínimamente actualizada
+    - [ ] La línea base de la arquitectura
+    - [ ] La lista de riesgos actualizada
+    - [ ] Manuales y materiales de capacitación para el usuario final, el operador y el administrador
+    > La línea base es de Elaboración; en Construcción la arquitectura sólo se mantiene al día. Se erró en el recu 2024 marcando sólo el ejecutable. [→ Las cuatro fases](#Las%20cuatro%20fases)
 
 ## Contenido
 
@@ -153,7 +161,7 @@ Casos de uso y arquitectura se equilibran: los casos de uso dicen **qué** tiene
 
 - **Inicio** (p. 29): ser iterativo e incremental lo hace menos riesgoso. El **modelo de negocio** describe el dominio en alto nivel; su caso especial es el **modelo de dominio** (clases conceptuales). Además, valida si la solución propuesta resuelve el problema para los usuarios y clientes (`2do Parcial - Powers de Clase (2), pp. 143–145`).
 - **Elaboración** (p. 30): al final la arquitectura tiene que estar definida, porque **cambiarla después cuesta mucho**; el PU admite cambios de requisitos, no de arquitectura. Se fija la **línea base de la arquitectura** (`2do Parcial - Powers de Clase (2), pp. 143–145`) y se llega a capturar cerca del **80% de los requisitos** (`Apunte Ivo 2do Parcial, p. 190`, apunte de estudiante), a diferencia de Construcción (donde se implementa el sistema final). Trampa de `Segundo Parcial Teoria 2024, P10` *(cátedra)*: "captura casos de uso hasta ~80%" y "crea una línea base de la arquitectura" son **distractores de Inicio**; Inicio es **delimitar el alcance** y **demostrar a usuarios o clientes que el sistema propuesto resuelve su problema**. Se mira el proyecto más a largo plazo. Cuesta distinguirla de la construcción: la construcción es implementar el sistema final.
-- **Construcción** (p. 31): el artefacto más importante es el **ejecutable**.
+- **Construcción** (p. 31): el artefacto más importante es el **ejecutable**. Para la cátedra (`2do recu parcial Teoria 2024, P4`, clave de Moodle) los **entregables clave** son dos: el **software ejecutable**, la versión de **capacidad operativa inicial**, y la **descripción de la arquitectura mantenida y mínimamente actualizada** (la arquitectura ya quedó fijada en Elaboración: en Construcción sólo se mantiene al día). Distractores de esa pregunta: **línea base de la arquitectura** (es de Elaboración), **lista de riesgos actualizada** y **manuales y materiales de capacitación para usuario final, operador y administrador**. Ojo: `Apunte Segundo Parcial - Celina` (apunte de estudiante) pone "manuales del usuario" entre los artefactos de Construcción; en el examen, la clave no los aceptó.
 - **Transición** (p. 32): los artefactos son los mismos que en construcción. No es mantenimiento: se corrigen detalles que no se vieron al construir.
 
 ### Flujos de trabajo y disciplinas
