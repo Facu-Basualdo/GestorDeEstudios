@@ -102,6 +102,31 @@
     - [ ] Cryptographic Failures
     - [ ] Security Logging & Alerting Failures
     > Falta de rate limiting en el login = fallas de autenticación. La táctica que lo ataca es "restringir login". [→ OWASP Top 10 (2025) y controles de aplicación](#OWASP%20Top%2010%20%282025%29%20y%20controles%20de%20aplicaci%C3%B3n)
+13. ¿Cómo se distinguen la suplantación de identidad y la elevación de privilegios en STRIDE? *(cátedra)*
+    - [ ] La suplantación consiste en negar una acción realizada. La elevación consiste en modificar información protegida.
+    - [ ] La suplantación consiste en divulgar información protegida. La elevación consiste en impedir el acceso legítimo al servicio.
+    - [ ] La suplantación consiste en adquirir permisos adicionales. La elevación consiste en hacerse pasar por otro usuario.
+    - [x] La suplantación consiste en hacerse pasar por otra identidad. La elevación consiste en obtener o ejercer permisos que exceden los asignados.
+    > S viola la autenticación (quién sos); E, la autorización (qué podés hacer). Las otras describen R y T, I y D, o invierten S y E. [→ Modelo STRIDE](#Modelo%20STRIDE)
+14. ¿Qué dos pares vinculan correctamente un fallo de seguridad con un control que aborda su causa? *(cátedra)*
+    - [ ] XSS en campo de texto → usar consultas parametrizadas al guardar el texto.
+    - [ ] Agotamiento de recursos por consultas costosas → cifrar la conexión con la base de datos.
+    - [x] XSS en campo de texto → codificar la salida según el contexto en que se muestra el texto.
+    - [x] Inyección SQL → usar consultas parametrizadas.
+    - [ ] Acceso a funciones no permitidas → comprobar que el usuario esté autenticado.
+    > Parametrizar frena la inyección SQL, no el XSS (que ocurre al mostrar). Cifrar no limita recursos: paginación, cuotas y tiempos máximos. Funciones no permitidas es autorización, no autenticación. [→ OWASP Top 10 (2025) y controles de aplicación](#OWASP%20Top%2010%20%282025%29%20y%20controles%20de%20aplicaci%C3%B3n)
+15. ¿Qué debe hacer el servicio si la sesión es válida, pero falla la comprobación del permiso para una operación protegida? *(cátedra)*
+    - [ ] Permitir la operación según el rol general del usuario y registrar el fallo.
+    - [x] Denegar la operación porque el permiso requerido no pudo verificarse.
+    - [ ] Solicitar una nueva autenticación y ejecutar la operación si la identidad se confirma.
+    - [ ] Aplicar el último permiso registrado para ese usuario, aunque corresponda a otro recurso.
+    > Fallar de forma segura: si el permiso no se verifica, se deniega. Reautenticar confirma quién es, no qué puede hacer; el rol general no alcanza (se autoriza por objeto y acción). [→ Autenticación, autorización sobre cada pedido y operación segura](#Autenticaci%C3%B3n%2C%20autorizaci%C3%B3n%20sobre%20cada%20pedido%20y%20operaci%C3%B3n%20segura)
+16. ¿Cómo se clasifican, respectivamente, estas tres tácticas de seguridad según Bass: identificar accesos anómalos, revocar una sesión comprometida y restaurar datos desde una copia? *(cátedra)*
+    - [ ] Reaccionar, resistir y recuperarse.
+    - [ ] Detectar, recuperarse y resistir.
+    - [ ] Resistir, detectar y reaccionar.
+    - [x] Detectar, reaccionar y recuperarse.
+    > Revocar acceso es de Reaccionar (responde a un ataque en curso), no de Resistir (que es preventiva). Restaurar es de Recuperarse. [→ Tácticas y patrones arquitectónicos de seguridad (Bass, cap. 11)](#T%C3%A1cticas%20y%20patrones%20arquitect%C3%B3nicos%20de%20seguridad%20%28Bass%2C%20cap.%2011%29)
 
 ## Qué es la seguridad y por qué entra en arquitectura
 
