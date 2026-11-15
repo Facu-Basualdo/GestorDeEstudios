@@ -99,6 +99,27 @@ resto con `- [ ]`, explicación en `>` con el mismo enlace a la sección:
   como "Varias correctas": hay que tildar todas y tocar Comprobar, y sólo cuenta como
   bien si coincide exactamente. Usalo cuando la cátedra pregunta así ("¿cuáles de las
   siguientes…?", como en los cuestionarios semanales de Diseño).
+- **Arrastrar** (emparejar o completar texto, como "arrastrar y soltar" de Moodle): ítems
+  **sin casilla**, con la respuesta de cada hueco entre llaves. Un ítem `Sobran:` agrega
+  fichas que no van en ningún hueco (distractores). La web muestra los huecos vacíos, todos del
+  mismo ancho, y las fichas mezcladas abajo. Se arrastran con mouse o dedo, o se toca la ficha y
+  después el hueco. Sólo cuenta como bien si están todos los huecos:
+
+  ```
+  2. Arrastrá cada atributo al objetivo de calidad que mide *(cátedra)*
+     - Calidad de Requisitos {Trazabilidad}
+     - Calidad de Diseño {Complejidad de la Interfaz}
+     - Sobran: {Volatilidad} {Asignación de recursos}
+     > Explicación. [→ Sección](#Sección)
+  ```
+
+  Para completar texto, el hueco va en medio de la frase: `- El patrón {Observer} define
+  una dependencia uno a muchos…`. Una línea puede tener varios huecos.
+- **Imágenes** (diagramas, capturas del parcial): `![texto alternativo](../imagenes/archivo.png)`
+  en una línea sangrada debajo del enunciado, dentro de una opción o en la teoría. El archivo
+  va en `materias/<materia>/imagenes/` (en git, no en `material/`). La web lo copia sola y el
+  verificador avisa si la ruta está rota. Sirve también para los diagramas con huecos: la
+  imagen con los huecos numerados y una pregunta de arrastrar con `- 1: {…}`, `- 2: {…}`.
 - Preguntas copiadas de un cuestionario o examen de la cátedra: agregá *(cátedra)* al
   final del enunciado.
 - Las opciones incorrectas salen de errores reales o probables (confundir C1 con C2,

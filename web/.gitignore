@@ -5,3 +5,6 @@ next-env.d.ts
 *.tsbuildinfo
 # Se genera desde las notas con `npm run datos`
 datos/
+
+# Imágenes de las notas copiadas por scripts/generar-web.mjs
+public/img/

@@ -4,6 +4,7 @@ import { Button, Card, Chip, Label, ListBox, Select, Separator, Typography } fro
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { IrATeoria, Materia, Pregunta, Tema } from '@/lib/tipos';
 import { filtrarPorTema, guardado, hash, mezclar, plural, porPeso, type Filtro } from '@/lib/util';
+import { Arrastrar, huecosBien } from './arrastrar';
 import { EnlaceTeoria } from './flashcards';
 import { FiltroTemas, PanelSesion, Peso, Progreso, QueMejorar, Rico, filasPorTema, textoPlano, type Fallo } from './piezas';
 
@@ -25,7 +26,11 @@ type SesionGuardada = {
 const LETRAS = 'ABCDEF';
 
 const acierta = (p: Pregunta, sel: number[] | undefined) =>
-  !!sel && sel.length === p.correctas.length && sel.every((o) => p.correctas.includes(o));
+  !!sel && sel.length === p.correctas.length &&
+  (p.tipo === 'arrastrar' ? huecosBien(p, sel) === p.correctas.length : sel.every((o) => p.correctas.includes(o)));
+
+/** Huecos de una pregunta de arrastrar sin responder: ninguna ficha colocada. */
+const vacios = (p: Pregunta) => p.correctas.map(() => -1);
 
 const letras = (ks: number[]) => {
   const l = ks.map((k) => LETRAS[k] ?? String(k + 1)).sort();
@@ -118,10 +123,18 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
   const actual = items[i];
   const elegida = elegidas[i];
   const respondida = elegida !== undefined;
-  const multiple = (actual?.p.correctas.length ?? 0) > 1;
+  const arrastra = actual?.p.tipo === 'arrastrar';
+  const multiple = !arrastra && (actual?.p.correctas.length ?? 0) > 1;
   // Opciones tildadas (originales) de una pregunta con varias correctas, antes de comprobar.
   const [marcadas, setMarcadas] = useState<number[]>([]);
-  useEffect(() => setMarcadas([]), [i, items]);
+  // Fichas puestas en cada hueco de una pregunta de arrastrar, antes de comprobar.
+  const [colocadas, setColocadas] = useState<number[]>([]);
+  useEffect(() => {
+    setMarcadas([]);
+    setColocadas([]);
+  }, [i, items]);
+  const huecos = actual ? actual.p.correctas.map((_, n) => colocadas[n] ?? -1) : [];
+  const puedeComprobar = arrastra ? huecos.some((f) => f >= 0) : marcadas.length > 0;
 
   const responder = useCallback(
     (sel: number[]) =>
@@ -135,14 +148,16 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
   );
   const elegir = useCallback(
     (k: number) => {
-      if (!actual || respondida || k >= actual.orden.length) return;
+      if (!actual || respondida || arrastra || k >= actual.orden.length) return;
       const o = actual.orden[k];
       if (!multiple) responder([o]);
       else setMarcadas((m) => (m.includes(o) ? m.filter((x) => x !== o) : [...m, o]));
     },
-    [actual, respondida, multiple, responder],
+    [actual, respondida, arrastra, multiple, responder],
   );
-  const comprobar = useCallback(() => responder(marcadas), [marcadas, responder]);
+  const comprobar = useCallback(() => {
+    if (puedeComprobar) responder(arrastra ? huecos : marcadas);
+  }, [puedeComprobar, arrastra, huecos, marcadas, responder]);
   const siguiente = useCallback(() => {
     setSesion((s) => ({ ...s, i: s.i + 1 }));
     window.scrollTo({ top: 0 });
@@ -162,15 +177,15 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
       if (e.key.length === 1 && k >= 0 && !respondida) elegir(k);
       else if (e.key === 'Enter' && t.tagName !== 'BUTTON') {
         if (respondida) siguiente();
-        else if (multiple) comprobar();
+        else if (multiple || arrastra) comprobar();
       }
     };
     window.addEventListener('keydown', alTeclear);
     return () => window.removeEventListener('keydown', alTeclear);
-  }, [activo, actual, respondida, multiple, elegir, comprobar, siguiente]);
+  }, [activo, actual, respondida, multiple, arrastra, elegir, comprobar, siguiente]);
 
   const estados = items.map((it, k) => (elegidas[k] === undefined ? undefined : acierta(it.p, elegidas[k]) ? 2 : 0));
-  const correctasVisibles = actual ? actual.p.correctas.map((o) => actual.orden.indexOf(o)) : [];
+  const correctasVisibles = actual && !arrastra ? actual.p.correctas.map((o) => actual.orden.indexOf(o)) : [];
   const bien = estados.filter((e) => e === 2).length;
 
   return (
@@ -248,11 +263,24 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
                   <Typography className="font-titulo text-[clamp(1.25rem,3vw,1.6rem)] font-semibold leading-snug text-balance">
                     <Rico html={actual.p.q} />
                   </Typography>
-                  {multiple && (
+                  {(multiple || arrastra) && (
                     <Typography type="body-sm" color="muted" className="-mt-2">
-                      <b className="font-medium text-accent">Varias correctas</b> · marcá todas y tocá Comprobar
+                      {multiple ? (
+                        <><b className="font-medium text-accent">Varias correctas</b> · marcá todas y tocá Comprobar</>
+                      ) : (
+                        <><b className="font-medium text-accent">Arrastrar</b> · completá los huecos y tocá Comprobar</>
+                      )}
                     </Typography>
                   )}
+                  {arrastra ? (
+                    <Arrastrar
+                      p={actual.p}
+                      orden={actual.orden}
+                      colocadas={elegida ?? huecos}
+                      onCambio={setColocadas}
+                      correccion={elegida}
+                    />
+                  ) : (
                   <ul className="grid gap-2.5">
                     {actual.orden.map((o, k) => {
                       const esCorrecta = actual.p.correctas.includes(o);
@@ -290,8 +318,9 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
                       );
                     })}
                   </ul>
-                  {multiple && !respondida && (
-                    <Button className="justify-self-start" isDisabled={!marcadas.length} onPress={comprobar}>
+                  )}
+                  {(multiple || arrastra) && !respondida && (
+                    <Button className="justify-self-start" isDisabled={!puedeComprobar} onPress={comprobar}>
                       Comprobar
                     </Button>
                   )}
@@ -300,6 +329,8 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
                       <Typography className={`font-titulo text-lg font-semibold ${acierta(actual.p, elegida) ? 'text-success' : 'text-danger'}`}>
                         {acierta(actual.p, elegida)
                           ? '✓ Correcto'
+                          : arrastra
+                            ? `✗ ${huecosBien(actual.p, elegida)} de ${actual.p.correctas.length} huecos bien: en verde, lo que iba`
                           : multiple
                             ? `✗ Incorrecto: las correctas eran la ${letras(correctasVisibles)}`
                             : `✗ Incorrecto: era la ${letras(correctasVisibles)}`}
@@ -322,7 +353,11 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
           </div>
           <PanelSesion
             filas={filasPorTema(items.map((it) => it.p), (k) => estados[k])}
-            atajos={[[['1', '2', '3', '4'], 'Elegir o marcar opción (o A–D)'], [['Enter'], 'Comprobar · siguiente pregunta']]}
+            atajos={
+              arrastra
+                ? [[['Tab'], 'Ir de ficha en ficha y a los huecos'], [['Enter'], 'Tomar ficha · dejarla en el hueco']]
+                : [[['1', '2', '3', '4'], 'Elegir o marcar opción (o A–D)'], [['Enter'], 'Comprobar · siguiente pregunta']]
+            }
           />
         </div>
       )}
@@ -341,7 +376,10 @@ function Resultado({ materia, sesion, estados, bien, onRehacer, onNuevo, irATeor
 }) {
   const { items, elegidas } = sesion;
   const mal = items.map((it, k) => ({ ...it, elegida: elegidas[k] })).filter((it) => !acierta(it.p, it.elegida));
-  const texto = (p: Pregunta, ks: number[]) => ks.map((k) => textoPlano(p.opciones[k])).join(' + ');
+  const texto = (p: Pregunta, ks: number[]) =>
+    p.tipo === 'arrastrar'
+      ? ks.map((k) => (k >= 0 ? textoPlano(p.opciones[k]) : '—')).join(' / ')
+      : ks.map((k) => textoPlano(p.opciones[k])).join(' + ');
   const fallos: Fallo[] = mal.map(({ p, elegida }) => ({
     tema: p.tema,
     pregunta: p.q,
@@ -380,6 +418,9 @@ function Resultado({ materia, sesion, estados, bien, onRehacer, onNuevo, irATeor
                 <Typography weight="semibold">
                   <Rico html={p.q} />
                 </Typography>
+                {p.tipo === 'arrastrar' ? (
+                  <Arrastrar p={p} orden={[]} colocadas={elegida ?? vacios(p)} onCambio={() => {}} correccion={elegida ?? vacios(p)} />
+                ) : (
                 <Typography color="muted">
                   {elegida !== undefined && (
                     <>
@@ -388,6 +429,7 @@ function Resultado({ materia, sesion, estados, bien, onRehacer, onNuevo, irATeor
                   )}
                   {p.correctas.length > 1 ? 'eran' : 'era'} <Opciones p={p} ks={p.correctas} className="font-medium text-success" />
                 </Typography>
+                )}
                 {p.exp && (
                   <Typography color="muted">
                     <Rico html={p.exp} />

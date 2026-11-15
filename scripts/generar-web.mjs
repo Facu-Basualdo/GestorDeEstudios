@@ -10,7 +10,7 @@
 //   "## Cuestionario"              -> opcion multiple (ver metodo/recuperacion-activa.md)
 //   el resto                       -> la teoria
 
-import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, copyFileSync, rmSync } from 'node:fs';
 import { join, dirname, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -58,11 +58,31 @@ function enlace(etiqueta, url, ctx) {
   return `<span class="ref-externa" title="${esc(decodeURIComponent(ruta))}">${texto}</span>`;
 }
 
+// Imágenes de las notas (`![texto](../imagenes/x.png)`): se copian a web/public/img/ con su
+// ruta dentro del vault, y la web las sirve desde ahí. Se guardan en materias/<materia>/imagenes/.
+const PUBLICO_IMG = join(RAIZ, 'web', 'public', 'img');
+rmSync(PUBLICO_IMG, { recursive: true, force: true });
+
+function imagen(alt, url, ctx) {
+  if (/^https?:/.test(url)) return `<img src="${esc(url)}" alt="${esc(alt)}" loading="lazy">`;
+  const abs = resolve(ctx.dir, decodeURIComponent(url));
+  const ruta = rel(abs);
+  if (!existsSync(abs)) {
+    avisos.push(`imagen que no existe: ${ruta}`);
+    return `<span class="ref-externa">[imagen: ${esc(alt || ruta)}]</span>`;
+  }
+  const destino = join(PUBLICO_IMG, ruta);
+  mkdirSync(dirname(destino), { recursive: true });
+  copyFileSync(abs, destino);
+  return `<img src="${esc(encodeURI(`img/${ruta}`))}" alt="${esc(alt)}" loading="lazy">`;
+}
+
 function inline(texto, ctx) {
   const guardados = [];
   const guardar = (html) => `\u0000${guardados.push(html) - 1}\u0000`;
   const t = texto
     .replace(/`([^`]+)`/g, (_, c) => guardar(`<code>${esc(c)}</code>`))
+    .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, (_, a, u) => guardar(imagen(a, u, ctx)))
     .replace(/\[([^\]]*)\]\(([^)\s]+)\)/g, (_, e, u) => guardar(enlace(e, u, ctx)));
   return esc(t)
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
@@ -210,27 +230,76 @@ function flashcardsDe(cuerpo, ctx, ruta) {
   return tarjetas;
 }
 
+// Dos tipos de pregunta (ver metodo/recuperacion-activa.md):
+//   opciones   `- [x]` / `- [ ]`; con más de una [x] es de varias correctas.
+//   arrastrar  ítems sin casilla con huecos `{respuesta}`; `- Sobran: {a} {b}` agrega fichas
+//              que no van en ningún hueco. Sirve para emparejar y para completar texto.
+// Las líneas sangradas que no son ítems ni explicación siguen el enunciado (p. ej. una imagen).
+//   opciones:  { tipo, q, opciones, correctas: índices de las correctas, lineas: [], exp, ref }
+//   arrastrar: { tipo, q, opciones: fichas, correctas: por hueco, el índice de su ficha,
+//                lineas: [[{ t: 'texto', html } | { t: 'hueco', n }]], exp, ref }
+const HUECO = /\{([^{}]+)\}/g;
+
+function arrastrarDe(p, ctx, ruta) {
+  const fichas = [];
+  const correctas = [];
+  const lineas = [];
+  for (const l of p.items) {
+    const sobran = l.match(/^sobran:\s*(.*)$/i);
+    if (sobran) {
+      for (const [, f] of sobran[1].matchAll(HUECO)) fichas.push(inline(f.trim(), ctx));
+      continue;
+    }
+    const segmentos = [];
+    let desde = 0;
+    for (const m of l.matchAll(HUECO)) {
+      if (m.index > desde) segmentos.push({ t: 'texto', html: inline(l.slice(desde, m.index), ctx) });
+      segmentos.push({ t: 'hueco', n: correctas.length });
+      correctas.push(fichas.push(inline(m[1].trim(), ctx)) - 1);
+      desde = m.index + m[0].length;
+    }
+    if (desde < l.length) segmentos.push({ t: 'texto', html: inline(l.slice(desde), ctx) });
+    lineas.push(segmentos);
+  }
+  if (!correctas.length) {
+    avisos.push(`${rel(ruta)}: pregunta de arrastrar sin huecos {…} → ${p.q.slice(0, 60)}`);
+    return null;
+  }
+  return { tipo: 'arrastrar', opciones: fichas, correctas, lineas };
+}
+
 function cuestionarioDe(cuerpo, ctx, ruta) {
   const crudas = [];
   let actual = null;
   for (const l of lineasDe(cuerpo)) {
     let m;
-    if ((m = l.match(/^\d+\.\s+(.*)$/))) crudas.push((actual = { q: m[1], opciones: [], correctas: [], exp: [] }));
-    else if (actual && (m = l.match(/^\s+[-*]\s+\[( |x|X)\]\s+(.*)$/))) {
+    if ((m = l.match(/^\d+\.\s+(.*)$/))) crudas.push((actual = { q: m[1], extra: [], opciones: [], correctas: [], items: [], exp: [] }));
+    else if (!actual) continue;
+    else if ((m = l.match(/^\s+[-*]\s+\[( |x|X)\]\s+(.*)$/))) {
       if (m[1] !== ' ') actual.correctas.push(actual.opciones.length);
       actual.opciones.push(m[2]);
-    } else if (actual && (m = l.match(/^\s+>\s?(.*)$/))) actual.exp.push(m[1]);
+    } else if ((m = l.match(/^\s+>\s?(.*)$/))) actual.exp.push(m[1]);
+    else if ((m = l.match(/^\s+[-*]\s+(.*)$/))) actual.items.push(m[1].trim());
+    else if (/^\s+\S/.test(l) && !actual.opciones.length && !actual.items.length) actual.extra.push(l.trim());
   }
   return crudas.flatMap((p) => {
-    if (p.opciones.length < 2 || !p.correctas.length) {
+    let cuerpo;
+    if (p.items.length && p.opciones.length) {
+      avisos.push(`${rel(ruta)}: pregunta que mezcla opciones [ ] con huecos {…} → ${p.q.slice(0, 60)}`);
+      return [];
+    } else if (p.items.length) {
+      cuerpo = arrastrarDe(p, ctx, ruta);
+      if (!cuerpo) return [];
+    } else if (p.opciones.length < 2 || !p.correctas.length) {
       avisos.push(`${rel(ruta)}: pregunta sin opciones o sin la correcta marcada [x] → ${p.q.slice(0, 60)}`);
       return [];
+    } else {
+      cuerpo = { tipo: 'opciones', opciones: p.opciones.map((o) => inline(o, ctx)), correctas: p.correctas, lineas: [] };
     }
     const { texto, ref } = separarRef(p.exp.join(' '));
     return [{
-      q: inline(p.q, ctx),
-      opciones: p.opciones.map((o) => inline(o, ctx)),
-      correctas: p.correctas,
+      q: inline([p.q, ...p.extra].join(' '), ctx),
+      ...cuerpo,
       exp: texto ? inline(texto, ctx) : '',
       ref,
     }];

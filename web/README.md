@@ -26,6 +26,8 @@ hosting estático para abrirla desde el celular.
 |---|---|
 | Flashcards | `## Preguntas de recuperación`: `- pregunta :: respuesta [→ Sección](#Sección)` |
 | Cuestionario | `## Cuestionario`: lista numerada con opciones `- [ ]` / `- [x]` y explicación en `>`. Con más de una `- [x]` es de varias correctas: se tildan todas y se comprueba |
+| Cuestionario de arrastrar | ítems sin casilla con huecos `{respuesta}` (y `- Sobran: {a} {b}` para distractores): emparejar o completar texto arrastrando fichas (`components/arrastrar.tsx`) |
+| Imágenes | `![texto](../imagenes/x.png)` en enunciados, opciones o teoría: el generador las copia a `web/public/img/` (no va a git) |
 | Teoría | el resto de la nota; los enlaces a `docs/` aparecen como "Fuentes citadas" |
 | Orden, unidad y peso | `INDICE.md` y la columna Nota de `temas.md` |
 | Selector de parcial | columna opcional **Parcial** de `temas.md` (1, 2…): con dos o más, la web muestra un parcial por vez, cada uno con su avance, más la pestaña **Todo** con la materia entera. Un tema que entra en varios parciales lleva `1, 2`. La cuenta regresiva va en el parcial cuyos temas tienen Eval "sí" |

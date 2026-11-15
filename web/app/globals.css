@@ -80,6 +80,27 @@ body {
   padding: 1px 5px;
   border-radius: 4px;
 }
+/* Imágenes de las notas (diagramas, capturas): suelen ser de fondo claro o transparente con
+   trazo negro, así que van sobre un panel claro para que se vean en el tema oscuro. */
+.enriquecido img,
+.prosa img {
+  display: block;
+  max-width: 100%;
+  max-height: 70vh;
+  height: auto;
+  margin: 0.75rem 0;
+  padding: 6px;
+  border-radius: 8px;
+  background: oklch(0.97 0.005 272);
+}
+
+/* Fichas de las preguntas de arrastrar: el dedo las arrastra en vez de desplazar la página. */
+.ficha {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 .enriquecido a {
   color: var(--link);
   text-decoration: underline;

@@ -15,8 +15,24 @@ export type Seccion = { nivel: number; titulo: string; id: string };
 
 export type Flashcard = { q: string; a: string; ref: string };
 
-/** `correctas`: índices de las opciones correctas; con más de una, se marcan todas y se comprueba. */
-export type Pregunta = { q: string; opciones: string[]; correctas: number[]; exp: string; ref: string };
+/** Un tramo de una línea de una pregunta de arrastrar: texto o el hueco número `n`. */
+export type Segmento = { t: 'texto'; html: string } | { t: 'hueco'; n: number };
+
+/**
+ * `opciones`: opción múltiple. `opciones` son las opciones y `correctas` los índices de las
+ * correctas; con más de una, se marcan todas y se comprueba.
+ * `arrastrar`: emparejar o completar texto. `opciones` son las fichas (las respuestas de los
+ * huecos y las que sobran), `correctas[n]` es la ficha del hueco `n` y `lineas` el texto.
+ */
+export type Pregunta = {
+  tipo: 'opciones' | 'arrastrar';
+  q: string;
+  opciones: string[];
+  correctas: number[];
+  lineas: Segmento[][];
+  exp: string;
+  ref: string;
+};
 
 export type Tema = {
   id: string;
