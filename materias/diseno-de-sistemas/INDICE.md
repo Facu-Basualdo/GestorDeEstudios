@@ -58,7 +58,7 @@
 
 | Nota | Peso | Qué cae · dónde me equivoco |
 |---|---|---|
-| [Calidad de software](notas/calidad-de-software.md) | 2 | **Parcial 2**. Puntos de vista (TVPUF), diseño vs. conformidad, Glass y Pressman, McCall e ISO 25010, costos de calidad, bugs vs. flaws, 4 pilares, revisiones FTR y métricas, SQA vs. SQC |
+| [Calidad de software](notas/calidad-de-software.md) | 2 | **Parcial 2**. Puntos de vista (TVPUF), diseño vs. conformidad, Glass y Pressman, McCall e ISO 25010, costos de calidad, bugs vs. flaws, 4 pilares, revisiones FTR y métricas, SQA vs. SQC. *(Cátedra)*: emparejar objetivo → atributo de la tabla de Pressman (la asignación de recursos es del QC) y los enfoques cualitativo/cuantitativo |
 | [Seguridad de software](notas/seguridad-de-software.md) | 2 | **Parcial 2**. Tema agregado en 2026: tríada CIA, amenaza/vulnerabilidad/ataque/riesgo, escenario de 6 partes y puntos de despliegue, STRIDE, OWASP Top 10 (2025), 4 familias de tácticas (Bass cap. 11) |
 
 El mapa de estado, pesos y dominio por tema está en [temas.md](temas.md), y la frecuencia en exámenes en [examenes/analisis.md](examenes/analisis.md).

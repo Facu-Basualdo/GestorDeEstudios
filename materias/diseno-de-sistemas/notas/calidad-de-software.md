@@ -25,6 +25,8 @@
 - ¿Cómo se calcula la densidad de errores de una revisión? :: Errores totales (menores + mayores) dividido el tamaño del producto revisado (WPS). [→ Revisiones técnicas como filtro de calidad](#Revisiones%20t%C3%A9cnicas%20como%20filtro%20de%20calidad)
 - ¿Por qué SQA es una "actividad sombrilla"? :: Porque atraviesa todo el proceso y todos los involucrados son responsables de la calidad, no un área al final. [→ Aseguramiento (SQA) vs. Control de Calidad (SQC) y Verificación/Validación](#Aseguramiento%20%28SQA%29%20vs.%20Control%20de%20Calidad%20%28SQC%29%20y%20Verificaci%C3%B3n%2FValidaci%C3%B3n)
 - Nombrá buenas prácticas de una revisión técnica formal (FTR). :: Revisar el producto y no a la persona, respetar agenda y tiempos, marcar los errores sin resolverlos en la reunión y usar checklists. [→ Tipos de revisiones, buenas prácticas y entornos ágiles](#Tipos%20de%20revisiones%2C%20buenas%20pr%C3%A1cticas%20y%20entornos%20%C3%A1giles)
+- ¿Qué atributo de la tabla de Pressman corresponde a cada objetivo de calidad: requisitos, diseño, código y efectividad del QC? *(cátedra)* :: Requisitos → trazabilidad. Diseño → complejidad de la interfaz. Código → reusabilidad. Efectividad del QC → asignación de recursos. [→ Componentes, elementos y tareas de SQA](#Componentes%2C%20elementos%20y%20tareas%20de%20SQA)
+- ¿Cuáles son los dos enfoques complementarios para evaluar la calidad según Pressman? *(cátedra)* :: El cualitativo (checklists) y el cuantitativo (métricas). [→ Evaluación cualitativa y cuantitativa](#Evaluaci%C3%B3n%20cualitativa%20y%20cuantitativa)
 
 ## Cuestionario
 
@@ -104,6 +106,34 @@
     - [x] Entrega dentro del plazo y del presupuesto
     - [ ] Cantidad de funcionalidades
     > Glass no habla de cantidad de funcionalidades: suma conformidad, calidad y entrega a tiempo. [→ Calidad de diseño, de conformidad, Glass y Pressman](#Calidad%20de%20dise%C3%B1o%2C%20de%20conformidad%2C%20Glass%20y%20Pressman)
+13. "Un teléfono móvil puede evaluarse por su resolución de pantalla, duración de batería o velocidad del procesador". ¿A qué aproximación de Garvin pertenece? *(cátedra)*
+    - [ ] Usuario
+    - [ ] Valor
+    - [ ] Fabricación
+    - [x] Producto
+    - [ ] Trascendental
+    > Producto = características inherentes, medibles y comparables. Usuario sería "cubre mis necesidades"; valor, "vale lo que pagué". [→ Concepto de calidad y los 5 puntos de vista (TVPUF)](#Concepto%20de%20calidad%20y%20los%205%20puntos%20de%20vista%20%28TVPUF%29)
+14. Según Pressman, ¿cuáles son los tipos generales de enfoques complementarios para evaluar la calidad? *(cátedra)*
+    - [ ] Probabilísticos
+    - [ ] Determinísticos
+    - [x] Cualitativos
+    - [ ] Estocásticos
+    - [x] Cuantitativos
+    - [ ] Formales
+    - [ ] Informales
+    > Cualitativo (checklists) + cuantitativo (métricas). Formal/informal es la clasificación de las revisiones técnicas, no de la evaluación. [→ Evaluación cualitativa y cuantitativa](#Evaluaci%C3%B3n%20cualitativa%20y%20cuantitativa)
+15. Arrastrá cada atributo al objetivo de calidad que mide, según la tabla de Pressman *(cátedra)*
+    - Calidad de Requisitos {Trazabilidad}
+    - Calidad de Diseño {Complejidad de la Interfaz}
+    - Calidad de Código {Reusabilidad}
+    - Efectividad del QC {Asignación de recursos}
+    > La asignación de recursos (% de horas por actividad) mide el proceso de QC, no el software. La trazabilidad es de requisitos: cuántos no llegan a diseño o código. [→ Componentes, elementos y tareas de SQA](#Componentes%2C%20elementos%20y%20tareas%20de%20SQA)
+16. ¿A qué objetivo de calidad pertenece el atributo "asignación de recursos"? *(cátedra)*
+    - [ ] Calidad de requisitos
+    - [ ] Calidad de diseño
+    - [ ] Calidad de código
+    - [x] Efectividad del QC
+    > Se mide con el porcentaje de horas-persona por actividad: evalúa el esfuerzo del control de calidad. [→ Componentes, elementos y tareas de SQA](#Componentes%2C%20elementos%20y%20tareas%20de%20SQA)
 
 ## Concepto de calidad y los 5 puntos de vista (TVPUF)
 
@@ -249,6 +279,25 @@ SQA es una **actividad sombrilla** transversal a todo el proceso: **todos** los 
 - **Diez elementos de SQA** (`Powers, pág. 361`; `Pressman cap. 17, págs. 341–342`): estándares (IEEE, ISO) · revisiones y auditorías · pruebas (*testing*) · recolección y análisis de errores/defectos · gestión del cambio · educación/capacitación (remarcado en clase: sin formación de RR. HH. no hay calidad) · gestión de proveedores · gestión de la seguridad (*security*) · seguridad física/crítica (*safety*) · gestión de riesgos.
 - **Seis tareas del grupo independiente SQA** (`Powers, pág. 362`; `Pressman cap. 17, págs. 343–344`): (1) preparar el Plan de SQA, (2) participar en la descripción del proceso, (3) revisar actividades para verificar cumplimiento del proceso, (4) auditar productos de trabajo contra estándares, (5) asegurar el registro y manejo de desviaciones, (6) registrar e informar no conformidades hasta su resolución.
 - **Cuatro objetivos SQA con ejemplos de métricas** (`Powers, pág. 363`; `Pressman cap. 17, pág. 346`): **calidad de requisitos** (modificadores ambiguos, TBA/TBD, cambios por requisito, no trazables) · **calidad del diseño** (*lo central de la materia*: modelo arquitectónico, componentes trazados a arquitectura, complejidad de interfaz, patrones usados) · **calidad del código** (complejidad ciclomática, comentarios, reutilización, legibilidad) · **eficacia del QC** (horas por actividad, tasa de finalización, errores hallados y origen).
+
+**Tabla objetivo → atributo → métrica** (Pressman, tabla *Software quality goals, attributes, and metrics*, de SATC 1996). La cátedra pregunta el **atributo** (el del medio). En negrita, los que cayeron en el cuestionario semanal:
+
+| Objetivo | Atributos | Métrica de ejemplo |
+|---|---|---|
+| **Calidad de requisitos** | Ambigüedad · completitud · comprensibilidad · volatilidad · **trazabilidad** · claridad del modelo | Trazabilidad: n.º de requisitos que no se pueden rastrear hasta el diseño o el código |
+| **Calidad de diseño** | Integridad arquitectónica · completitud de componentes · **complejidad de la interfaz** · patrones | Complejidad de la interfaz: clics promedio para llegar a una función o contenido |
+| **Calidad de código** | Complejidad · mantenibilidad · comprensibilidad · **reusabilidad** · documentación | Reusabilidad: % de componentes reutilizados |
+| **Efectividad del QC** | **Asignación de recursos** · tasa de finalización · efectividad de revisiones · efectividad de pruebas | Asignación de recursos: % de horas-persona por actividad |
+
+> **Cómo no confundirse**: los atributos de **efectividad del QC** miden el **proceso** (esfuerzo, plazos, revisiones, pruebas), no el software. La **trazabilidad** se mide en **requisitos**: cuántos no llegan al diseño o al código.
+
+## Lo que preguntó la cátedra
+
+Del cuestionario semanal de calidad (lo trajo el estudiante el 2026-11-15):
+
+- **Aproximaciones de Garvin**: "un teléfono móvil puede evaluarse por su resolución de pantalla, duración de batería o velocidad del procesador" → **producto**. Distractores: usuario, valor, fabricación, trascendental.
+- **Enfoques complementarios de evaluación (Pressman)**: **cualitativos** y **cuantitativos**. Distractores: probabilísticos, determinísticos, estocásticos, formales, informales (formal/informal es la clasificación de las revisiones).
+- **Emparejar objetivo con atributo** (tabla de Pressman): requisitos → **trazabilidad** · diseño → **complejidad de la interfaz** · código → **reusabilidad** · efectividad del QC → **asignación de recursos**. Ver la [tabla completa](#Componentes%2C%20elementos%20y%20tareas%20de%20SQA).
 
 ## Dónde me equivoco
 
