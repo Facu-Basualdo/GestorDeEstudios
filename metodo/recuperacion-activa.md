@@ -95,10 +95,13 @@ resto con `- [ ]`, explicación en `>` con el mismo enlace a la sección:
    > Síndrome 0 = sin error. [→ Código de Hamming](#Código%20de%20Hamming)
 ```
 
-- **Varias correctas**: marcá con `- [x]` todas las que correspondan. La web la muestra
-  como "Varias correctas": hay que tildar todas y tocar Comprobar, y sólo cuenta como
-  bien si coincide exactamente. Usalo cuando la cátedra pregunta así ("¿cuáles de las
-  siguientes…?", como en los cuestionarios semanales de Diseño).
+- **Varias correctas**: marcá con `- [x]` todas las que correspondan. Usalo cuando la
+  cátedra pregunta así ("¿cuáles de las siguientes…?", como en los cuestionarios semanales
+  de Diseño).
+- **En la web todas son "seleccioná una o más"**, como en Moodle: no dice cuántas van, se
+  tildan y se toca Comprobar, y sólo cuenta como bien si coincide exactamente. Con la casilla
+  **Avisar cuántas van** vuelve a mostrar las de una sola correcta como selección única y
+  las otras como "Varias correctas".
 - **Arrastrar** (emparejar o completar texto, como "arrastrar y soltar" de Moodle): ítems
   **sin casilla**, con la respuesta de cada hueco entre llaves. Un ítem `Sobran:` agrega
   fichas que no van en ningún hueco (distractores). La web muestra los huecos vacíos, todos del

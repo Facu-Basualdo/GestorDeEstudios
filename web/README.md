@@ -25,7 +25,7 @@ hosting estático para abrirla desde el celular.
 | En la web | En la nota |
 |---|---|
 | Flashcards | `## Preguntas de recuperación`: `- pregunta :: respuesta [→ Sección](#Sección)` |
-| Cuestionario | `## Cuestionario`: lista numerada con opciones `- [ ]` / `- [x]` y explicación en `>`. Con más de una `- [x]` es de varias correctas: se tildan todas y se comprueba |
+| Cuestionario | `## Cuestionario`: lista numerada con opciones `- [ ]` / `- [x]` y explicación en `>`. Todas se muestran como "seleccioná una o más" (como en Moodle, sin decir cuántas van): se tildan y se comprueba. La casilla **Avisar cuántas van** muestra las de una sola `- [x]` como selección única |
 | Cuestionario de arrastrar | ítems sin casilla con huecos `{respuesta}` (y `- Sobran: {a} {b}` para distractores): emparejar o completar texto arrastrando fichas (`components/arrastrar.tsx`) |
 | Imágenes | `![texto](../imagenes/x.png)` en enunciados, opciones o teoría: el generador las copia a `web/public/img/` (no va a git) |
 | Teoría | el resto de la nota; los enlaces a `docs/` aparecen como "Fuentes citadas" |

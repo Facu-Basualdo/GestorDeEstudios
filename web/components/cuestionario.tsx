@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Chip, Label, ListBox, Select, Separator, Typography } from '@heroui/react';
+import { Button, Card, Checkbox, Chip, Label, ListBox, Select, Separator, Typography } from '@heroui/react';
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { IrATeoria, Materia, Pregunta, Tema } from '@/lib/tipos';
 import { filtrarPorTema, guardado, hash, mezclar, plural, porPeso, type Filtro } from '@/lib/util';
@@ -54,6 +54,9 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
   );
   const [filtro, setFiltro] = useState<Filtro>('todos');
   const [cantidad, setCantidad] = useState(0); // 0 = todas
+  // Por defecto todas son "seleccioná una o más", como en Moodle: no se sabe cuántas van.
+  // Con "Avisar cuántas van" las de una sola correcta se responden con un toque.
+  const [avisar, setAvisar] = useState(false);
   // Primer render sin mezclar (igual en servidor y navegador); se mezcla al montar.
   const [sesion, setSesion] = useState<Sesion>(() => ({
     items: todas.map((p) => ({ p, orden: p.opciones.map((_, k) => k) })),
@@ -96,6 +99,7 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
       setCantidad(cant);
       armar(valido ? f : 'todos', cant);
     }
+    setAvisar(guardado.leer('avisar-cu', false));
     setCargada(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [materia.id]);
@@ -124,7 +128,8 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
   const elegida = elegidas[i];
   const respondida = elegida !== undefined;
   const arrastra = actual?.p.tipo === 'arrastrar';
-  const multiple = !arrastra && (actual?.p.correctas.length ?? 0) > 1;
+  const varias = (actual?.p.correctas.length ?? 0) > 1;
+  const multiple = !arrastra && (!avisar || varias);
   // Opciones tildadas (originales) de una pregunta con varias correctas, antes de comprobar.
   const [marcadas, setMarcadas] = useState<number[]>([]);
   // Fichas puestas en cada hueco de una pregunta de arrastrar, antes de comprobar.
@@ -228,6 +233,20 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
             </ListBox>
           </Select.Popover>
         </Select>
+        <Checkbox
+          isSelected={avisar}
+          onChange={(v: boolean) => {
+            setAvisar(v);
+            guardado.escribir('avisar-cu', v);
+          }}
+        >
+          <Checkbox.Content>
+            <Checkbox.Control>
+              <Checkbox.Indicator />
+            </Checkbox.Control>
+            Avisar cuántas van
+          </Checkbox.Content>
+        </Checkbox>
         <Button variant="ghost" size="sm" className="sm:ml-auto" onPress={() => armar(filtro, cantidad)}>
           Nuevo cuestionario
         </Button>
@@ -266,7 +285,11 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
                   {(multiple || arrastra) && (
                     <Typography type="body-sm" color="muted" className="-mt-2">
                       {multiple ? (
-                        <><b className="font-medium text-accent">Varias correctas</b> · marcá todas y tocá Comprobar</>
+                        avisar ? (
+                          <><b className="font-medium text-accent">Varias correctas</b> · marcá todas y tocá Comprobar</>
+                        ) : (
+                          <><b className="font-medium text-accent">Seleccioná una o más</b> · marcá las correctas y tocá Comprobar</>
+                        )
                       ) : (
                         <><b className="font-medium text-accent">Arrastrar</b> · completá los huecos y tocá Comprobar</>
                       )}
@@ -331,7 +354,7 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
                           ? '✓ Correcto'
                           : arrastra
                             ? `✗ ${huecosBien(actual.p, elegida)} de ${actual.p.correctas.length} huecos bien: en verde, lo que iba`
-                          : multiple
+                          : varias
                             ? `✗ Incorrecto: las correctas eran la ${letras(correctasVisibles)}`
                             : `✗ Incorrecto: era la ${letras(correctasVisibles)}`}
                       </Typography>
@@ -356,7 +379,7 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
             atajos={
               arrastra
                 ? [[['Tab'], 'Ir de ficha en ficha y a los huecos'], [['Enter'], 'Tomar ficha · dejarla en el hueco']]
-                : [[['1', '2', '3', '4'], 'Elegir o marcar opción (o A–D)'], [['Enter'], 'Comprobar · siguiente pregunta']]
+                : [[['1', '2', '3', '4'], multiple ? 'Marcar o desmarcar opción (o A–D)' : 'Elegir opción (o A–D)'], [['Enter'], 'Comprobar · siguiente pregunta']]
             }
           />
         </div>
