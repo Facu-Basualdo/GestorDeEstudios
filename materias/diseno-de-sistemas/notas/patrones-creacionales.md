@@ -70,6 +70,12 @@
    - [ ] Factory Method y Singleton
    - [ ] Builder y Composite
    > Ambos resuelven la creación de productos sin nombrar clases concretas. Builder, en cambio, puede complementarse con otros creacionales. [→ Qué resuelven](#Qué%20resuelven)
+9. ¿Cuál(es) de los siguientes patrones pertenece a la categoría Creacional y tiene un alcance de Objeto? *(cátedra)*
+   - [ ] Adapter
+   - [x] Prototype
+   - [ ] Factory Method
+   - [x] Singleton
+   > Factory Method es creacional pero de clase; Adapter es estructural. Los creacionales de objeto son Abstract Factory, Builder, Prototype y Singleton. [→ Qué resuelven](#Qu%C3%A9%20resuelven)
 
 ## Contenido
 

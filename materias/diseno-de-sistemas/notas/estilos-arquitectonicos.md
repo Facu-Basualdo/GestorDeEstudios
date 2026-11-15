@@ -84,6 +84,12 @@
     - [ ] Los plug-ins quedan acoplados al núcleo
     - [ ] Obliga a recompilar todo ante cada cambio
     > Mientras las interfaces fijas no cambien, los plug-ins no se acoplan al núcleo. [→ Microkernel o plug-in](#Microkernel%20o%20plug-in)
+11. Marcá las afirmaciones correctas acerca de la arquitectura en capas *(cátedra)*
+    - [ ] Cada capa representa una capa física.
+    - [ ] Las capas inferiores dependen de las capas superiores.
+    - [x] Se pueden reemplazar capas completas mientras no se cambien las interfaces entre ellas.
+    - [x] Apunta a mejorar la modificabilidad de un sistema software.
+    > Cada capa depende sólo de la inmediata inferior; las capas son lógicas, no nodos físicos. [→ Capas](#Capas)
 
 ## Contenido
 

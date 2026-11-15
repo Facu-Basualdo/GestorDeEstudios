@@ -88,6 +88,18 @@
     - [ ] El lenguaje de programación
     - [ ] La cantidad de casos de uso
     > La funcionalidad se puede lograr con casi cualquier estructura; lo que la arquitectura habilita o inhibe son las cualidades. [→ Arquitectura y atributos de calidad](#Arquitectura%20y%20atributos%20de%20calidad)
+11. ¿Cuáles de las siguientes corresponden a las estructuras/vistas de una arquitectura de software propuestas por Bass et al.? *(cátedra)*
+    - [ ] Componentes y conductores
+    - [ ] Lógica
+    - [x] Módulos
+    - [ ] Estática
+    > Bass propone módulos, componentes y **conectores** (C&C) y asignación. "Conductores" es la trampa; lógica es de 4+1. [→ Estructuras](#Estructuras)
+12. Marcá las afirmaciones correctas acerca de la arquitectura de software *(cátedra)*
+    - [x] La arquitectura es una abstracción.
+    - [ ] Un patrón arquitectónico es sinónimo de un patrón de diseño.
+    - [ ] La arquitectura se concentra en el diseño de las clases.
+    - [x] Los requisitos funcionales NO definen la arquitectura.
+    > La forma de la arquitectura la determinan los atributos de calidad, no los requisitos funcionales; y omite el detalle interno de las clases. [→ Qué es la arquitectura](#Qu%C3%A9%20es%20la%20arquitectura)
 
 ## Contenido
 

@@ -84,6 +84,12 @@
     - [ ] Proxy
     - [ ] Composite
     > Decorator y Proxy mantienen la misma interfaz que el objeto envuelto. [→ Cómo no confundirlos](#Cómo%20no%20confundirlos)
+11. ¿Cuál/es de las siguientes frases corresponden a la intención de Adapter? *(cátedra)*
+    - [x] Permite que las clases trabajen juntas, ya que de otro modo no podrían debido a interfaces incompatibles.
+    - [ ] Proporcionar una interfaz unificada para un conjunto de interfaces en un subsistema.
+    - [ ] Definir una interfaz de nivel superior que hace que el subsistema sea más fácil de usar.
+    - [x] Convertir la interfaz de una clase en otra interfaz que los clientes esperan.
+    > Las otras dos son la intención de Facade. [→ Adapter](#Adapter)
 
 ## Contenido
 

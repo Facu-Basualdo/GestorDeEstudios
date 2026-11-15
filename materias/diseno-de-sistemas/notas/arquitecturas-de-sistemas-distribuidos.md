@@ -85,6 +85,24 @@
     - [ ] Tienen un único despliegue monolítico
     - [ ] Dependen de UDDI para descubrirse
     > Son una especialización de SOA; al haber muchos, suelen necesitar una capa de API. [→ Microservicios](#Microservicios)
+11. ¿Cuáles de las siguientes características son ventajas de un sistema distribuido según Sommerville? *(cátedra)*
+    - [x] Son escalables ya que se pueden aumentar las capacidades del sistema añadiendo nuevos recursos.
+    - [ ] Predictibilidad de la red, la respuesta depende de la carga global del sistema, de su organización y de la carga de la red.
+    - [ ] Consistencia estricta, garantizando que todas las copias de datos estén siempre sincronizadas en tiempo real.
+    - [x] Los procesos pueden operar de manera concurrente.
+    > Ventajas: uso compartido, apertura, concurrencia, escalabilidad y tolerancia a fallos. Que la respuesta dependa de la carga es la desventaja de imprevisibilidad. [→ Sistemas distribuidos](#Sistemas%20distribuidos)
+12. En una arquitectura maestro-esclavo, ¿cuál es el papel principal del nodo maestro? *(cátedra)*
+    - [x] Suele ser responsable del cálculo, la coordinación y las comunicaciones, y controla los procesos esclavos.
+    - [ ] Se encarga de las operaciones computacionalmente intensivas, como el procesamiento de señales y la gestión de equipos.
+    - [ ] Actuar únicamente como un nodo de respaldo en caso de falla de un nodo esclavo.
+    > Las operaciones intensivas (señales, equipos) las hacen los esclavos. [→ Maestro-esclavo](#Maestro-esclavo)
+13. Dado el siguiente diagrama, ¿a qué arquitectura corresponde? *(cátedra)*
+    ![Capa de API que deriva pedidos a servicios independientes, cada uno con sus módulos y su propia base de datos](../imagenes/distribuidos-topologia-diagrama.png)
+    - [ ] Peer 2 Peer
+    - [x] Microservicios
+    - [ ] Arquitectura Orientada a Servicios (SOA)
+    - [ ] Arquitectura de componentes/objetos distribuidos
+    > Cada servicio tiene **su propia base de datos** y se expone por una capa de API: microservicios. En SOA los servicios comparten datos y bus. [→ Microservicios](#Microservicios)
 
 ## Contenido
 

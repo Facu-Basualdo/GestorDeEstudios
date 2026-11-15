@@ -92,6 +92,24 @@
     - [ ] Para planificar el despliegue en el hardware
     - [ ] Para documentar las pruebas de regresión
     > Es la vista externa, en el lenguaje del cliente; puede tener redundancias, que el modelo de análisis elimina. [→ Trabajadores y artefactos](#Trabajadores%20y%20artefactos)
+12. ¿Cuál de las siguientes es una responsabilidad del Analista de Sistemas en el Proceso Unificado? *(cátedra)*
+    - [ ] Documentar en detalle cada caso de uso individual.
+    - [ ] Realizar pruebas de aceptación con los usuarios finales.
+    - [ ] Priorizar los casos de uso.
+    - [x] Definir el límite del sistema, identificar actores y casos de uso.
+    > Priorizar es del Arquitecto; detallar cada caso de uso, del Especificador de casos de uso. [→ Trabajadores y artefactos](#Trabajadores%20y%20artefactos)
+13. Marcá las afirmaciones verdaderas acerca del modelo de negocios *(cátedra)*
+    - [ ] Describe la interacción entre actores y el sistema
+    - [x] Está formado por el modelo de casos de uso de negocio
+    - [ ] Generalmente se hace en conjunto con el modelo de dominio
+    - [x] Está formado por el modelo de objetos de negocio
+    > La interacción actores–sistema es del modelo de casos de uso; el modelo de dominio es un subconjunto del de negocio, una alternativa más simple. [→ Modelo del negocio y del dominio](#Modelo%20del%20negocio%20y%20del%20dominio)
+14. ¿Cuál(es) de los siguientes artefactos NO corresponden al flujo de trabajo de Captura de Requisitos? *(cátedra)*
+    - [x] Clase de Análisis
+    - [ ] Modelo de casos de uso
+    - [ ] Prototipo de interfaz de usuario
+    - [ ] Glosario
+    > La clase de análisis es un artefacto del flujo de Análisis. [→ Trabajadores y artefactos](#Trabajadores%20y%20artefactos)
 
 ## Contenido
 

@@ -83,6 +83,18 @@
     - [ ] Participantes, colaboraciones y código de ejemplo
     - [ ] Propósito y ámbito
     > Las fuerzas caracterizan el problema y la solución en el contexto. Clasificación, intención y aplicabilidad son del formato GoF. [→ Cómo se documenta un patrón](#Cómo%20se%20documenta%20un%20patrón)
+11. ¿Cuál(es) de las siguientes opciones describe mejor lo que son los patrones de diseño según el GoF? *(cátedra)*
+    - [x] Son descripciones de objetos que se comunican y clases personalizadas para resolver problemas de diseño generales en un contexto particular.
+    - [ ] Son diseños complejos y específicos de dominio para aplicaciones o subsistemas completos.
+    - [ ] Son implementaciones concretas de estructuras de datos como listas enlazadas y tablas hash que pueden ser reutilizadas sin cambios.
+    - [ ] Son plantillas de código que proporcionan soluciones detalladas para problemas específicos de programación.
+    > Definición de Gamma et al. Los diseños de dominio completos son frameworks; las estructuras de datos y plantillas de código no son patrones. [→ Qué es un patrón](#Qu%C3%A9%20es%20un%20patr%C3%B3n)
+12. ¿Cuál(es) de las siguientes NO es una sección del formato de patrones de diseño de GoF? *(cátedra)*
+    - [x] Contexto
+    - [ ] Motivación
+    - [ ] Estructura
+    - [x] Pautas
+    > Contexto es de la forma de Alexander; el formato GoF tiene Motivación, Aplicabilidad, Estructura, Participantes, Colaboraciones, Consecuencias, etc. [→ Cómo se documenta un patrón](#C%C3%B3mo%20se%20documenta%20un%20patr%C3%B3n)
 
 ## Contenido
 

@@ -100,6 +100,12 @@
     - [ ] Usabilidad
     - [ ] Disponibilidad
     > "La más importante" es modificabilidad; el segundo foco, rendimiento. [→ Modificabilidad (Bass, cap. 8)](#Modificabilidad%20%28Bass%2C%20cap.%208%29)
+12. ¿Cuál de las siguientes opciones relaciona correctamente un atributo de calidad con el objetivo principal que busca asegurar? *(cátedra)*
+    - [ ] Usability (Usabilidad): asegurar tiempos de respuesta adecuados y throughput alto.
+    - [ ] Seguridad (Security): garantizar que el sistema no cause daños físicos.
+    - [ ] Escalabilidad (Escalability): permitir que el sistema se integre fácilmente con otros.
+    - [x] Deployability (Desplegabilidad): facilitar la liberación rápida y confiable de nuevas versiones.
+    > Tiempos de respuesta es rendimiento; no causar daño físico es *safety*; integrarse con otros es integrabilidad. [→ Atributos de calidad, funcionalidad y arquitectura](#Atributos%20de%20calidad%2C%20funcionalidad%20y%20arquitectura)
 
 ## Atributos de calidad, funcionalidad y arquitectura
 

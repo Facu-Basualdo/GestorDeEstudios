@@ -98,6 +98,24 @@
     - [ ] XP usa iteraciones de un mes y Scrum de 1 a 3 semanas
     - [ ] Son el mismo framework con distinto nombre
     > También las duraciones están al revés: XP de 1 a 3 semanas y Scrum un mes. [→ Limitaciones de XP](#Limitaciones%20de%20XP)
+13. ¿Qué papel desempeña Test-Driven Development (TDD) en Extreme Programming (XP)? *(cátedra)*
+    - [ ] TDD es una técnica opcional en XP, utilizada solo para casos complejos.
+    - [ ] TDD en XP se utiliza principalmente para pruebas manuales en lugar de pruebas automáticas.
+    - [x] TDD es una práctica clave en XP que promueve escribir las pruebas antes del código.
+    - [ ] XP y TDD son metodologías que se enfocan en principios completamente diferentes, por lo que no suelen usarse juntas.
+    > Desarrollo con pruebas primero, automatizadas. [→ Historias, pruebas y spikes](#Historias%2C%20pruebas%20y%20spikes)
+14. En XP, ¿cómo se utiliza un Architectural Spike y cuál es su propósito principal? *(cátedra)*
+    - [x] Se implementan para abordar incertidumbres técnicas y probar diferentes enfoques antes de comprometerse con una solución definitiva, en línea con el enfoque iterativo y adaptable de XP.
+    - [ ] XP fomenta su uso como estrategia para retrasar decisiones importantes sobre el diseño, con el fin de priorizar la entrega de características al cliente.
+    - [ ] Se implementan principalmente para evaluar el impacto de los cambios de hardware y optimizar el uso de recursos.
+    - [ ] Se usa para definir la arquitectura del sistema desde el principio del proyecto, evitando la necesidad de futuros ajustes estructurales.
+    > Un spike es un prototipo descartable para despejar una duda técnica antes de estimar o decidir. [→ Historias, pruebas y spikes](#Historias%2C%20pruebas%20y%20spikes)
+15. ¿Cuáles de las siguientes afirmaciones son verdaderas respecto al refactoring? *(cátedra)*
+    - [ ] El refactoring busca corregir errores lógicos en el código.
+    - [x] El refactoring ayuda a hacer que el código sea más legible y fácil de mantener.
+    - [x] El refactoring se enfoca en mejorar la estructura interna del código sin alterar su comportamiento externo.
+    - [ ] El refactoring mejora el rendimiento de una aplicación al reducir el uso de recursos.
+    > No corrige errores ni optimiza: cambia la estructura sin cambiar lo que hace. [→ Diseño en XP](#Dise%C3%B1o%20en%20XP)
 
 ## Contenido
 

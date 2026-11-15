@@ -121,6 +121,32 @@
     - [ ] El principio abierto/cerrado
     - [ ] El patrón Creador
     > Es una llamada encadenada a objetos que no son "amigos inmediatos". Demeter funciona como una alarma de acoplamiento mal distribuido. [→ Ley de Demeter](#Ley%20de%20Demeter)
+17. ¿Qué principio SOLID incumple el siguiente código? *(cátedra)*
+    ![Clase Vehicle con getWheelCount, getMaxSpeed, toString y print](../imagenes/solid-vehicle.png)
+    - [ ] Alta Cohesión
+    - [x] Responsabilidad Única
+    - [ ] Substitución de Liskov
+    - [ ] Segregación de Interfaces
+    > `Vehicle` guarda datos del vehículo y además se imprime por consola (`print`): dos razones para cambiar. Alta cohesión no es un principio SOLID. [→ S — Responsabilidad única](#S%20%E2%80%94%20Responsabilidad%20%C3%BAnica)
+18. Dado el siguiente párrafo de un libro, seleccioná los principios involucrados *(cátedra)*
+    - La importancia de este principio se vuelve obvia cuando consideras las consecuencias de violarlo. Supongamos que tenemos una función f que toma, como su argumento, un puntero o referencia a alguna clase base B. Supongamos también que existe algún derivado D de B que, cuando se pasa a f en la apariencia de B, causa que f se comporte incorrectamente. Entonces, D viola el {LSP}. Claramente, D es frágil en presencia de f.
+    - Los autores de f se verán tentados a poner algún tipo de prueba para D, de manera que f pueda comportarse correctamente cuando se le pase un D. Esta prueba viola el {OCP} porque ahora f no está cerrada a todos los diversos derivados de B. Tales pruebas son un indicio de mal diseño que resultan de desarrolladores inexpertos (o, lo que es peor, desarrolladores con prisa) reaccionando a violaciones del {LSP}.
+    - Opciones: {SRP} {OCP} {LSP} {ISP} {DIP}
+    > D no sustituye a B: LSP. El `if` que pregunta por D hace que f deje de estar cerrada: OCP. El último hueco también es LSP (las pruebas reaccionan a violaciones de Liskov); en 2025 se erró poniendo SRP. [→ L — Sustitución de Liskov](#L%20%E2%80%94%20Sustituci%C3%B3n%20de%20Liskov)
+19. Según el Principio de Segregación de Interfaces (ISP), ¿cuál es la mejor manera de manejar interfaces "gruesas" que no son cohesivas? *(cátedra)*
+    - [x] Dividir la interfaz en varias interfaces más pequeñas y cohesivas, de modo que cada cliente dependa solo de lo que necesita.
+    - [ ] Reemplazar las interfaces por clases concretas que agrupen todos los métodos en un solo lugar.
+    - [ ] Forzar a todos los clientes a implementar todos los métodos de la interfaz para garantizar consistencia.
+    - [ ] Mantener la interfaz completa en una sola clase, aunque algunos clientes no usen todos sus métodos.
+    > Los clientes no deben depender de métodos que no usan: interfaces chicas por grupo de clientes. [→ I — Segregación de interfaces](#I%20%E2%80%94%20Segregaci%C3%B3n%20de%20interfaces)
+20. Elegí a qué principio corresponde cada enunciado (puede ser ninguno)
+    - Una clase debería tener una sola razón para cambiar. {SRP}
+    - Los módulos de alto nivel no deben depender de los de bajo nivel: ambos dependen de abstracciones. {DIP}
+    - Un objeto sólo debería hablar con sus amigos inmediatos. {Ninguno}
+    - Los clientes no deberían verse obligados a depender de métodos que no usan. {ISP}
+    - Las subclases deben poder reemplazar a su clase base sin alterar el comportamiento esperado. {LSP}
+    - Opciones: {SRP} {OCP} {LSP} {ISP} {DIP} {Ninguno}
+    > "Hablar sólo con amigos inmediatos" es la Ley de Demeter, que no es uno de los cinco SOLID. Formato de desplegable del parcial. [→ Ley de Demeter](#Ley%20de%20Demeter)
 
 ## Contenido
 

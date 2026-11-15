@@ -98,6 +98,27 @@
     - [ ] Strategy
     - [ ] Observer
     > Usan herencia para repartir el comportamiento. El resto son de objeto (composición). [→ Qué resuelven](#Qué%20resuelven)
+13. ¿Cuál/es de las siguientes NO es una situación en la que se pueda aplicar el patrón Observer? *(cátedra)*
+    - [x] Cuando se desea controlar las extensiones de subclases. Puede definir un método de plantilla que llame a operaciones de "enganche" en puntos específicos, permitiendo así extensiones sólo en esos puntos.
+    - [ ] Cuando un cambio en un objeto requiere cambiar otros, y no se sabe cuántos objetos hay que cambiar.
+    - [x] Cuando una interfaz directa para obtener el estado expondría los detalles de implementación y rompería la encapsulación del objeto.
+    - [ ] Cuando un objeto debe ser capaz de notificar a otros objetos sin hacer suposiciones sobre quiénes son estos objetos.
+    > La primera es aplicabilidad de Template Method; la de no romper la encapsulación al obtener el estado, de Memento. En 2025 se marcó sólo la de Template Method. [→ Observer](#Observer)
+14. ¿A qué patrón se adapta la siguiente estructura? *(cátedra)*
+    ![Duck delega volar y graznar en las interfaces FlyBehavior y QuackBehavior, con implementaciones intercambiables](../imagenes/comportamiento-patos-diagrama.png)
+    - [ ] Composite
+    - [ ] Factory method
+    - [x] Strategy
+    - [ ] State
+    > Familias de algoritmos encapsulados e intercambiables (`setFlyBehavior`), elegidos por el cliente: Strategy. En State el cambio lo dispara el estado interno. [→ Strategy](#Strategy)
+15. Elegí a qué patrón corresponde cada intención (puede ser ninguno)
+    - Encapsula una petición como un objeto, lo que permite deshacer operaciones. {Command}
+    - Define una dependencia uno a muchos para que, cuando un objeto cambia de estado, se notifique a todos sus dependientes. {Observer}
+    - Permite que un objeto altere su comportamiento cuando cambia su estado interno. {State}
+    - Proporciona una interfaz unificada para un conjunto de interfaces de un subsistema. {Ninguno}
+    - Define una familia de algoritmos, encapsula cada uno y los hace intercambiables. {Strategy}
+    - Opciones: {Strategy} {State} {Observer} {Command} {Template Method} {Memento} {Mediator} {Ninguno}
+    > La interfaz unificada para un subsistema es Facade, que es estructural. Formato de desplegable del parcial. [→ Strategy vs. State y otros pares](#Strategy%20vs.%20State%20y%20otros%20pares)
 
 ## Contenido
 

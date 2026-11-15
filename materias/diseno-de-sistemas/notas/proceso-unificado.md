@@ -107,6 +107,36 @@
     - [ ] La lista de riesgos actualizada
     - [ ] Manuales y materiales de capacitación para el usuario final, el operador y el administrador
     > La línea base es de Elaboración; en Construcción la arquitectura sólo se mantiene al día. Se erró en el recu 2024 marcando sólo el ejecutable. [→ Las cuatro fases](#Las%20cuatro%20fases)
+14. ¿Cuál es la principal razón por la que el Proceso Unificado utiliza un enfoque iterativo e incremental? *(cátedra)*
+    - [ ] Para reducir los costos de desarrollo.
+    - [ ] Para facilitar la incorporación de nuevas tecnologías.
+    - [ ] Para maximizar la reutilización de código.
+    - [x] Para manejar mejor los riesgos y permitir la retroalimentación temprana.
+    > Cada iteración ataca primero los riesgos más grandes y muestra resultados pronto. [→ Las tres características](#Las%20tres%20caracter%C3%ADsticas)
+15. ¿Cuáles de los siguientes factores influyen directamente en la arquitectura según el PUDS? *(cátedra)*
+    - [x] Los casos de uso más importantes.
+    - [x] Los requisitos no funcionales (rendimiento, disponibilidad, confiabilidad, etc.).
+    - [ ] Las preferencias individuales de los programadores.
+    - [x] Los patrones arquitectónicos.
+    > Sección 4.3 del libro (casos de uso y arquitectura): también los patrones arquitectónicos; en 2025 se olvidó esa opción. [→ Las tres características](#Las%20tres%20caracter%C3%ADsticas)
+16. ¿Cuál es el propósito principal de un hito en el Proceso Unificado? *(cátedra)*
+    - [ ] Completar la codificación de un módulo específico del sistema.
+    - [ ] Establecer los costos finales del proyecto.
+    - [x] Proporcionar un punto de evaluación para decidir la continuación o ajuste del proyecto.
+    - [ ] Definir el alcance total del proyecto desde el inicio.
+    > Al final de cada fase hay un hito donde se decide si seguir, ajustar o cancelar. [→ Ciclo de vida](#Ciclo%20de%20vida)
+17. ¿Cuál de las siguientes afirmaciones sobre los flujos de trabajo en el Proceso Unificado es correcta? *(cátedra)*
+    - [x] El flujo de trabajo de diseño suele tener más actividad durante la fase de elaboración.
+    - [ ] El flujo de trabajo de implementación comienza solo después de que todos los requisitos estén completamente definidos.
+    - [ ] El flujo de trabajo de prueba solo se realiza en la fase de transición.
+    - [ ] Los flujos de trabajo no se pueden superponer.
+    > Los flujos se superponen en todas las fases; sólo cambia el esfuerzo. (La captura de 2025 no muestra la corrección; las otras tres contradicen el PU.) [→ Flujos de trabajo y disciplinas](#Flujos%20de%20trabajo%20y%20disciplinas)
+18. ¿Cuál de los siguientes artefactos es el foco de la fase de elaboración? *(cátedra)*
+    - [ ] Elaborar el plan para la fase de transición
+    - [x] Establecer la línea base de la arquitectura
+    - [ ] Completar el modelo de Diseño
+    - [ ] Elaborar la versión beta del producto final
+    > La beta es de construcción y transición; el modelo de diseño se completa en construcción. [→ Las cuatro fases](#Las%20cuatro%20fases)
 
 ## Contenido
 

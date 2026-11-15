@@ -62,12 +62,13 @@
    - [x] Es responsable de la integridad de una o varias realizaciones de casos de uso
    - [ ] Es responsable de definir y mantener las operaciones, métodos y atributos de una o varias clases de diseño
    > En el recuperatorio 2024 se marcó sólo una de las tres correctas. Las clases de diseño son del Ing. de componentes. [→ Lo que preguntó la cátedra](#Lo%20que%20pregunt%C3%B3%20la%20c%C3%A1tedra)
-6. En el flujo de Análisis, ¿qué parejas trabajador → actividad son correctas? *(cátedra)*
-   - [x] Arquitecto → Análisis de la arquitectura
-   - [x] Ingeniero de casos de uso → Analizar un caso de uso
-   - [x] Ingeniero de componentes → Analizar una clase
-   - [ ] Analista de sistemas → Analizar un paquete
-   > El Analista de sistemas no participa en Análisis; "Analizar un paquete" es del Ing. de componentes. [→ Flujo de trabajo del análisis (Fig. 8.18)](#Flujo%20de%20trabajo%20del%20an%C3%A1lisis%20%28Fig.%208.18%29)
+6. Emparejá el trabajador con la actividad que lleva a cabo en el flujo de Análisis *(cátedra)*
+   - Arquitecto {Análisis de la arquitectura}
+   - Analista de sistemas {No participa en este flujo}
+   - Ingeniero de componentes {Analizar una clase}
+   - Ingeniero de casos de uso {Analizar un caso de uso}
+   - Opciones: {Análisis de la arquitectura} {Analizar un caso de uso} {Analizar una clase} {Encontrar actores y casos de uso} {No participa en este flujo}
+   > El Analista de sistemas no participa en Análisis (encontrar actores y casos de uso es de Requisitos). El Ing. de componentes también analiza paquetes. Así aparece en los cuestionarios 2025: con desplegables. [→ Flujo de trabajo del análisis (Fig. 8.18)](#Flujo%20de%20trabajo%20del%20an%C3%A1lisis%20%28Fig.%208.18%29)
 7. ¿Cuál/es de las siguientes afirmaciones son verdaderas para una Clase de Diseño? *(cátedra)*
    - [x] Los atributos se declaran en términos del lenguaje de programación
    - [ ] Siempre se ajusta a uno de los tres estereotipos básicos: frontera, control o entidad
@@ -122,6 +123,12 @@
     - [ ] Ingeniero de casos de uso
     - [ ] Integrador de sistemas
     > El Ing. de componentes sigue en Prueba (implementa los componentes de prueba). [→ Trabajadores y artefactos de la prueba](#Trabajadores%20y%20artefactos%20de%20la%20prueba)
+16. ¿Qué describe un plan de compilación (build) de integración? *(cátedra)*
+    - [x] Una lista de casos de uso y/o escenarios que serán implementados en la compilación
+    - [ ] Una lista de las clases necesarias para implementar la funcionalidad esperada por la compilación
+    - [x] Describe la secuencia de compilaciones necesarias para una integración
+    - [x] Una lista de los subsistemas y componentes necesarios para implementar la funcionalidad esperada por la compilación
+    > Habla de subsistemas y componentes, no de clases. En 2025 se olvidó la lista de casos de uso. [→ Flujo de trabajo de la implementación (Fig. 10.16)](#Flujo%20de%20trabajo%20de%20la%20implementaci%C3%B3n%20%28Fig.%2010.16%29)
 
 ## Panorama general: los 5 flujos fundamentales y trazabilidad
 

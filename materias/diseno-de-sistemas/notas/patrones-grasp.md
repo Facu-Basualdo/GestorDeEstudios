@@ -122,6 +122,33 @@
     - [ ] Convertirlo en Singleton
     - [ ] Fusionarlo con las clases de dominio
     > Es un controlador inflado (*bloated controller*): viola Experto y Alta cohesión. [→ Controlador](#Controlador)
+17. ¿Qué patrón GRASP se debe aplicar cuando ninguna clase natural (según Experto) puede asumir la responsabilidad sin violar la Alta Cohesión o el Bajo Acoplamiento? *(cátedra)*
+    - [ ] Indirección
+    - [ ] Experto de la Información
+    - [x] Fabricación Pura
+    - [ ] Controlador
+    - [ ] Variaciones Protegidas
+    > Se inventa una clase que no es del dominio para no ensuciar a las clases naturales. [→ Fabricación pura](#Fabricaci%C3%B3n%20pura)
+18. Un sistema de ventas en línea usa distintas billeteras virtuales (Modo, MercadoPago, etc.) y en el futuro podrían agregarse nuevas o cambiar las existentes sin afectar al resto. Según Variaciones Protegidas, ¿qué diseño es el más adecuado? *(cátedra)*
+    - [ ] Que cada clase concreta del sistema (Carrito, Cliente, Factura) conozca directamente a la billetera virtual que utilizará.
+    - [ ] Crear una clase Controlador central que tenga referencias a todas las billeteras virtuales y decida cuál usar.
+    - [x] Definir una interfaz común de "BilleteraVirtual" y que el sistema interactúe con ella, en lugar de depender de implementaciones concretas.
+    - [ ] Asignar la responsabilidad de procesar el pago al objeto Factura ya que es quien contiene toda la información para crear el pago.
+    > El punto de variación (la billetera) queda detrás de una interfaz estable. La última opción es Experto, no protege la variación. [→ Variaciones protegidas](#Variaciones%20protegidas)
+19. Dados los dos diagramas de comunicación, elegí las alternativas correctas *(cátedra)*
+    ![Figura 1: Register crea Payment y se lo pasa a Sale. Figura 2: Register le pide a Sale que cree Payment](../imagenes/grasp-acoplamiento-figuras.png)
+    - [ ] Ambas figuras presentan un acoplamiento similar
+    - [x] La Figura 2 presenta menor acoplamiento que la Figura 1
+    - [ ] La Figura 1 presenta menor acoplamiento que la Figura 2
+    > En la Figura 1, Register se acopla a Payment y a Sale; en la 2, sólo a Sale, que crea su Payment. Es el ejemplo de Larman de Bajo acoplamiento; en 2025 se erró marcando la Figura 1. [→ Bajo acoplamiento y alta cohesión](#Bajo%20acoplamiento%20y%20alta%20cohesi%C3%B3n)
+20. Elegí a qué patrón GRASP corresponde cada descripción (puede ser ninguno)
+    - Asignar la responsabilidad a la clase que tiene la información necesaria para cumplirla. {Experto en información}
+    - Primer objeto más allá de la capa de interfaz que recibe y coordina una operación del sistema. {Controlador}
+    - Clase inventada, que no representa un concepto del dominio, para mantener alta cohesión y bajo acoplamiento. {Fabricación pura}
+    - Identificar los puntos de variación previstos y crear una interfaz estable a su alrededor. {Variaciones protegidas}
+    - Convertir la interfaz de una clase en otra que los clientes esperan. {Ninguno}
+    - Opciones: {Experto en información} {Creador} {Controlador} {Fabricación pura} {Indirección} {Polimorfismo} {Variaciones protegidas} {Ninguno}
+    > Convertir una interfaz es la intención de Adapter (GoF), no un patrón GRASP. Formato de desplegable del parcial. [→ Qué es GRASP](#Qu%C3%A9%20es%20GRASP)
 
 ## Contenido
 
