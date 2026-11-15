@@ -230,24 +230,35 @@ function flashcardsDe(cuerpo, ctx, ruta) {
   return tarjetas;
 }
 
-// Dos tipos de pregunta (ver metodo/recuperacion-activa.md):
-//   opciones   `- [x]` / `- [ ]`; con más de una [x] es de varias correctas.
-//   arrastrar  ítems sin casilla con huecos `{respuesta}`; `- Sobran: {a} {b}` agrega fichas
-//              que no van en ningún hueco. Sirve para emparejar y para completar texto.
+// Tres tipos de pregunta (ver metodo/recuperacion-activa.md):
+//   opciones     `- [x]` / `- [ ]`; con más de una [x] es de varias correctas.
+//   arrastrar    ítems sin casilla con huecos `{respuesta}`; `- Sobran: {a} {b}` agrega fichas
+//                que no van en ningún hueco. Sirve para emparejar y para completar texto.
+//   desplegable  igual, con `- Opciones: {a} {b}`: cada hueco es una lista con esas opciones.
 // Las líneas sangradas que no son ítems ni explicación siguen el enunciado (p. ej. una imagen).
 //   opciones:  { tipo, q, opciones, correctas: índices de las correctas, lineas: [], exp, ref }
 //   arrastrar: { tipo, q, opciones: fichas, correctas: por hueco, el índice de su ficha,
 //                lineas: [[{ t: 'texto', html } | { t: 'hueco', n }]], exp, ref }
 const HUECO = /\{([^{}]+)\}/g;
 
+// Con `- Opciones: {a} {b}` la pregunta es de desplegables (como "emparejamiento" y
+// "seleccionar palabras perdidas" de Moodle): cada hueco es una lista con las mismas opciones,
+// que se pueden repetir; las respuestas de los huecos se suman solas a la lista.
+// Con `- Sobran: {a} {b}` (o sin ninguna de las dos) es de arrastrar: una ficha por hueco.
 function arrastrarDe(p, ctx, ruta) {
+  const desplegable = p.items.some((l) => /^opciones:/i.test(l));
   const fichas = [];
   const correctas = [];
   const lineas = [];
+  const agregar = (texto) => {
+    const html = inline(texto.trim(), ctx);
+    const previa = desplegable ? fichas.indexOf(html) : -1;
+    return previa >= 0 ? previa : fichas.push(html) - 1;
+  };
   for (const l of p.items) {
-    const sobran = l.match(/^sobran:\s*(.*)$/i);
-    if (sobran) {
-      for (const [, f] of sobran[1].matchAll(HUECO)) fichas.push(inline(f.trim(), ctx));
+    const extra = l.match(/^(?:sobran|opciones):\s*(.*)$/i);
+    if (extra) {
+      for (const [, f] of extra[1].matchAll(HUECO)) agregar(f);
       continue;
     }
     const segmentos = [];
@@ -255,17 +266,17 @@ function arrastrarDe(p, ctx, ruta) {
     for (const m of l.matchAll(HUECO)) {
       if (m.index > desde) segmentos.push({ t: 'texto', html: inline(l.slice(desde, m.index), ctx) });
       segmentos.push({ t: 'hueco', n: correctas.length });
-      correctas.push(fichas.push(inline(m[1].trim(), ctx)) - 1);
+      correctas.push(agregar(m[1]));
       desde = m.index + m[0].length;
     }
     if (desde < l.length) segmentos.push({ t: 'texto', html: inline(l.slice(desde), ctx) });
     lineas.push(segmentos);
   }
   if (!correctas.length) {
-    avisos.push(`${rel(ruta)}: pregunta de arrastrar sin huecos {…} → ${p.q.slice(0, 60)}`);
+    avisos.push(`${rel(ruta)}: pregunta de huecos sin ningún {…} → ${p.q.slice(0, 60)}`);
     return null;
   }
-  return { tipo: 'arrastrar', opciones: fichas, correctas, lineas };
+  return { tipo: desplegable ? 'desplegable' : 'arrastrar', opciones: fichas, correctas, lineas };
 }
 
 function cuestionarioDe(cuerpo, ctx, ruta) {

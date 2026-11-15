@@ -118,6 +118,19 @@ resto con `- [ ]`, explicación en `>` con el mismo enlace a la sección:
 
   Para completar texto, el hueco va en medio de la frase: `- El patrón {Observer} define
   una dependencia uno a muchos…`. Una línea puede tener varios huecos.
+- **Desplegable** (como "emparejamiento" y "seleccionar palabras perdidas" de Moodle): igual
+  que arrastrar, pero con un ítem `Opciones:` en vez de `Sobran:`. Cada hueco es una lista con
+  todas las opciones, que **se pueden repetir** entre huecos; las respuestas se suman solas a
+  la lista. Una descripción con el hueco al final se ve en dos columnas (descripción y lista);
+  un hueco en medio de la frase queda dentro del renglón. Usá `{Ninguno}` cuando la cátedra
+  da esa opción:
+
+  ```
+  3. Elegí a qué principio corresponde cada enunciado
+     - Una clase debería tener una sola razón para cambiar. {SRP}
+     - Un objeto sólo debería hablar con sus amigos inmediatos. {Ninguno}
+     - Opciones: {SRP} {OCP} {LSP} {ISP} {DIP} {Ninguno}
+  ```
 - **Imágenes** (diagramas, capturas del parcial): `![texto alternativo](../imagenes/archivo.png)`
   en una línea sangrada debajo del enunciado, dentro de una opción o en la teoría. El archivo
   va en `materias/<materia>/imagenes/` (en git, no en `material/`). La web lo copia sola y el

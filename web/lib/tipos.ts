@@ -23,9 +23,11 @@ export type Segmento = { t: 'texto'; html: string } | { t: 'hueco'; n: number };
  * correctas; con más de una, se marcan todas y se comprueba.
  * `arrastrar`: emparejar o completar texto. `opciones` son las fichas (las respuestas de los
  * huecos y las que sobran), `correctas[n]` es la ficha del hueco `n` y `lineas` el texto.
+ * `desplegable`: igual, pero cada hueco es una lista con todas las `opciones` (sin repetir),
+ * que se pueden elegir en varios huecos.
  */
 export type Pregunta = {
-  tipo: 'opciones' | 'arrastrar';
+  tipo: 'opciones' | 'arrastrar' | 'desplegable';
   q: string;
   opciones: string[];
   correctas: number[];

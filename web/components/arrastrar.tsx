@@ -4,11 +4,24 @@ import { Fragment, useEffect, useRef, useState, type PointerEvent as EventoPunte
 import type { Pregunta } from '@/lib/tipos';
 import { Rico } from './piezas';
 
+/** Texto plano de un fragmento HTML del generador (sirve también en el servidor, sin DOMParser). */
+const plano = (html: string) =>
+  html
+    .replace(/<[^>]+>/g, '')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&');
+
 /**
- * Pregunta de arrastrar (como "arrastrar y soltar sobre texto" de Moodle): las fichas se
- * arrastran a los huecos con mouse o dedo, o se tocan (ficha y después hueco). Tocar un
- * hueco ocupado devuelve su ficha. Con teclado: Enter sobre la ficha y después sobre el hueco.
- * `colocadas[n]`: la ficha (índice en `p.opciones`) que está en el hueco `n`, o -1.
+ * Pregunta con huecos, de dos tipos:
+ * - `arrastrar` (como "arrastrar y soltar sobre texto" de Moodle): las fichas se arrastran a
+ *   los huecos con mouse o dedo, o se tocan (ficha y después hueco). Tocar un hueco ocupado
+ *   devuelve su ficha. Con teclado: Enter sobre la ficha y después sobre el hueco.
+ * - `desplegable` (como "emparejamiento" o "seleccionar palabras perdidas"): cada hueco es una
+ *   lista con todas las opciones, que se pueden repetir entre huecos.
+ * `colocadas[n]`: la ficha u opción (índice en `p.opciones`) que está en el hueco `n`, o -1.
  */
 export function Arrastrar({ p, orden, colocadas, onCambio, correccion }: {
   p: Pregunta;
@@ -24,11 +37,12 @@ export function Arrastrar({ p, orden, colocadas, onCambio, correccion }: {
   /** El gesto en curso (puntero apretado sobre una ficha), aunque todavía no sea un arrastre. */
   const inicio = useRef<{ ficha: number; desde: number; x: number; y: number; movio: boolean } | null>(null);
   const bloqueada = !!correccion;
+  const lista = p.tipo === 'desplegable';
 
   useEffect(() => setElegida(null), [p]);
 
   // Ancho de los huecos: el de la ficha más larga, como en Moodle, para no delatar la respuesta.
-  const largo = Math.max(...p.opciones.map((o) => o.replace(/<[^>]+>/g, '').length));
+  const largo = lista ? Math.max(8, ...p.opciones.map((o) => plano(o).length)) + 3 : Math.max(...p.opciones.map((o) => plano(o).length));
   const anchoHueco = `${Math.min(largo, 60) + 3}ch`;
 
   const enBanco = orden.filter((f) => !colocadas.includes(f));
@@ -104,6 +118,39 @@ export function Arrastrar({ p, orden, colocadas, onCambio, correccion }: {
     const ficha = colocadas[n];
     const correcta = p.correctas[n];
     const bien = correccion && ficha >= 0 && p.opciones[ficha] === p.opciones[correcta];
+    const correccionDe = correccion && !bien && (
+      <span className="mt-1 text-sm text-success">
+        → <Rico html={p.opciones[correcta]} />
+      </span>
+    );
+    if (lista) {
+      const estiloLista = correccion
+        ? bien ? 'border-success bg-success-soft' : 'border-danger bg-danger-soft'
+        : ficha >= 0 ? 'border-accent' : 'border-border';
+      return (
+        <span className="inline-flex max-w-full flex-col align-middle" style={{ width: anchoHueco }}>
+          <select
+            aria-label={`Lista ${n + 1}`}
+            value={ficha}
+            disabled={bloqueada}
+            onChange={(e) => {
+              const nuevas = [...colocadas];
+              nuevas[n] = Number(e.target.value);
+              onCambio(nuevas);
+            }}
+            className={`min-h-10 w-full rounded-lg border-2 bg-surface-secondary px-2 py-1 text-foreground transition-colors ${estiloLista}`}
+          >
+            <option value={-1}>Elegir…</option>
+            {orden.map((o) => (
+              <option key={o} value={o}>
+                {plano(p.opciones[o])}
+              </option>
+            ))}
+          </select>
+          {correccionDe}
+        </span>
+      );
+    }
     const resaltado = arrastre?.sobre === n || (elegida !== null && !bloqueada);
     const estilo = correccion
       ? bien ? 'border-success bg-success-soft' : 'border-danger bg-danger-soft'
@@ -113,7 +160,7 @@ export function Arrastrar({ p, orden, colocadas, onCambio, correccion }: {
         <button
           type="button"
           data-hueco={n}
-          aria-label={`Hueco ${n + 1}${ficha >= 0 ? `: ${p.opciones[ficha].replace(/<[^>]+>/g, '')}` : ', vacío'}`}
+          aria-label={`Hueco ${n + 1}${ficha >= 0 ? `: ${plano(p.opciones[ficha])}` : ', vacío'}`}
           disabled={bloqueada}
           onClick={(e) => e.detail === 0 && tocarHueco(n)}
           onPointerUp={() => !inicio.current && elegida !== null && tocarHueco(n)}
@@ -128,11 +175,7 @@ export function Arrastrar({ p, orden, colocadas, onCambio, correccion }: {
             </span>
           )}
         </button>
-        {correccion && !bien && (
-          <span className="mt-1 text-sm text-success">
-            → <Rico html={p.opciones[correcta]} />
-          </span>
-        )}
+        {correccionDe}
       </span>
     );
   };
@@ -140,16 +183,30 @@ export function Arrastrar({ p, orden, colocadas, onCambio, correccion }: {
   return (
     <div className="grid gap-5">
       <div className="grid gap-3 leading-relaxed">
-        {p.lineas.map((linea, k) => (
-          <div key={k} className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
-            {linea.map((s, j) => (
-              <Fragment key={j}>{s.t === 'texto' ? <Rico html={s.html} /> : hueco(s.n)}</Fragment>
-            ))}
-          </div>
-        ))}
+        {p.lineas.map((linea, k) => {
+          // Una descripción con su lista (o hueco) al final se dibuja en dos columnas, como el
+          // emparejamiento de Moodle; si el hueco está en medio del texto, sigue en el renglón.
+          const [texto, ultimo] = [linea[0], linea.at(-1)];
+          if (linea.length === 2 && texto.t === 'texto' && ultimo?.t === 'hueco') {
+            return (
+              <div key={k} className="grid items-center gap-x-4 gap-y-1.5 border-b border-separator pb-3 last:border-0 last:pb-0 sm:grid-cols-[minmax(0,1fr)_auto]">
+                <Rico html={texto.html} />
+                {hueco(ultimo.n)}
+              </div>
+            );
+          }
+          // Texto corrido: los huecos van dentro del renglón, como en Moodle.
+          return (
+            <p key={k} className="leading-[2.6]">
+              {linea.map((s, j) => (
+                <Fragment key={j}>{s.t === 'texto' ? <Rico html={s.html} /> : <span className="mx-1 inline-block align-middle">{hueco(s.n)}</span>}</Fragment>
+              ))}
+            </p>
+          );
+        })}
       </div>
 
-      {!bloqueada && (
+      {!bloqueada && !lista && (
         <div className="grid gap-2">
           <span className="etiqueta">
             {enBanco.length

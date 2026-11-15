@@ -27,7 +27,7 @@ const LETRAS = 'ABCDEF';
 
 const acierta = (p: Pregunta, sel: number[] | undefined) =>
   !!sel && sel.length === p.correctas.length &&
-  (p.tipo === 'arrastrar' ? huecosBien(p, sel) === p.correctas.length : sel.every((o) => p.correctas.includes(o)));
+  (p.tipo !== 'opciones' ? huecosBien(p, sel) === p.correctas.length : sel.every((o) => p.correctas.includes(o)));
 
 /** Huecos de una pregunta de arrastrar sin responder: ninguna ficha colocada. */
 const vacios = (p: Pregunta) => p.correctas.map(() => -1);
@@ -127,7 +127,9 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
   const actual = items[i];
   const elegida = elegidas[i];
   const respondida = elegida !== undefined;
-  const arrastra = actual?.p.tipo === 'arrastrar';
+  // Arrastrar y desplegable comparten los huecos: se completan y se comprueban igual.
+  const arrastra = actual?.p.tipo === 'arrastrar' || actual?.p.tipo === 'desplegable';
+  const desplegable = actual?.p.tipo === 'desplegable';
   const varias = (actual?.p.correctas.length ?? 0) > 1;
   const multiple = !arrastra && (!avisar || varias);
   // Opciones tildadas (originales) de una pregunta con varias correctas, antes de comprobar.
@@ -291,7 +293,11 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
                           <><b className="font-medium text-accent">Seleccioná una o más</b> · marcá las correctas y tocá Comprobar</>
                         )
                       ) : (
-                        <><b className="font-medium text-accent">Arrastrar</b> · completá los huecos y tocá Comprobar</>
+                        desplegable ? (
+                          <><b className="font-medium text-accent">Elegir de la lista</b> · una opción por lista (se pueden repetir) y tocá Comprobar</>
+                        ) : (
+                          <><b className="font-medium text-accent">Arrastrar</b> · completá los huecos y tocá Comprobar</>
+                        )
                       )}
                     </Typography>
                   )}
@@ -353,7 +359,7 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
                         {acierta(actual.p, elegida)
                           ? '✓ Correcto'
                           : arrastra
-                            ? `✗ ${huecosBien(actual.p, elegida)} de ${actual.p.correctas.length} huecos bien: en verde, lo que iba`
+                            ? `✗ ${huecosBien(actual.p, elegida)} de ${actual.p.correctas.length} ${desplegable ? 'bien' : 'huecos bien'}: en verde, lo que iba`
                           : varias
                             ? `✗ Incorrecto: las correctas eran la ${letras(correctasVisibles)}`
                             : `✗ Incorrecto: era la ${letras(correctasVisibles)}`}
@@ -377,7 +383,9 @@ export function Cuestionario({ materia, activo, irATeoria, pedido }: {
           <PanelSesion
             filas={filasPorTema(items.map((it) => it.p), (k) => estados[k])}
             atajos={
-              arrastra
+              desplegable
+                ? [[['Tab'], 'Ir de lista en lista'], [['↑', '↓'], 'Elegir en la lista']]
+                : arrastra
                 ? [[['Tab'], 'Ir de ficha en ficha y a los huecos'], [['Enter'], 'Tomar ficha · dejarla en el hueco']]
                 : [[['1', '2', '3', '4'], multiple ? 'Marcar o desmarcar opción (o A–D)' : 'Elegir opción (o A–D)'], [['Enter'], 'Comprobar · siguiente pregunta']]
             }
@@ -400,7 +408,7 @@ function Resultado({ materia, sesion, estados, bien, onRehacer, onNuevo, irATeor
   const { items, elegidas } = sesion;
   const mal = items.map((it, k) => ({ ...it, elegida: elegidas[k] })).filter((it) => !acierta(it.p, it.elegida));
   const texto = (p: Pregunta, ks: number[]) =>
-    p.tipo === 'arrastrar'
+    p.tipo !== 'opciones'
       ? ks.map((k) => (k >= 0 ? textoPlano(p.opciones[k]) : '—')).join(' / ')
       : ks.map((k) => textoPlano(p.opciones[k])).join(' + ');
   const fallos: Fallo[] = mal.map(({ p, elegida }) => ({
@@ -441,7 +449,7 @@ function Resultado({ materia, sesion, estados, bien, onRehacer, onNuevo, irATeor
                 <Typography weight="semibold">
                   <Rico html={p.q} />
                 </Typography>
-                {p.tipo === 'arrastrar' ? (
+                {p.tipo !== 'opciones' ? (
                   <Arrastrar p={p} orden={[]} colocadas={elegida ?? vacios(p)} onCambio={() => {}} correccion={elegida ?? vacios(p)} />
                 ) : (
                 <Typography color="muted">
