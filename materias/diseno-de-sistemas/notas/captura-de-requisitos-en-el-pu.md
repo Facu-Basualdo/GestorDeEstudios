@@ -110,6 +110,23 @@
     - [ ] Prototipo de interfaz de usuario
     - [ ] Glosario
     > La clase de análisis es un artefacto del flujo de Análisis. [→ Trabajadores y artefactos](#Trabajadores%20y%20artefactos)
+15. Completá el diagrama del flujo de trabajo de **Requisitos**: arrastrá cada trabajador a su carril y cada actividad a su lugar
+    ![Diagrama de actividad del flujo de Requisitos con los 4 trabajadores y las 5 actividades tapados por huecos numerados del 1 al 9](../imagenes/flujo-requisitos-huecos.png)
+    - 1: {Analista de sistemas}
+    - 2: {Arquitecto}
+    - 3: {Especificador de casos de uso}
+    - 4: {Diseñador de interfaces de usuario}
+    - 5: {Encontrar actores y casos de uso}
+    - 6: {Priorizar los casos de uso}
+    - 7: {Detallar un caso de uso}
+    - 8: {Prototipar la interfaz de usuario}
+    - 9: {Estructurar el modelo de casos de uso}
+    - Sobran: {Ingeniero de casos de uso} {Analizar un caso de uso} {Validar los requisitos}
+    > El Analista de sistemas abre (encontrar) y cierra (estructurar) en el carril de arriba. Detallar sube a Estructurar y baja a Prototipar. El Ingeniero de casos de uso recién aparece en Análisis. Apunte de Celina, p. 75 (Fig. 7.16 de Jacobson). [→ El flujo de trabajo de requisitos](#El%20flujo%20de%20trabajo%20de%20requisitos)
+16. Completá el texto que describe el flujo de trabajo de Requisitos
+    - Primero, el {analista de sistemas} ejecuta la actividad de Encontrar actores y casos de uso para preparar una primera versión del modelo de casos de uso. Entonces el {arquitecto} identifica los casos de uso relevantes arquitectónicamente, para proporcionar entradas a la priorización. Hecho esto, los {especificadores de casos de uso} describen todos los casos de uso que se han priorizado. Más o menos en paralelo, los {diseñadores de interfaz de usuario} sugieren las interfaces adecuadas para cada actor. Entonces el analista de sistemas {reestructura} el modelo de casos de uso definiendo {generalizaciones} entre los casos de uso.
+    - Sobran: {ingenieros de casos de uso} {integrador de sistemas} {prioriza} {realizaciones}
+    > Párrafo de Jacobson que Celina copia en la p. 75. Detallar y prototipar van más o menos en paralelo; estructurar agrega generalizaciones (y relaciones de inclusión y extensión) para que el modelo se entienda mejor. [→ El flujo de trabajo de requisitos](#El%20flujo%20de%20trabajo%20de%20requisitos)
 
 ## Contenido
 

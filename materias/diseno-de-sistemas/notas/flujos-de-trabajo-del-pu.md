@@ -129,6 +129,58 @@
     - [x] Describe la secuencia de compilaciones necesarias para una integración
     - [x] Una lista de los subsistemas y componentes necesarios para implementar la funcionalidad esperada por la compilación
     > Habla de subsistemas y componentes, no de clases. En 2025 se olvidó la lista de casos de uso. [→ Flujo de trabajo de la implementación (Fig. 10.16)](#Flujo%20de%20trabajo%20de%20la%20implementaci%C3%B3n%20%28Fig.%2010.16%29)
+17. Completá el diagrama del flujo de trabajo del **Análisis**: arrastrá cada trabajador a su carril y cada actividad a su lugar
+    ![Diagrama de actividad del flujo de Análisis con los 3 trabajadores y las 4 actividades tapados por huecos numerados del 1 al 7](../imagenes/flujo-analisis-huecos.png)
+    - 1: {Arquitecto}
+    - 2: {Ingeniero de casos de uso}
+    - 3: {Ingeniero de componentes}
+    - 4: {Análisis de la arquitectura}
+    - 5: {Analizar un caso de uso}
+    - 6: {Analizar una clase}
+    - 7: {Analizar un paquete}
+    - Sobran: {Analista de sistemas} {Analizar un subsistema} {Diseñar un caso de uso}
+    > Tres carriles: Arquitecto → Ing. de casos de uso → Ing. de componentes, que hace las dos últimas (clase y después paquete). El Analista de sistemas no participa en Análisis y los subsistemas son de Diseño. Diagrama del apunte de Celina, p. 88 (Fig. 8.18 de Jacobson). [→ Flujo de trabajo del análisis (Fig. 8.18)](#Flujo%20de%20trabajo%20del%20an%C3%A1lisis%20%28Fig.%208.18%29)
+18. Completá el diagrama del flujo de trabajo del **Diseño**: arrastrá cada trabajador a su carril y cada actividad a su lugar
+    ![Diagrama de actividad del flujo de Diseño con los 3 trabajadores y las 4 actividades tapados por huecos numerados del 1 al 7](../imagenes/flujo-diseno-huecos.png)
+    - 1: {Arquitecto}
+    - 2: {Ingeniero de casos de uso}
+    - 3: {Ingeniero de componentes}
+    - 4: {Diseño de la arquitectura}
+    - 5: {Diseñar un caso de uso}
+    - 6: {Diseñar una clase}
+    - 7: {Diseñar un subsistema}
+    - Sobran: {Diseñar interfaces} {Integrador de sistemas} {Diseñar un paquete}
+    > Mismos 3 trabajadores que en Análisis. Del Diseño de la arquitectura salen dos flechas: al caso de uso y a la clase; las dos terminan en Diseñar un subsistema. "Diseñar interfaces" no existe como actividad: fue el error del recuperatorio 2024 (P6). Apunte de Celina, p. 100 (Fig. 9.16). [→ Flujo de trabajo del diseño (Fig. 9.16)](#Flujo%20de%20trabajo%20del%20dise%C3%B1o%20%28Fig.%209.16%29)
+19. Completá el diagrama del flujo de trabajo de la **Implementación**: arrastrá cada trabajador a su carril y cada actividad a su lugar
+    ![Diagrama de actividad del flujo de Implementación con los 3 trabajadores y las 5 actividades tapados por huecos numerados del 1 al 8](../imagenes/flujo-implementacion-huecos.png)
+    - 1: {Arquitecto}
+    - 2: {Integrador de sistemas}
+    - 3: {Ingeniero de componentes}
+    - 4: {Implementación de la arquitectura}
+    - 5: {Integrar sistemas}
+    - 6: {Implementar una clase}
+    - 7: {Implementar un subsistema}
+    - 8: {Realizar prueba de unidad}
+    - Sobran: {Ingeniero de casos de uso} {Implementar un caso de uso} {Realizar prueba de integración}
+    > El carril del medio es el **Integrador de sistemas** (no el Ing. de casos de uso, que ya no está). Ojo con la posición: Implementar un subsistema queda **abajo** y Implementar una clase **arriba**; las dos van a la prueba de unidad, que es de Implementación (la de integración es de Prueba). Apunte de Celina, p. 113 (Fig. 10.16). [→ Flujo de trabajo de la implementación (Fig. 10.16)](#Flujo%20de%20trabajo%20de%20la%20implementaci%C3%B3n%20%28Fig.%2010.16%29)
+20. Completá el diagrama del flujo de trabajo de la **Prueba**: arrastrá cada trabajador a su carril y cada actividad a su lugar
+    ![Diagrama de actividad del flujo de Prueba con los 4 trabajadores y las 6 actividades tapados por huecos numerados del 1 al 10](../imagenes/flujo-prueba-huecos.png)
+    - 1: {Ingeniero de pruebas}
+    - 2: {Ingeniero de pruebas de integración}
+    - 3: {Ingeniero de pruebas de sistema}
+    - 4: {Ingeniero de componentes}
+    - 5: {Planificar prueba}
+    - 6: {Diseñar prueba}
+    - 7: {Implementar pruebas}
+    - 8: {Realizar prueba de integración}
+    - 9: {Realizar prueba de sistema}
+    - 10: {Evaluar prueba}
+    - Sobran: {Arquitecto} {Integrador de sistemas} {Realizar prueba de unidad}
+    > El Ingeniero de pruebas (en el texto, **Diseñador de pruebas**) planifica, diseña y **evalúa**: arranca y cierra arriba. El Ing. de componentes queda **abajo** implementando las pruebas, y de ahí salen las de integración y de sistema. No hay Arquitecto. Apunte de Celina, p. 123 (Fig. 11.8). [→ Flujo de trabajo de la prueba (Fig. 11.8)](#Flujo%20de%20trabajo%20de%20la%20prueba%20%28Fig.%2011.8%29)
+21. Ordená las actividades del flujo de Prueba según el diagrama
+    - Primero el Ingeniero de pruebas hace {Planificar prueba} y después {Diseñar prueba}. El Ingeniero de componentes hace {Implementar pruebas}. En paralelo se hacen {Realizar prueba de integración} y {Realizar prueba de sistema}, y el Ingeniero de pruebas cierra con {Evaluar prueba}.
+    - Sobran: {Realizar prueba de unidad} {Integrar sistemas}
+    > La prueba de unidad y la integración del sistema son del flujo de Implementación. [→ Flujo de trabajo de la prueba (Fig. 11.8)](#Flujo%20de%20trabajo%20de%20la%20prueba%20%28Fig.%2011.8%29)
 
 ## Panorama general: los 5 flujos fundamentales y trazabilidad
 
