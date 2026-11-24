@@ -136,7 +136,7 @@
     - [ ] En cada consulta, aunque la red funcione
     - [ ] Sólo en motores de grafo
     > "No es menú": no se eligen dos de tres en cualquier momento. [→ Distribución y CAP](#Distribución%20y%20CAP)
-18. ¿Qué afirmaciones sobre CAP son falsas? (varias correctas)
+18. ¿Qué afirmaciones sobre CAP son falsas?
     - [x] La C de CAP es la misma consistencia de ACID
     - [x] Cada producto tiene una etiqueta CAP fija
     - [x] Siempre se eligen dos de tres propiedades
@@ -184,6 +184,86 @@
     - [ ] Neo4j no tiene transacciones
     - [ ] MongoDB es un motor de grafos
     > "No gana quien usa más motores": cada motor entra sólo si resuelve algo que los demás no. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
+26. Elegí la estructura de Redis para cada necesidad
+    - Sesión con un valor que vence a los 120 s {String}
+    - Carrito con varios productos y sus cantidades bajo una clave {Hash}
+    - Favoritos de un usuario, sin repetidos ni orden {Set}
+    - Ranking de productos por puntaje {Sorted set}
+    - Opciones: {String} {Hash} {Set} {Sorted set} {List}
+    > El TTL se pone a cualquier clave (EX o EXPIRE). El set guarda miembros únicos sin orden; el sorted set, pares puntaje–miembro ordenados. Así los usó el grupo en la U9 Act. 1. [→ Redis](#Redis)
+27. Completá qué devuelve cada comando del laboratorio (U9 Act. 1)
+    - `HSET carrito:U01 P102 5` sobre un campo que ya existía devuelve {0}; `HDEL` de ese campo devuelve {1}; `SISMEMBER` de un producto que no está en favoritos devuelve {0}; y `TTL session:temporal` después de que la clave expiró devuelve {-2}.
+    - Opciones: {0} {1} {-1} {-2}
+    > HSET cuenta campos nuevos (0 = sólo actualizó). *(tutor)* -1 sería una clave que existe pero no tiene vencimiento. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
+28. Completá el esquema de distribución de Cassandra: arrastrá cada concepto a su lugar
+    ![PRIMARY KEY ((usuario), fecha, evento_id): el hueco 1 marca (usuario) y el 2 marca fecha y evento_id; el valor 'ana' pasa por una función hash y da el hueco 3, que decide qué nodos del anillo N1 a N6 son dueños; el cliente le manda la operación a N1 (hueco 4); N3, N4 y N5 tienen las copias (hueco 5 = 3) y responden 2 de 3 (hueco 6 = QUORUM)](../imagenes/cassandra-distribucion-huecos.png)
+    - 1: {Partition key}
+    - 2: {Clustering columns}
+    - 3: {Token}
+    - 4: {Coordinador}
+    - 5: {RF}
+    - 6: {CL}
+    - Sobran: {Shard key} {Primary} {Slot}
+    > N1 coordina aunque no tenga el dato: no hay maestro, cualquier nodo puede coordinar. RF dice cuántas copias hay y CL cuántas tienen que responder: son decisiones distintas. Primary es de MongoDB y los slots, de Redis Cluster. Esquema del tutor con las diap. 15–18. [→ Cassandra](#Cassandra)
+29. Con cada combinación de RF y CL, ¿cuántas réplicas tienen que responder?
+    - RF = 3, CL = ONE {1}
+    - RF = 3, CL = QUORUM {2}
+    - RF = 3, CL = ALL {3}
+    - RF = 5, CL = QUORUM {3}
+    - RF = 1, CL = QUORUM {1}
+    - Opciones: {1} {2} {3} {4} {5}
+    > QUORUM es la mayoría de las réplicas: con RF = 3, 2 de 3. *(tutor)* La cuenta general es RF / 2 + 1 redondeando hacia abajo: con RF = 5 son 3, con RF = 1 es 1 (por eso el laboratorio con RF = 1 no demuestra tolerancia a fallas). [→ Cassandra](#Cassandra)
+30. ¿Cuáles de estas operaciones resuelve sin ALLOW FILTERING la tabla `eventos` con `PRIMARY KEY ((usuario), fecha, evento_id)`?
+    - [x] `SELECT * FROM eventos WHERE usuario = 'ana' LIMIT 10`
+    - [x] `SELECT * FROM eventos WHERE usuario = 'ana' AND fecha > '2026-11-01'`
+    - [ ] `SELECT * FROM eventos WHERE tipo = 'click'`
+    - [ ] `SELECT * FROM eventos WHERE fecha > '2026-11-01'`
+    - [x] Un DELETE con usuario, fecha y evento_id (la clave primaria completa)
+    > Sin la partición no hay consulta: el rango sobre la clustering va después de fijar usuario. Para buscar por tipo hace falta otra tabla (eventos_por_tipo), no ALLOW FILTERING. [→ Cassandra](#Cassandra)
+31. Elegí a qué motor corresponde cada garantía (tabla ACID de la clase)
+    - MULTI/EXEC sin rollback tradicional {Redis}
+    - Atomicidad por partición y LWT (IF) con Paxos {Cassandra}
+    - Transacciones ACID completas: una compra que falla se revierte entera {Neo4j}
+    - Durabilidad con commit log y SSTables {Cassandra}
+    - Durabilidad según RDB o AOF {Redis}
+    - Aislamiento con bloqueos {Neo4j}
+    - Ejecución secuencial, sin aislamiento SQL {Redis}
+    - Opciones: {Redis} {Cassandra} {Neo4j}
+    > Diap. 24: los NoSQL no "sacrifican ACID" en bloque; cada motor da garantías distintas según su arquitectura y el alcance de sus operaciones. [→ ACID en NoSQL](#ACID%20en%20NoSQL)
+32. Con el grafo de la figura, ¿qué productos devuelve `MATCH (u1:Cliente)-[:SIGUE]->(u2:Cliente)-[:COMPRO]->(p:Producto) WHERE u1.usuario_id = 'U01' AND NOT (u1)-[:COMPRO]->(p) RETURN DISTINCT p.producto_id`?
+    ![Grafo: U01 SIGUE a U02 y a U03; U04 SIGUE a U01; U01 COMPRO P1; U02 COMPRO P1 y P2; U03 COMPRO P2 y P3; U04 COMPRO P4](../imagenes/neo4j-recomendacion-grafo.png)
+    - [ ] P1
+    - [x] P2
+    - [x] P3
+    - [ ] P4
+    > P1 ya lo compró U01: el WHERE NOT lo excluye. P4 lo compró U04, que sigue a U01 y no al revés: la dirección de SIGUE importa. P2 lo compraron U02 y U03, y DISTINCT lo devuelve una sola vez. Grafo del tutor con la consulta de recomendación del laboratorio. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
+33. Completá la formulación correcta de CAP
+    - Bajo una {partición de red}, C significa que cada lectura ve el último valor confirmado o {recibe un error}, y A que cada solicitud a un nodo {no fallado} obtiene respuesta. La C de CAP {no es} la consistencia de ACID.
+    - Sobran: {siempre} {cualquier nodo} {es la misma que}
+    > CAP no es un menú de "dos de tres" en cualquier momento: el compromiso aparece sólo bajo partición. Tampoco es una etiqueta fija del producto. [→ Distribución y CAP](#Distribución%20y%20CAP)
+34. OmniMarket (U9 Act. 2): elegí el motor que el grupo asignó a cada dominio
+    - Inventario {PostgreSQL}
+    - Ventas y pagos {PostgreSQL}
+    - Catálogo de productos {MongoDB}
+    - Logística (el envío con su historial embebido) {MongoDB}
+    - Sesiones y carritos {Redis}
+    - Navegación (clickstream) {Cassandra}
+    - Recomendaciones calculadas en batch {MongoDB}
+    - Opciones: {PostgreSQL} {MongoDB} {Redis} {Cassandra} {Neo4j}
+    > Neo4j quedó afuera: el batch alcanza y un quinto motor sumaba costo. Identidad, dinero y stock son de PostgreSQL (ACID y bloqueo de fila). [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
+35. Elegí si cada rasgo es de RDB o de AOF
+    - Snapshot periódico de toda la base {RDB}
+    - Registro secuencial de cada escritura {AOF}
+    - Archivo compacto y reinicio rápido {RDB}
+    - Pérdida casi nula: reejecuta el historial {AOF}
+    - Se pierde lo escrito después de la última copia {RDB}
+    - `BGSAVE` genera `dump.rdb` {RDB}
+    - Opciones: {RDB} {AOF}
+    > Diap. 10. Sin ninguna de las dos, un reinicio pierde todos los datos. [→ Redis](#Redis)
+36. Ordená cómo se resuelve la venta de la última unidad en OmniMarket
+    - A lee el stock en PostgreSQL con {FOR UPDATE}, toma el lock, descuenta y hace {COMMIT}. B {espera}, relee stock 0 y hace {ROLLBACK}. Después un evento marca el producto sin stock en {MongoDB} y borra el carrito en {Redis}.
+    - Sobran: {Cassandra} {lee el stock viejo}
+    > Redis guarda la intención pero no conoce el stock: decide PostgreSQL con el bloqueo de fila. La sincronización hacia MongoDB y Redis es asincrónica. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
 
 ## Tres modelos tres preguntas
 

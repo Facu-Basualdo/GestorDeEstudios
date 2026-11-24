@@ -54,7 +54,9 @@
 
 > Notas escritas el 2026-11-10 con las **clases 7 a 10 de 2026** y las **bitácoras del grupo** (U7 Act. 1 y 2, U8 Act. 1
 > y 2, U9 Act. 1 y 2). Pesos **estimados** por el énfasis de las clases. El tema 12 (herramientas de datos distribuidos)
-> no tiene material todavía.
+> no tiene material todavía. Los cuestionarios usan los mismos formatos de Moodle que Diseño: varias correctas sin
+> avisar cuántas, desplegables (emparejar y dentro del texto), arrastrar con fichas que sobran y diagramas con huecos
+> numerados (esquemas del tutor armados con las diapositivas).
 
 ## Unidad 7 — Datos semiestructurados
 

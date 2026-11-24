@@ -146,12 +146,13 @@
     - [ ] En la autenticación: la contraseña es incorrecta
     - [ ] En el bindIp
     > Si puede leer, la conexión y la autenticación funcionan. [→ Seguridad](#Seguridad)
-20. ¿Qué mínimo de seguridad no puede omitir un DBA en MongoDB? (varias correctas)
+20. ¿Qué mínimo de seguridad no puede omitir un DBA en MongoDB?
     - [x] Habilitar autenticación (control de acceso)
     - [x] Usuarios y roles con privilegio mínimo
     - [x] Limitar la exposición de red y cifrar con TLS
     - [x] Probar la restauración de los backups
-    > Los cuatro de la diapositiva 36: autenticación, RBAC, red/TLS y backups con restore probado. [→ Seguridad](#Seguridad)
+    - [ ] Abrir bindIp a 0.0.0.0 para que conecten todos los drivers
+    > Los cuatro de la diapositiva 36: autenticación, RBAC, red/TLS y backups con restore probado. Abrir la red a todas las interfaces es lo contrario de limitar la exposición. [→ Seguridad](#Seguridad)
 21. En la U8 Act. 1, ¿qué se descartó para los comentarios de una nota y por qué?
     - [x] Embeberlos: array sin tope, cada comentario reescribe la nota más leída y la moderación tendría que hacer $unwind de todas las notas
     - [ ] Referenciarlos: obliga a hacer $lookup en cada listado
@@ -176,6 +177,70 @@
     - [ ] Porque $out sólo funciona en replica set
     - [ ] No hay diferencia: es un backup válido
     > Igualar conteos prueba que la copia salió bien, no que el sistema sea recuperable. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
+25. Marcá cuándo conviene embeber (incrustar) en vez de referenciar
+    - [x] El dato se consulta junto casi siempre
+    - [x] La relación es acotada (uno a pocos)
+    - [x] Se actualiza como unidad
+    - [ ] Muchos documentos comparten la misma entidad
+    - [ ] El crecimiento puede ser no acotado
+    > Compartir la entidad, la alta cardinalidad y el crecimiento sin tope son razones para referenciar. No es una traducción mecánica de PK/FK. [→ Embedding o referencia](#Embedding%20o%20referencia)
+26. Elegí la decisión de modelado para cada caso
+    - Direcciones y preferencias del perfil de usuario {Embeber}
+    - Ítems del pedido, con la descripción y el precio del momento de compra {Embeber}
+    - Cliente del pedido, que participa en muchos pedidos y cambia por separado {Referenciar}
+    - Categorías del catálogo, que cambian poco y las comparten millones de productos {Referenciar}
+    - Autor de la publicación en la U8 Act. 1, guardando su id y su nombre para listar sin $lookup {Referencia extendida}
+    - Millones de mediciones de un dispositivo IoT {Colección separada}
+    - Opciones: {Embeber} {Referenciar} {Referencia extendida} {Colección separada}
+    > Los ítems son una foto histórica; el cliente y las categorías tienen vida propia; la referencia extendida copia sólo lo que muestra el listado; las mediciones crecen sin límite (bucket pattern o time series). [→ Embedding o referencia](#Embedding%20o%20referencia)
+27. Completá el pipeline de ventas por producto: arrastrá cada etapa a su lugar
+    ![Pipeline sobre la colección pedidos con 4 etapas tapadas: 1 sólo los confirmados, 2 un documento por ítem, 3 por sku unidades e importe, 4 importe descendente](../imagenes/mongodb-pipeline-huecos.png)
+    - 1: {$match}
+    - 2: {$unwind}
+    - 3: {$group}
+    - 4: {$sort}
+    - Sobran: {$lookup} {$out} {$elemMatch}
+    > $match va primero para reducir el conjunto antes de abrir el array. $elemMatch es un operador de consulta, no una etapa; $lookup une con otra colección y $out escribe el resultado en una. Esquema del tutor con el ejemplo de la diap. 31–32. [→ Aggregation pipeline](#Aggregation%20pipeline)
+28. Elegí en qué capa falla cada caso (diagnóstico por capas de la U8 Act. 2)
+    - El cliente recibe connection refused {Conexión}
+    - El cliente queda esperando hasta un timeout {Conexión}
+    - Authentication failed con el usuario y la base de autenticación indicados {Autenticación}
+    - not authorized on u8_g06 to execute command insert {Autorización}
+    - El operador (readWrite) intenta createUser y recibe Unauthorized {Autorización}
+    - Opciones: {Conexión} {Autenticación} {Autorización}
+    > Conexión: ¿llega al puerto? Autenticación: ¿credenciales válidas en su authenticationDatabase? Autorización: ¿su rol permite la acción? Es la misma ruta de la conectividad de la U5. [→ Seguridad](#Seguridad)
+29. Elegí a qué arquitectura de MongoDB corresponde cada elemento
+    - Un primary y varios secondaries con copias de los datos {Replica set}
+    - mongos enruta las consultas {Sharded cluster}
+    - Los config servers guardan los metadatos {Sharded cluster}
+    - Elección automática de un nuevo primary ante una falla {Replica set}
+    - Objetivo: escalar datos y carga horizontalmente {Sharded cluster}
+    - Objetivo: redundancia y alta disponibilidad {Replica set}
+    - Opciones: {Replica set} {Sharded cluster}
+    > Diap. 35: dos problemas distintos. Replicar da disponibilidad; repartir datos entre shards da escala. [→ Replica set y sharding](#Replica%20set%20y%20sharding)
+30. Completá con el operador que corresponde
+    - Para cambiar el estado se usa {$set}, para sumar 1 a intentosPago {$inc} y para agregar un evento al array {$push}. Para filtrar pedidos cuyo estado esté en una lista se usa {$in}, y para poner una condición sobre los elementos de un array, {$elemMatch}.
+    - Sobran: {$unwind} {$group} {$exists}
+    > $unwind y $group son etapas del pipeline, no operadores de update ni de filtro. $exists pregunta si el campo está. [→ CRUD](#CRUD)
+31. Completá la evidencia del explain de la consulta P1 en la U8 Act. 1
+    - Antes del índice el winningPlan era SORT ← {COLLSCAN} con totalDocsExamined en {20}. Después del índice seccion_fecha pasó a FETCH ← {IXSCAN}, que examinó {4} documentos, los mismos que devolvió. El tiempo dio {0 ms} en los dos casos.
+    - Sobran: {IDHACK} {43} {16 MB}
+    > Con 20 documentos el tiempo no cambia: la mejora se demuestra en trabajo (documentos examinados frente a devueltos) y en que desaparece el SORT en memoria. "No afirmar 'mejoró': demostrar qué cambió". [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
+32. Marcá las afirmaciones verdaderas sobre validación y atomicidad en MongoDB
+    - [x] Una escritura sobre un único documento es atómica aunque modifique varios campos o subdocumentos
+    - [x] Con $jsonSchema el motor rechaza los documentos que no cumplen campos y tipos
+    - [ ] Toda la validación queda en la aplicación
+    - [ ] Una instancia standalone admite transacciones multidocumento
+    - [x] Modelar bien el agregado puede reducir la necesidad de transacciones
+    > "Toda la validación en la aplicación" era la afirmación de la PPT vieja. Las transacciones multidocumento piden replica set o sharded cluster (el error de la U8 Act. 1). [→ Validación y atomicidad](#Validación%20y%20atomicidad)
+33. Ordená los cuatro pasos para diseñar un documento desde los patrones de acceso
+    - Primero hay que {listar las consultas}, después {identificar las escrituras}, luego {medir la cardinalidad} y recién ahí {diseñar el documento}.
+    - Sobran: {normalizar hasta 3FN} {crear índices por si acaso}
+    > Normalizar es pensar en tablas: lleva al anti-patrón de "SQL traducido 1:1". Los índices se crean para una consulta concreta, no por si acaso. [→ Diseñar desde los patrones de acceso](#Diseñar%20desde%20los%20patrones%20de%20acceso)
+34. Ordená cómo se activó la seguridad en la U8 Act. 2
+    - Primero se creó {el administrador en admin con rol root}, después se agregó {security.authorization: enabled} en mongod.cfg y se {reinició el servicio}. Para TLS en producción se migra con {preferTLS} antes de pasar a {requireTLS}.
+    - Sobran: {bindIp: 0.0.0.0} {el usuario lector con readWrite}
+    > Así quedó probado que sin credenciales `show dbs` falla. Abrir bindIp a todas las interfaces aumenta la exposición; el lector tiene `read`, el operador `readWrite`. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
 
 ## El documento
 

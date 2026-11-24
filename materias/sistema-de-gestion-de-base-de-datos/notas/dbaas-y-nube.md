@@ -58,7 +58,7 @@
    - [ ] El modelo, el SQL y los índices
    - [ ] El costo y el gobierno
    > Hardware y SO: proveedor. Modelo, SQL, datos, costo: cliente. [→ Responsabilidad compartida](#Responsabilidad%20compartida)
-6. ¿Qué trabajo **permanece** al pasar de la VM del curso a DBaaS? (varias correctas)
+6. ¿Qué trabajo **permanece** al pasar de la VM del curso a DBaaS?
    - [x] Diseñar datos e índices
    - [x] Validar el restore, el RPO/RTO y los costos
    - [x] Diagnosticar consultas y sesiones
@@ -166,6 +166,87 @@
     - [ ] ¿Tiene la consola más completa?
     - [ ] ¿Cuántas regiones tiene?
     > Portabilidad: dependencias, exportación y prueba de salida. "No gana el proveedor más conocido." [→ Elegir dónde operar](#Elegir%20dónde%20operar)
+24. Matriz de responsabilidad compartida: elegí quién responde por cada ítem
+    - Hardware y datacenter {Proveedor}
+    - SO y parches de plataforma {Proveedor}
+    - Disponibilidad de la plataforma {Compartida}
+    - Configuración del servicio {Cliente}
+    - Usuarios, roles y privilegios {Cliente}
+    - Modelo, SQL e índices {Cliente}
+    - Datos y clasificación {Cliente}
+    - Costo y gobierno {Cliente}
+    - Opciones: {Proveedor} {Cliente} {Compartida}
+    > Diap. 9–10: "managed" no significa "sin dueño". Lo único compartido es la disponibilidad de la plataforma. [→ Responsabilidad compartida](#Responsabilidad%20compartida)
+25. Al pasar de la VM a DBaaS, ¿cada trabajo se reduce o permanece?
+    - Instalar el SO y el motor {Se reduce}
+    - Gestionar los discos del servidor {Se reduce}
+    - Automatizar las copias estándar {Se reduce}
+    - Diagnosticar consultas y sesiones {Permanece}
+    - Configurar los parámetros permitidos {Permanece}
+    - Validar el restore, el RPO/RTO y los costos {Permanece}
+    - Gestionar identidades y privilegios {Permanece}
+    - Opciones: {Se reduce} {Permanece}
+    > El foco pasa de administrar máquinas a administrar niveles de servicio y decisiones. [→ Responsabilidad compartida](#Responsabilidad%20compartida)
+26. Completá la ruta de conexión a un DBaaS: arrastrá cada componente a su lugar
+    ![La aplicación pasa por los huecos 1 (resuelve el nombre), 2 (host:5432 que reemplaza a la IP) y 3 (red segura) hasta el DBaaS, que guarda en el hueco 4; al costado, el hueco 5 es lo que mira el DBA en vez de entrar al SO](../imagenes/dbaas-ruta-huecos.png)
+    - 1: {DNS}
+    - 2: {Endpoint}
+    - 3: {TLS}
+    - 4: {Storage}
+    - 5: {Métricas y logs}
+    - Sobran: {IP del servidor} {SSH al sistema operativo}
+    > El endpoint reemplaza a la IP y el DBA ya no entra al servidor: observa por SQL, consola, API, métricas y logs. La ruta sigue siendo cliente → red → autenticación → base. Esquema del tutor con las diap. 11–16. [→ Provisionar y conectar](#Provisionar%20y%20conectar)
+27. Completá qué es cada parte de la cadena `postgresql://app@mi-db.proveedor.cloud:5432/ventas`
+    - `app` es {el usuario}, `mi-db.proveedor.cloud` es {el endpoint administrado}, `5432` es {el puerto del motor} y `ventas` es {la base lógica}.
+    - Opciones: {el usuario} {el endpoint administrado} {el puerto del motor} {la base lógica} {la IP del servidor} {la región}
+    > Además la aplicación necesita TLS, la credencial y un timeout del cliente; el pool sigue importando. [→ Provisionar y conectar](#Provisionar%20y%20conectar)
+28. Emparejá cada paso de la migración a DBaaS con lo que se hace (están en orden)
+    - Versiones, extensiones y tamaño: {Inventariar}
+    - Compatibilidad y límites: {Evaluar}
+    - Dump/restore o replicación: {Mover}
+    - Conteos, SQL y rendimiento: {Validar}
+    - DNS o endpoint, en una ventana: {Traspasar}
+    - Errores, latencia y costo: {Observar}
+    - Sobran: {Escalar} {Optimizar}
+    > Migrar no es copiar y pegar: termina cuando la operación es estable y verificable, no cuando finaliza la copia. [→ Seguridad y migración](#Seguridad%20y%20migración)
+29. Elegí el modelo de operación que corresponde a cada rasgo del cuadro comparativo
+    - Control del SO bajo {DBaaS}
+    - Compatibilidad máxima {On-premise}
+    - Compatibilidad sujeta a límites {DBaaS}
+    - Costo de capacidad + operación (CapEx) {On-premise}
+    - Costo de infraestructura + operación (OpEx) {VM / IaaS}
+    - Foco del DBA: VM + motor {VM / IaaS}
+    - Foco del DBA: servicio + datos {DBaaS}
+    - Opciones: {On-premise} {VM / IaaS} {DBaaS}
+    > Cuadro comparativo de la clase: elegir DBaaS es elegir una frontera de responsabilidad, no sólo un proveedor. [→ Elegir dónde operar](#Elegir%20dónde%20operar)
+30. Marcá lo que puede cambiar al pasar un PostgreSQL a un servicio administrado
+    - [x] Las extensiones disponibles
+    - [x] Los privilegios de superusuario
+    - [x] Los parámetros que se pueden modificar
+    - [x] El acceso al filesystem
+    - [ ] El lenguaje SQL y los tipos
+    - [ ] Las transacciones y el aislamiento
+    > Diap. 16: SQL, tipos, constraints, transacciones, planes y roles se reconocen; lo que cambia es lo operativo. Por eso se verifica la compatibilidad funcional y operativa antes de migrar. [→ Provisionar y conectar](#Provisionar%20y%20conectar)
+31. Elegí la forma de escalar que corresponde a cada advertencia (puede ser ninguna)
+    - Puede requerir reinicio o failover y tiene techo {Vertical}
+    - La aplicación tiene que saber usarlas {Réplicas de lectura}
+    - Hay que entender los límites y el modelo de cobro {Serverless / autoscale}
+    - A una consulta le falta un índice y hace un recorrido completo en cada llamada {Ninguna: hay que optimizar}
+    - Opciones: {Vertical} {Réplicas de lectura} {Serverless / autoscale} {Ninguna: hay que optimizar}
+    > Escalar puede ocultar un problema: primero medir SQL, I/O e índices y comparar el costo de optimizar contra el de escalar. El proveedor no optimiza nuestro SQL. [→ Escalar y costos](#Escalar%20y%20costos)
+32. Completá con las ideas de la clase sobre backup, HA y patching
+    - Un checkbox de {backup enabled} no demuestra recuperabilidad: la evidencia es un {restore validado}. La HA multizona no corrige {errores lógicos}: un DROP TABLE también llega al {standby}. "Managed" cambia quién aplica el parche, no quién asume {el impacto de negocio}.
+    - Sobran: {failover} {el proveedor} {snapshot}
+    > Igual que en la U6: HA no es backup. Para el borrado se recupera con PITR o un backup. [→ Backup HA y mantenimiento](#Backup%20HA%20y%20mantenimiento)
+33. Elegí el plano de seguridad de cada control
+    - Quién puede crear, modificar o borrar la instancia {IAM del proveedor}
+    - Quién puede leer la configuración del servicio {IAM del proveedor}
+    - GRANT SELECT sobre una tabla para el rol de la aplicación {Identidad del motor}
+    - Usuario de sólo lectura para los reportes {Identidad del motor}
+    - Red privada (VPC o VNet) o reglas de firewall {Red y cifrado}
+    - TLS y cifrado en reposo {Red y cifrado}
+    - Opciones: {IAM del proveedor} {Identidad del motor} {Red y cifrado}
+    > Dos planos: quién administra el servicio (IAM) y quién puede usar los datos (roles del motor). La red y el cifrado complementan la autorización, no la reemplazan. [→ Seguridad y migración](#Seguridad%20y%20migración)
 
 ## De servidor a servicio
 

@@ -106,7 +106,7 @@
     - [ ] Sólo en motores relacionales
     - [ ] Cuando se crea un índice
     > Si dos grupos de nodos no se comunican: ¿respondo con datos quizá viejos o rechazo para proteger la consistencia? [→ ACID BASE y CAP](#ACID%20BASE%20y%20CAP)
-14. ¿Qué **no** significa NoSQL según la clase? (varias correctas)
+14. ¿Qué **no** significa NoSQL según la clase?
     - [x] Que no se use SQL en absoluto
     - [x] Que no existan transacciones
     - [x] Que no haga falta diseñar
@@ -148,6 +148,70 @@
     - [ ] LIKE con un índice full text
     - [ ] = con un índice hash
     > jsonb_path_ops es la clase de GIN para búsquedas por contención; ->> devuelve texto. [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
+21. ¿Cuáles de estas capacidades vienen en el core de PostgreSQL 18, sin instalar nada?
+    - [x] El tipo JSONB
+    - [x] El índice GIN sobre JSONB
+    - [x] Full Text Search (`to_tsvector`, operador `@@`)
+    - [ ] hstore
+    - [ ] PostGIS
+    > Lo que documentó el grupo en la U7 Act. 1: hstore es una extensión contrib disponible pero no instalada (`CREATE EXTENSION hstore`) y PostGIS es un paquete aparte (`postgresql-18-postgis-3`). [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
+22. Marcá las afirmaciones verdaderas sobre json y jsonb en PostgreSQL
+    - [x] json guarda una copia del texto de entrada y preserva su formato
+    - [x] jsonb guarda una representación binaria descompuesta
+    - [ ] json se indexa con GIN igual que jsonb
+    - [ ] jsonb conserva los espacios y el orden de las claves del texto original
+    - [x] La documentación recomienda jsonb para la mayoría de las aplicaciones que consultan el contenido
+    > json reprocesa el texto en cada operación y no admite índices GIN; jsonb no preserva el formato original a cambio de procesarse más rápido. [→ PostgreSQL 18](#PostgreSQL%2018)
+23. Elegí qué tipo de dato es cada ejemplo
+    - Tabla CLIENTE con columnas tipadas, PK y FK {Estructurado}
+    - Pedido en JSON con el cliente y un array de ítems anidados {Semiestructurado}
+    - Factura en XML validada con un XSD {Semiestructurado}
+    - Grabación de audio de un reclamo {No estructurado}
+    - Evento de clickstream que llega como JSON {Semiestructurado}
+    - Texto libre de un contrato escaneado {No estructurado}
+    - Opciones: {Estructurado} {Semiestructurado} {No estructurado}
+    > El XML con XSD tiene estructura y tipos, pero jerárquica y autodescriptiva: es semiestructurado. Semiestructurado no es "sin estructura"; lo no estructurado es texto libre, imagen, audio o video. [→ Tres formas de mirar los datos](#Tres%20formas%20de%20mirar%20los%20datos)
+24. Elegí la tensión del modelo relacional que aparece en cada caso
+    - Cada categoría del catálogo suma atributos nuevos todos los meses {Estructura}
+    - El pedido llega de la API con el cliente y los ítems anidados {Jerarquía}
+    - Recomendar "amigos de amigos" obliga a encadenar muchos JOIN {Relaciones}
+    - Una sola instancia ya no alcanza para el volumen de escritura {Escala}
+    - Lo dominante es leer la sesión por su clave con latencia mínima {Acceso}
+    - Opciones: {Estructura} {Jerarquía} {Relaciones} {Escala} {Acceso}
+    > Las cinco tensiones con las que arranca la clase 7. Identificar la tensión es el primer paso; recién después se decide entre relacional, extendido o especializado. [→ La pregunta de la unidad](#La%20pregunta%20de%20la%20unidad)
+25. Persistencia políglota: elegí el modelo para cada parte del mismo comercio
+    - Pedidos y pagos {Relacional}
+    - Catálogo con atributos distintos por categoría {Documental}
+    - Sesión y carrito con expiración {Clave–valor}
+    - Millones de eventos por cliente y fecha {Wide-column}
+    - Fraude siguiendo conexiones entre cuentas, comercios e IP {Grafo}
+    - Opciones: {Relacional} {Clave–valor} {Documental} {Wide-column} {Grafo}
+    > Diap. 32–33: la tecnología se elige por patrón de datos y acceso, y muchas veces complementa al relacional en vez de reemplazarlo. [→ Familias NoSQL y persistencia políglota](#Familias%20NoSQL%20y%20persistencia%20políglota)
+26. Completá el árbol de decisión de la clase: arrastrá cada paso a su lugar
+    ![Árbol de decisión: la pregunta "¿El relacional representa bien el problema?" lleva por Sí al hueco 1 y por No al hueco 2, que se abre en Sí (hueco 3) y No (hueco 4)](../imagenes/semiestructurados-arbol-huecos.png)
+    - 1: {Mantener el relacional}
+    - 2: {¿Alcanza una extensión del motor?}
+    - 3: {Extender: JSONB o Document Store}
+    - 4: {Modelo especializado}
+    - Sobran: {Migrar todo a MongoDB} {¿Hay más de un millón de filas?}
+    > Antes de cambiar de motor se pregunta si alcanza con extender el relacional. El volumen solo no es una rama del árbol. Esquema del tutor con el árbol de la clase 7. [→ Familias NoSQL y persistencia políglota](#Familias%20NoSQL%20y%20persistencia%20políglota)
+27. Elegí en qué motor está cada mecanismo (puede estar en los dos)
+    - Document Store con X DevAPI y X Protocol {MySQL}
+    - Índice GIN sobre una columna documental {PostgreSQL}
+    - Columna generada desde una ruta JSON, con un índice {MySQL}
+    - hstore para pares clave–valor de texto {PostgreSQL}
+    - JSON Duality Views {MySQL}
+    - Búsqueda de texto completo {Ambos}
+    - Opciones: {MySQL} {PostgreSQL} {Ambos}
+    > Diap. 20: mismo problema, mecanismos distintos. MySQL suma una interfaz documental aparte; PostgreSQL extiende el SQL con tipos, índices y extensiones. [→ Comparación](#Comparación)
+28. Completá con los términos de la clase
+    - En PostgreSQL, el tipo {jsonb} guarda el documento en binario descompuesto y se indexa con {GIN}, que es un índice {invertido}: cada clave y valor apunta a las filas que lo contienen. En MySQL, la propiedad que se consulta seguido se vuelve una {columna generada} con un índice común.
+    - Sobran: {json} {B-tree} {hstore} {Document Store}
+    > El B-tree indexa la columna entera y no entra en el documento; por eso PostgreSQL usa GIN y MySQL saca la propiedad a una columna. [→ El relacional extendido](#El%20relacional%20extendido)
+29. Ordená lo que hizo el grupo en la U7 Act. 2 (laboratorio bisagra)
+    - Se midió la consulta de contención con {EXPLAIN (ANALYZE, BUFFERS)} y el plan era un {Seq Scan}. Se creó un índice {GIN con jsonb_path_ops} y se corrió {ANALYZE}. El plan pasó a un {Bitmap Index Scan} (de 31 a 9 buffers) y el veredicto fue {mantener el relacional extendido}.
+    - Sobran: {Index Only Scan} {B-tree sobre carreras} {migrar a MongoDB}
+    > Medir, intervenir y volver a medir: la evidencia es el plan y los buffers, no la sensación de que "anda más rápido". [→ Lo que hicimos en el laboratorio](#Lo%20que%20hicimos%20en%20el%20laboratorio)
 
 ## La pregunta de la unidad
 
